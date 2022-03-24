@@ -1,4 +1,8 @@
-﻿namespace PPS3.Server.Repositories.RepUsuario
+﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using System.Security.Cryptography;
+using System.Text;
+
+namespace PPS3.Server.Repositories.RepUsuario
 {
     public class RepUsuario : IRepUsuario
     {
@@ -64,9 +68,13 @@
             return result > 0;
         }
 
-        public async Task<bool> CrearUsuario(Usuario usuario)
+        public async Task<bool> CrearUsuario(UsuarioCliente usuarioCliente)
         {
             var db = dbConnection();
+
+            //Uso los metodos internos para crear un nuevo salt y su hash correspondiente
+            var salt = CrearSalt();
+            var hash = CrearHash(usuarioCliente.Password,  salt);
 
             //El privilegio esta por defecto en la base de datos que sea para cliente, si se quiere un usuario administrador, lo tiene que modificar un usuario con privilegios adecuados
             var sql = @"
@@ -89,12 +97,12 @@
                         ";
 
             var result = await db.ExecuteAsync(sql, new {
-                                                        usuario.NombreCompleto,
-                                                        usuario.NombreUs,
-                                                        SaltCont = "",
-                                                        HashCont = "",
-                                                        IdCliente = 2,
-                                                        usuario.Email
+                                                        usuarioCliente.NombreCompleto,
+                                                        usuarioCliente.NombreUs,
+                                                        SaltCont = salt,
+                                                        HashCont = hash,
+                                                        usuarioCliente.IdCliente,
+                                                        usuarioCliente.Email
                                                         });
             return result > 0;
         }
@@ -138,6 +146,41 @@
 
             var result = await db.QueryAsync<Usuario>(sql, new { });
             return result;
+        }
+
+        private static string CrearSalt()
+        {
+            //Creo un array de bytes, es lo mismo 128/8 que 16 bytes
+            byte[] randomBytes = new byte[128 / 8];
+            //Creo un RNG de la libreria Cryptography para que llene de Bytes el array creado anteriormente. Luego devuelvo el array lleno de bytes al azar convertido en string para que pueda utlizarlo o almancenarlo en la base de datos
+            using (var generator = RandomNumberGenerator.Create())
+            {
+                generator.GetBytes(randomBytes);
+                return Convert.ToBase64String(randomBytes);
+            }
+        }
+
+        private static string CrearHash(string pass, string salt)
+        {
+            //Genero un nuevo array de Bytes que seran los correspondientes al Hasheo de la contraseña y el salt del usuario
+            var valueBytes = KeyDerivation.Pbkdf2(
+                                                    password: pass,
+                                                    //Vuelvo a convertir a Bytes el Salt correspondiente.
+                                                    salt: Encoding.UTF8.GetBytes(salt),
+                                                    //El metodo de Hasheo
+                                                    prf: KeyDerivationPrf.HMACSHA512,
+                                                    iterationCount: 10000,
+                                                    //La cantidad de bytes que va a tener el array devuelto por la funcion. Es lo mismo 256/8 que 32 bytes
+                                                    numBytesRequested: 256 / 8  
+                                                  );
+
+            return Convert.ToBase64String(valueBytes);
+        }
+
+        private static bool ValidarHash(string pass, string salt, string hash)
+        {
+            //Comparo si el hash del usuario es igual al hash generado con la contraseña de la persona que trata de iniciar sesion
+            return CrearHash(pass, salt) == hash;
         }
     }
 }

@@ -2,11 +2,11 @@
 
 namespace PPS3.Shared.Models
 {
-    public class TipoProducto
+    public class Provincia
     {
-        public int IdTipo { get; set; }
+        public int IdProvincia { get; set; }
         [Required]
-        public string DescripcionTipo { get; set; } = string.Empty;
+        public string NombreProv { get; set; } = string.Empty;
         public bool Activo { get; set; }
         public int UsuarioCrea { get; set; }
         public DateTime FechaCrea { get; set; }

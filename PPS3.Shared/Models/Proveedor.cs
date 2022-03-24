@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace PPS3.Shared.Models
 {
     public class Proveedor
     {
         public int IdProveedor { get; set; }
+        [Required]
         public string NombreProv { get; set; } = string.Empty;
         public string DomicilioProv { get; set; } = string.Empty;
         public bool Activo { get; set; }

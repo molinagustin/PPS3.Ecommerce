@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace PPS3.Server.Controllers
 {
@@ -8,8 +7,13 @@ namespace PPS3.Server.Controllers
     public class UsuariosController : ControllerBase
     {
         private readonly IRepUsuario _repUsuario;
+        private readonly IRepCliente _repCliente;
 
-        public UsuariosController(IRepUsuario repUsuario) => _repUsuario = repUsuario;
+        public UsuariosController(IRepUsuario repUsuario, IRepCliente repCliente)
+        {
+            _repUsuario = repUsuario;
+            _repCliente = repCliente;
+        } 
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Usuario>>> ObtenerUsuarios()
@@ -39,18 +43,26 @@ namespace PPS3.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CrearUsuario([FromBody] Usuario usuario)
+        public async Task<ActionResult> CrearUsuario([FromBody] UsuarioCliente usuarioCliente)
         {
-            if (usuario == null)
+            if (usuarioCliente == null)
                 return BadRequest();
 
             if (ModelState.IsValid)
             {
-                var response = await _repUsuario.CrearUsuario(usuario);
-                if (response != false)
-                    return Ok();
+                //Luego de la verificacion del modelo valido, creo un nuevo cliente y traigo su id, el cual, si es mayor a 0 se lo asigno al usuario que estoy creando
+                var clienteResponse = await _repCliente.CrearCliente(usuarioCliente);
+                if (clienteResponse > 0)
+                {
+                    usuarioCliente.IdCliente = clienteResponse;
+                    var response = await _repUsuario.CrearUsuario(usuarioCliente);
+                    if (response != false)
+                        return Ok();
+                    else
+                        return BadRequest();
+                }
                 else
-                    return BadRequest();
+                    return BadRequest();                
             }
             else
                 return BadRequest();

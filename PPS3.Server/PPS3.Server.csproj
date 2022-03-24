@@ -13,10 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Encrypter\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\PPS3.Shared\PPS3.Shared.csproj" />
   </ItemGroup>
 

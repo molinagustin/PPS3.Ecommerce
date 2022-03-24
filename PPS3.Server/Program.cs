@@ -1,5 +1,6 @@
 //Se colocan de forma global las referencias a usar en otros proyectos/carpetas, de esa forma todo el proyecto ya las tendra asignadas en un solo lugar
 global using PPS3.Shared.Models;
+global using PPS3.Shared.InternalModels;
 global using System.Data.SqlClient; //Para la conexion a la base de datos
 global using PPS3.Server.Data; //Para poder instanciar en todos los repositorios la clase SqlConfiguration
 global using Dapper; //Para que los repositorios usen Dapper
@@ -9,6 +10,9 @@ global using PPS3.Server.Repositories.RepRubro;
 global using PPS3.Server.Repositories.RepTipoProducto;
 global using PPS3.Server.Repositories.RepUnidadMedida;
 global using PPS3.Server.Repositories.RepUsuario;
+global using PPS3.Server.Repositories.RepCliente;
+global using PPS3.Server.Repositories.RepProvincia;
+global using PPS3.Server.Repositories.RepLocalidad;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,12 +29,15 @@ var sqlConnectionString = new SqlConfiguration(builder.Configuration.GetConnecti
 builder.Services.AddSingleton(sqlConnectionString); //Para inyectarlo en los servicios, se usa Singleton para que se intancie solo 1 vez
 
 //Repositorios con acceso a datos
-builder.Services.AddScoped<IRepProducto, RepProducto > ();
-builder.Services.AddScoped<IRepProveedor, RepProveedor > ();
-builder.Services.AddScoped<IRepRubro, RepRubro > ();
+builder.Services.AddScoped<IRepProducto, RepProducto>();
+builder.Services.AddScoped<IRepProveedor, RepProveedor>();
+builder.Services.AddScoped<IRepRubro, RepRubro>();
 builder.Services.AddScoped<IRepTipoProducto, RepTipoProducto>();
 builder.Services.AddScoped<IRepUnidadMedida, RepUnidadMedida>();
 builder.Services.AddScoped<IRepUsuario, RepUsuario>();
+builder.Services.AddScoped<IRepCliente, RepCliente>();
+builder.Services.AddScoped<IRepProvincia, RepProvincia>();
+builder.Services.AddScoped<IRepLocalidad, RepLocalidad>();
 
 var app = builder.Build();
 
