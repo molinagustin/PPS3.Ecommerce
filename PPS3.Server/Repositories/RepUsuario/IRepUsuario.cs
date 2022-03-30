@@ -8,5 +8,7 @@
         Task<bool> CrearUsuario(UsuarioCliente usuarioCliente);
         Task<bool> ActualizarUsuario(Usuario usuario);
         Task<bool> BorrarUsuario(int id);
+        bool ValidarHash(string pass, string salt, string hash);
+        Task<bool> UsuarioExistente(string nombreUsuario);
     }
 }

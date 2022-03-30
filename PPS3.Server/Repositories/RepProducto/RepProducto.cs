@@ -29,6 +29,7 @@
                             Proveedor=@Proveedor, 
                             UnidadMedida=@UnidadMedida, 
                             CantMinAlerta=@CantMinAlerta, 
+                            StockExistencia=@StockExistencia,
                             Stockeable=@Stockeable, 
                             UsuarioModif=@UsuarioModif, 
                             FechaUltModif=@FechaUltModif
@@ -46,6 +47,7 @@
                                                         producto.Proveedor, 
                                                         producto.UnidadMedida, 
                                                         producto.CantMinAlerta, 
+                                                        producto.StockExistencia,
                                                         producto.Stockeable, 
                                                         UsuarioModif = 1, 
                                                         FechaUltModif = DateTime.Now, 
@@ -89,7 +91,8 @@
                                 PrecioFinal, 
                                 Proveedor, 
                                 UnidadMedida, 
-                                CantMinAlerta, 
+                                CantMinAlerta,
+                                StockExistencia,
                                 Stockeable, 
                                 UsuarioCrea, 
                                 UsuarioModif
@@ -104,6 +107,7 @@
                                 @Proveedor, 
                                 @UnidadMedida, 
                                 @CantMinAlerta, 
+                                @StockExistencia
                                 @Stockeable, 
                                 @UsuarioCrea, 
                                 @UsuarioModif
@@ -120,6 +124,7 @@
                                                         producto.Proveedor, 
                                                         producto.UnidadMedida, 
                                                         producto.CantMinAlerta, 
+                                                        producto.StockExistencia,
                                                         producto.Stockeable, 
                                                         UsuarioCrea = 1, 
                                                         UsuarioModif = 1 });

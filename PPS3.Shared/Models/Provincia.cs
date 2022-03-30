@@ -5,7 +5,7 @@ namespace PPS3.Shared.Models
     public class Provincia
     {
         public int IdProvincia { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Se debe introducir un Nombre para la Provincia.")]
         public string NombreProv { get; set; } = string.Empty;
         public bool Activo { get; set; }
         public int UsuarioCrea { get; set; }

@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace PPS3.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class TiposProductosController : ControllerBase
@@ -11,6 +11,7 @@ namespace PPS3.Server.Controllers
 
         public TiposProductosController(IRepTipoProducto repTipoProducto) => _repTipoProducto = repTipoProducto;
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TipoProducto>>> ObtenerTiposProductos()
         {
@@ -18,6 +19,7 @@ namespace PPS3.Server.Controllers
             return Ok(response);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<TipoProducto>> ObtenerTipoProducto(int id)
         {

@@ -2,6 +2,7 @@
 
 namespace PPS3.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class LocalidadesController : ControllerBase
@@ -10,6 +11,7 @@ namespace PPS3.Server.Controllers
 
         public LocalidadesController(IRepLocalidad repLocalidad) => _repLocalidad = repLocalidad;
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Localidad>>> ObtenerLocalidades()
         {
@@ -17,6 +19,7 @@ namespace PPS3.Server.Controllers
             return Ok(response);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Localidad>> ObtenerLocalidad(int id)
         {
@@ -27,7 +30,7 @@ namespace PPS3.Server.Controllers
                 return BadRequest();
         }
 
-
+        [AllowAnonymous]
         [HttpGet("{nombreLocalidad}")]
         public async Task<ActionResult<Localidad>> ObtenerLocalidad(string nombreLocalidad)
         {

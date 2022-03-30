@@ -5,7 +5,7 @@ namespace PPS3.Shared.Models
     public class Proveedor
     {
         public int IdProveedor { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Se debe introducir un Nombre para el Proveedor.")]
         public string NombreProv { get; set; } = string.Empty;
         public string DomicilioProv { get; set; } = string.Empty;
         public bool Activo { get; set; }

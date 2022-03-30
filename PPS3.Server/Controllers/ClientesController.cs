@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace PPS3.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ClientesController : ControllerBase

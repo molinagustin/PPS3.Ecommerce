@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace PPS3.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ProveedoresController : ControllerBase
@@ -10,7 +10,8 @@ namespace PPS3.Server.Controllers
         private readonly IRepProveedor _repProveedor;
 
         public ProveedoresController(IRepProveedor repProveedor) => _repProveedor = repProveedor;
-        
+
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Proveedor>>> ObtenerProveedores()
         {
@@ -18,6 +19,7 @@ namespace PPS3.Server.Controllers
             return Ok(response);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<Proveedor>> ObtenerProveedor(int id)
         {

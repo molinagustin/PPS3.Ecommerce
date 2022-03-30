@@ -6,25 +6,27 @@ namespace PPS3.Shared.Models
     public class Producto
     {
         public int IdProducto { get; set; }
-        [Required]
+        [Required(ErrorMessage = "El Nombre de Producto es un campo obligatorio.")]
         public string NombreProd { get; set; } = string.Empty;
         public string Descripcion { get; set; } = string.Empty;
-        [Required]
+        [Required(ErrorMessage = "El Rubro del producto es obligatorio.")]
         public int Rubro { get; set; }
-        [Required]
+        [Required(ErrorMessage = "El Tipo de Producto es obligatorio.")]
         public int TipoProd { get; set; }
-        [Required]
+        [Required(ErrorMessage = "El Precio de Costo debe ser introducido.")]
         [Column(TypeName = "decimal(8,2)")]
         public decimal PrecioCosto { get; set; }
-        [Required]
+        [Required(ErrorMessage = "El Precio Final debe ser introducido.")]
         [Column(TypeName = "decimal(8,2)")]
         public decimal PrecioFinal { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Se debe introducir un Proveedor.")]
         public int Proveedor { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Se debe seleccionar la Unidad de Medida correspondiente.")]
         public int UnidadMedida { get; set; }
         [Column(TypeName = "decimal(11,2)")]
         public decimal CantMinAlerta { get; set; }
+        [Column(TypeName = "decimal(8,2)")]
+        public decimal StockExistencia { get; set; }
         public bool Stockeable { get; set; }
         public bool Activo { get; set; }
         public int UsuarioCrea { get; set; }

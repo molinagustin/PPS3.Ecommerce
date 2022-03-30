@@ -14,7 +14,7 @@ namespace PPS3.Server.Repositories.RepUsuario
         {
             return new SqlConnection(_connectionString);
         }
-        
+
         public async Task<bool> ActualizarUsuario(Usuario usuario)
         {
             var db = dbConnection();
@@ -35,17 +35,17 @@ namespace PPS3.Server.Repositories.RepUsuario
                         ";
 
             var result = await db.ExecuteAsync(sql, new {
-                                                        usuario.NombreCompleto,
-                                                        usuario.NombreUs,
-                                                        usuario.SaltCont,
-                                                        usuario.HashCont,
-                                                        usuario.Privilegio,
-                                                        usuario.IdCliente,
-                                                        usuario.Email,
-                                                        usuario.EmailVerificado,
-                                                        FechaUltModif = DateTime.Now,
-                                                        usuario.IdUsuarioAct
-                                                        });
+                usuario.NombreCompleto,
+                usuario.NombreUs,
+                usuario.SaltCont,
+                usuario.HashCont,
+                usuario.Privilegio,
+                usuario.IdCliente,
+                usuario.Email,
+                usuario.EmailVerificado,
+                FechaUltModif = DateTime.Now,
+                usuario.IdUsuarioAct
+            });
             return result > 0;
         }
 
@@ -62,9 +62,9 @@ namespace PPS3.Server.Repositories.RepUsuario
                         ";
 
             var result = await db.ExecuteAsync(sql, new {
-                                                        FechaUltModif = DateTime.Now,
-                                                        IdUsuarioAct = id
-                                                        });
+                FechaUltModif = DateTime.Now,
+                IdUsuarioAct = id
+            });
             return result > 0;
         }
 
@@ -74,7 +74,7 @@ namespace PPS3.Server.Repositories.RepUsuario
 
             //Uso los metodos internos para crear un nuevo salt y su hash correspondiente
             var salt = CrearSalt();
-            var hash = CrearHash(usuarioCliente.Password,  salt);
+            var hash = CrearHash(usuarioCliente.Password, salt);
 
             //El privilegio esta por defecto en la base de datos que sea para cliente, si se quiere un usuario administrador, lo tiene que modificar un usuario con privilegios adecuados
             var sql = @"
@@ -97,13 +97,13 @@ namespace PPS3.Server.Repositories.RepUsuario
                         ";
 
             var result = await db.ExecuteAsync(sql, new {
-                                                        usuarioCliente.NombreCompleto,
-                                                        usuarioCliente.NombreUs,
-                                                        SaltCont = salt,
-                                                        HashCont = hash,
-                                                        usuarioCliente.IdCliente,
-                                                        usuarioCliente.Email
-                                                        });
+                usuarioCliente.NombreCompleto,
+                usuarioCliente.NombreUs,
+                SaltCont = salt,
+                HashCont = hash,
+                usuarioCliente.IdCliente,
+                usuarioCliente.Email
+            });
             return result > 0;
         }
 
@@ -171,16 +171,35 @@ namespace PPS3.Server.Repositories.RepUsuario
                                                     prf: KeyDerivationPrf.HMACSHA512,
                                                     iterationCount: 10000,
                                                     //La cantidad de bytes que va a tener el array devuelto por la funcion. Es lo mismo 256/8 que 32 bytes
-                                                    numBytesRequested: 256 / 8  
+                                                    numBytesRequested: 256 / 8
                                                   );
 
             return Convert.ToBase64String(valueBytes);
         }
 
-        private static bool ValidarHash(string pass, string salt, string hash)
+        public bool ValidarHash(string pass, string salt, string hash)
         {
             //Comparo si el hash del usuario es igual al hash generado con la contraseña de la persona que trata de iniciar sesion
             return CrearHash(pass, salt) == hash;
+        }
+
+        /// <summary>
+        /// Metodo que verifica si ya existe un usuario con el Nombre de Usuario que se esta intentando utilizar
+        /// </summary>
+        /// <param name="nombreUsuario">Nombre Usuario a crear</param>
+        /// <returns></returns>
+        public async Task<bool> UsuarioExistente(string nombreUsuario)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT *
+                        FROM usuarios
+                        WHERE NombreUs = @NombreUs
+                        ";
+
+            var result = await db.ExecuteScalarAsync<int>(sql, new { NombreUs = nombreUsuario });
+            return result > 0;
         }
     }
 }

@@ -5,7 +5,7 @@ namespace PPS3.Shared.Models
     public class TipoProducto
     {
         public int IdTipo { get; set; }
-        [Required]
+        [Required(ErrorMessage = "El nombre del Tipo de Producto es obligatorio.")]
         public string DescripcionTipo { get; set; } = string.Empty;
         public bool Activo { get; set; }
         public int UsuarioCrea { get; set; }

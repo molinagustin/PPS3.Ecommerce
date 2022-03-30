@@ -2,6 +2,7 @@
 
 namespace PPS3.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UnidadesMedidaController : ControllerBase
@@ -10,6 +11,7 @@ namespace PPS3.Server.Controllers
 
         public UnidadesMedidaController(IRepUnidadMedida repUnidadMedida) => _repUnidadMedida = repUnidadMedida;
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UnidadMedida>>> ObtenerUnidadesMedida()
         {
@@ -17,6 +19,7 @@ namespace PPS3.Server.Controllers
             return Ok(response);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<UnidadMedida>> ObtenerUnidadMedida(int id)
         {

@@ -5,7 +5,7 @@ namespace PPS3.Shared.Models
     public class UnidadMedida
     {
         public int IdUnidad { get; set; }
-        [Required]
+        [Required(ErrorMessage = "El nombre de la Unidad de Medida es obligatorio.")]
         public string DescripcionUnidad { get; set; } = string.Empty;
         public bool Activo { get; set; }
         public int UsuarioCrea { get; set; }

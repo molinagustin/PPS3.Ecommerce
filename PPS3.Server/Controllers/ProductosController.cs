@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace PPS3.Server.Controllers
 {
+    //El Decorador [Authorize] indica que el usuario debera estar Autorizado o Iniciado Sesion con un token para poder acceder a los distintos metodos.
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductosController : ControllerBase
@@ -11,8 +12,10 @@ namespace PPS3.Server.Controllers
         private readonly IRepProducto _repProducto;
 
         public ProductosController(IRepProducto repProducto) => _repProducto = repProducto;
-        
+
         //En el metodo Get se va a devolver un ActionResult que contiene la respuesta al servicio solicitado, en este caso se devuelve Ok en conjunto con el listado de productos de la base de datos
+        //El Decorador [AllowAnonymous] permite que a pesar de que haya que estar Autorizado para acceder a las llamadas HTTP, en estos casos, se pueda hacer de forma Anonima, es decir, sin estar Autorizado o Iniciado Sesion
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Producto>>> ObtenerProductos()
         {
@@ -21,6 +24,7 @@ namespace PPS3.Server.Controllers
         }
 
         //Similar al metodo anterior, solo que en la solicitud HTTP va a ir un parametro, que sera el ID del producto que solicitamos
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<Producto>> ObtenerProducto(int id)
         {
