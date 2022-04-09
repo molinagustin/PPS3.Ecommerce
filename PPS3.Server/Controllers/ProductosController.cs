@@ -38,7 +38,7 @@ namespace PPS3.Server.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<Producto>> ObtenerProducto(string nombreProd)
+        public async Task<ActionResult<Producto>> ObtenerProductoPorNombre(string nombreProd)
         {
             var response = await _repProducto.ObtenerProducto(nombreProd);
 
