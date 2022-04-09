@@ -16,7 +16,7 @@
             var db = dbConnection();
 
             var sql = @"
-                        UPDATE cuentas_corrientes_encabezado
+                        UPDATE cuentas_corrientes
                         SET
                             SaldoCCC = @SaldoCCC,
                             LimiteSaldo = @LimiteSaldo,
@@ -40,7 +40,7 @@
             var db = dbConnection();
 
             var sql = @"
-                        UPDATE cuentas_corrientes_encabezado
+                        UPDATE cuentas_corrientes
                         SET
                             Activo = 0,
                             UsuarioModif = @UsuarioModif
@@ -59,7 +59,7 @@
             var db = dbConnection();
 
             var sql = @"
-                        INSERT INTO cuentas_corrientes_encabezado
+                        INSERT INTO cuentas_corrientes
                                     (
                                     ClienteCC,
                                     SaldoCCC,
@@ -92,7 +92,7 @@
 
             var sql = @"
                         SELECT *
-                        FROM cuentas_corrientes_encabezado
+                        FROM cuentas_corrientes
                         WHERE ClienteCC = @ClienteCC
                         ";
             var result = await db.QueryFirstOrDefaultAsync<EncabezadoCuentaCorriente>(sql, new { ClienteCC = idCliente});
@@ -105,7 +105,7 @@
 
             var sql = @"
                         SELECT *
-                        FROM cuentas_corrientes_encabezado
+                        FROM cuentas_corrientes
                         WHERE NumCC = @NumCC
                         ";
             var result = await db.QueryFirstOrDefaultAsync<EncabezadoCuentaCorriente>(sql, new { NumCC = numCC });
@@ -118,7 +118,7 @@
 
             var sql = @"
                         SELECT *
-                        FROM cuentas_corrientes_encabezado
+                        FROM cuentas_corrientes
                         ";
             var result = await db.QueryAsync<EncabezadoCuentaCorriente>(sql, new { });
             return result;

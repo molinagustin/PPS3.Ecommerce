@@ -8,9 +8,5 @@ namespace PPS3.Shared.Models
         public int IdTipoVta { get; set; }
         [Required(ErrorMessage = "La Descripcion del Tipo de Venta es obligatoria.")]
         public string TipoVta { get; set; } = string.Empty;
-        public int UsuarioCrea { get; set; }
-        public DateTime FechaCrea { get; set; }
-        public int UsuarioModif { get; set; }
-        public DateTime FechaUltModif { get; set; }
     }
 }

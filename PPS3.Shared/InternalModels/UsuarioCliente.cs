@@ -19,9 +19,9 @@ namespace PPS3.Shared.InternalModels
 
         //=======>>>    PROPIEDADES DE CLIENTE    <<<=======
         [Required(ErrorMessage = "Se debe seleccionar un Tipo de Cliente.")]
-        public int TipoCliente { get; set; }
+        public char TipoCliente { get; set; }
         [Required(ErrorMessage = "Se debe seleccionar un Genero.")]
-        public int Genero { get; set; }
+        public char Genero { get; set; }
         [Required(ErrorMessage = "Se debe seleccionar un Tipo de Documento.")]
         public int TipoDocumento { get; set; }
         [Required(ErrorMessage = "Se debe introducir el Numero de Documento.")]

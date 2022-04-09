@@ -6,9 +6,9 @@ namespace PPS3.Shared.Models
     {
         public int IdCliente { get; set; }
         [Required(ErrorMessage = "El Tipo de Cliente debe ser completado.")]
-        public int TipoCliente { get; set; }
+        public char TipoCliente { get; set; }
         [Required(ErrorMessage = "El Genero del Cliente debe ser seleccionado.")]
-        public int Genero { get; set; }
+        public char Genero { get; set; }
         [Required(ErrorMessage = "El Tipo de Documento del Cliente ha de ser seleccionado.")]
         public int TipoDocumento { get; set; }
         [Required(ErrorMessage = "Se debe introducir el Numero de Documento del Cliente.")]

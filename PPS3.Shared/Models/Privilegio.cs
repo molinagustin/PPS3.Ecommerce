@@ -7,7 +7,5 @@
         public bool Activo { get; set; }
         public int UsuarioCrea { get; set; }
         public DateTime FechaCrea { get; set; }
-        public int UsuarioModif { get; set; }
-        public DateTime FechaUltModif { get; set; }
     }
 }

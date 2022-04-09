@@ -4,7 +4,7 @@ namespace PPS3.Server.Controllers
 {
     //El Decorador [Authorize] indica que el usuario debera estar Autorizado o Iniciado Sesion con un token para poder acceder a los distintos metodos.
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ProductosController : ControllerBase
     {
@@ -25,10 +25,22 @@ namespace PPS3.Server.Controllers
 
         //Similar al metodo anterior, solo que en la solicitud HTTP va a ir un parametro, que sera el ID del producto que solicitamos
         [AllowAnonymous]
-        [HttpGet("{id}")]
+        [HttpGet]
         public async Task<ActionResult<Producto>> ObtenerProducto(int id)
         {
             var response = await _repProducto.ObtenerProducto(id);
+
+            if (response != null)
+                return Ok(response);
+            else
+                return BadRequest();
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<Producto>> ObtenerProducto(string nombreProd)
+        {
+            var response = await _repProducto.ObtenerProducto(nombreProd);
 
             if (response != null)
                 return Ok(response);

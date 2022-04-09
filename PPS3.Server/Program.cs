@@ -18,29 +18,23 @@ global using PPS3.Server.Repositories.RepProvincia;
 global using PPS3.Server.Repositories.RepLocalidad;
 global using PPS3.Server.Repositories.RepCondicionIVA;
 global using PPS3.Server.Repositories.RepTipoDocumento;
-global using PPS3.Server.Repositories.RepGenero;
-global using PPS3.Server.Repositories.RepTipoCliente;
 global using PPS3.Server.Repositories.RepCarroCompra;
 global using PPS3.Server.Repositories.RepEstadoCarroCompra;
 global using PPS3.Server.Repositories.RepDetalleCarroCompra;
 global using PPS3.Server.Repositories.RepTipoVenta;
-global using PPS3.Server.Repositories.RepTipoIVA;
-global using PPS3.Server.Repositories.RepTipoIngreso;
 global using PPS3.Server.Repositories.RepTipoComprobante;
 global using PPS3.Server.Repositories.RepTipoTarjeta;
 global using PPS3.Server.Repositories.RepTarjeta;
-global using PPS3.Server.Repositories.RepPuntoVenta;
 global using PPS3.Server.Repositories.RepContactoProveedor;
 global using PPS3.Server.Repositories.RepImagenProducto;
 global using PPS3.Server.Repositories.RepEncabezadoPresupuesto;
 global using PPS3.Server.Repositories.RepCuerpoPresupuesto;
 global using PPS3.Server.Repositories.RepFormaPago;
-global using PPS3.Server.Repositories.RepMovimientoCuentaCorriente;
-global using PPS3.Server.Repositories.RepIngresoCuentaCorriente;
 global using PPS3.Server.Repositories.RepEncabezadoCuentaCorriente;
-global using PPS3.Server.Repositories.RepConceptoComprobante;
 global using PPS3.Server.Repositories.RepEncabezadoComprobante;
 global using PPS3.Server.Repositories.RepCuerpoComprobante;
+global using PPS3.Server.Repositories.RepEncabezadoRecibo;
+global using PPS3.Server.Repositories.RepDetalleRecibo;
 #endregion
 using Microsoft.AspNetCore.Authentication.JwtBearer; //Para establecer la comunicacion de autenticacion
 using Microsoft.IdentityModel.Tokens; //Para las configuraciones de los JWT Bearers
@@ -74,29 +68,23 @@ builder.Services.AddScoped<IRepProvincia, RepProvincia>();
 builder.Services.AddScoped<IRepLocalidad, RepLocalidad>();
 builder.Services.AddScoped<IRepCondicionIVA, RepCondicionIVA>();
 builder.Services.AddScoped<IRepTipoDocumento, RepTipoDocumento>();
-builder.Services.AddScoped<IRepGenero, RepGenero>();
-builder.Services.AddScoped<IRepTipoCliente, RepTipoCliente>();
 builder.Services.AddScoped<IRepCarroCompra, RepCarroCompra>();
 builder.Services.AddScoped<IRepEstadoCarroCompra, RepEstadoCarroCompra>();
 builder.Services.AddScoped<IRepDetalleCarroCompra, RepDetalleCarroCompra>();
 builder.Services.AddScoped<IRepTipoVenta, RepTipoVenta>();
-builder.Services.AddScoped<IRepTipoIVA, RepTipoIVA>();
-builder.Services.AddScoped<IRepTipoIngreso, RepTipoIngreso>();
 builder.Services.AddScoped<IRepTipoComprobante, RepTipoComprobante>();
 builder.Services.AddScoped<IRepTipoTarjeta, RepTipoTarjeta>();
 builder.Services.AddScoped<IRepTarjeta, RepTarjeta>();
-builder.Services.AddScoped<IRepPuntoVenta, RepPuntoVenta>();
 builder.Services.AddScoped<IRepContactoProveedor, RepContactoProveedor>();
 builder.Services.AddScoped<IRepImagenProducto, RepImagenProducto>();
 builder.Services.AddScoped<IRepEncabezadoPresupuesto, RepEncabezadoPresupuesto>();
 builder.Services.AddScoped<IRepCuerpoPresupuesto, RepCuerpoPresupuesto>();
 builder.Services.AddScoped<IRepFormaPago, RepFormaPago>();
-builder.Services.AddScoped<IRepMovimientoCuentaCorriente, RepMovimientoCuentaCorriente>();
-builder.Services.AddScoped<IRepIngresoCuentaCorriente, RepIngresoCuentaCorriente>();
 builder.Services.AddScoped<IRepEncabezadoCuentaCorriente, RepEncabezadoCuentaCorriente>();
-builder.Services.AddScoped<IRepConceptoComprobante, RepConceptoComprobante>();
 builder.Services.AddScoped<IRepEncabezadoComprobante, RepEncabezadoComprobante>();
 builder.Services.AddScoped<IRepCuerpoComprobante, RepCuerpoComprobante>();
+builder.Services.AddScoped<IRepEncabezadoRecibo, RepEncabezadoRecibo>();
+builder.Services.AddScoped<IRepDetalleRecibo, RepDetalleRecibo>();
 #endregion
 
 #region Servicio de Autenticacion

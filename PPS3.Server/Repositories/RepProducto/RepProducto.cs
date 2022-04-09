@@ -30,7 +30,6 @@
                             UnidadMedida=@UnidadMedida, 
                             CantMinAlerta=@CantMinAlerta, 
                             StockExistencia=@StockExistencia,
-                            Stockeable=@Stockeable, 
                             UsuarioModif=@UsuarioModif, 
                             FechaUltModif=@FechaUltModif
                             
@@ -48,7 +47,6 @@
                                                         producto.UnidadMedida, 
                                                         producto.CantMinAlerta, 
                                                         producto.StockExistencia,
-                                                        producto.Stockeable, 
                                                         UsuarioModif = 1, 
                                                         FechaUltModif = DateTime.Now, 
                                                         producto.IdProducto 
@@ -93,7 +91,6 @@
                                 UnidadMedida, 
                                 CantMinAlerta,
                                 StockExistencia,
-                                Stockeable, 
                                 UsuarioCrea, 
                                 UsuarioModif
                                 )
@@ -107,8 +104,7 @@
                                 @Proveedor, 
                                 @UnidadMedida, 
                                 @CantMinAlerta, 
-                                @StockExistencia
-                                @Stockeable, 
+                                @StockExistencia,
                                 @UsuarioCrea, 
                                 @UsuarioModif
                                 )";
@@ -125,7 +121,6 @@
                                                         producto.UnidadMedida, 
                                                         producto.CantMinAlerta, 
                                                         producto.StockExistencia,
-                                                        producto.Stockeable, 
                                                         UsuarioCrea = 1, 
                                                         UsuarioModif = 1 });
             return result > 0;
@@ -142,7 +137,20 @@
 
             var result = await db.QueryFirstOrDefaultAsync<Producto>(sql, new { IdProducto = id });
             return result;
-        }      
+        }
+
+        public async Task<Producto> ObtenerProducto(string nombreProd)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT *
+                        FROM productos
+                        WHERE NombreProd = @NombreProd
+                        ";
+            var result = await db.QueryFirstOrDefaultAsync<Producto>(sql, new { NombreProd = nombreProd });
+            return result;
+        }
 
         public async Task<IEnumerable<Producto>> ObtenerProductos()
         {
@@ -155,6 +163,6 @@
             //El metodo QueryAsync va a devolver un IEnumerable con los datos del modelo que pasamos por parametro
             var result = await db.QueryAsync<Producto>(sql, new { });
             return result;
-        }
+        }                
     }
 }

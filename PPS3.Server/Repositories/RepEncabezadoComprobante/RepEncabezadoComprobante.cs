@@ -13,61 +13,51 @@
 
         public async Task<int> InsertarEncabezadoComp(EncabezadoComprobante encabezadoComp)
         {
-            //Verifico si la forma de pago fue con tarjeta o no
-            if (encabezadoComp.FormaPago != 2 && encabezadoComp.FormaPago != 3)
-                encabezadoComp.Tarjeta = 8;
-
             var db = dbConnection();
 
             var sql = @"
                         INSERT INTO comprobantes_encabezados
                             (
-                            NumComprobante,
-                            CAE,
+                            Periodo,
+                            NumComp,
                             TipoComprobante,
                             FechaComp,
                             ClienteComp,
-                            ConceptoInc,
-                            PuntoVta,
-                            TipoVenta,
                             FormaPago,
-                            Tarjeta,
-                            NumeroTarjDebito,
-                            NumeroTarjCredito,
+                            TipoVta,
+                            ImporteFinal,
+                            SaldoRestante,
+                            Observaciones,
                             UsuarioCrea
                             )
                         VALUES 
                             (
-                            @NumComprobante,
-                            @CAE,
+                            @Periodo,
+                            @NumComp,
                             @TipoComprobante,
                             @FechaComp,
                             @ClienteComp,
-                            @ConceptoInc,
-                            @PuntoVta,
-                            @TipoVenta,
                             @FormaPago,
-                            @Tarjeta,
-                            @NumeroTarjDebito,
-                            @NumeroTarjCredito,
+                            @TipoVta,
+                            @ImporteFinal,
+                            @SaldoRestante,
+                            @Observaciones,
                             @UsuarioCrea
                             )
                         ";
 
             var result = await db.ExecuteAsync(sql, new 
                             { 
-                            encabezadoComp.NumComprobante,
-                            encabezadoComp.CAE,
+                            encabezadoComp.Periodo,
+                            encabezadoComp.NumComp,
                             encabezadoComp.TipoComprobante,
                             encabezadoComp.FechaComp,
                             encabezadoComp.ClienteComp,
-                            encabezadoComp.ConceptoInc,
-                            encabezadoComp.PuntoVta,
-                            encabezadoComp.TipoVenta,
                             encabezadoComp.FormaPago,
-                            encabezadoComp.Tarjeta,
-                            encabezadoComp.NumeroTarjDebito,
-                            encabezadoComp.NumeroTarjCredito,
+                            encabezadoComp.TipoVta,
+                            encabezadoComp.ImporteFinal,
+                            encabezadoComp.SaldoRestante,
+                            encabezadoComp.Observaciones,
                             UsuarioCrea = 1
                             });
 

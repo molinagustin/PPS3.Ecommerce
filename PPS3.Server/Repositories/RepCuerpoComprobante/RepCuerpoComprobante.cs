@@ -22,10 +22,8 @@
                                                         CantidadProdC, 
                                                         PrecioUnitario, 
                                                         Bonificacion, 
-                                                        Iva, 
                                                         BonificacionTotal, 
-                                                        Total, 
-                                                        UsuarioCrea
+                                                        Total
                                                         )
                         VALUES  (
                                 @IdEncab, 
@@ -33,10 +31,8 @@
                                 @CantidadProdC, 
                                 @PrecioUnitario, 
                                 @Bonificacion, 
-                                @Iva, 
                                 @BonificacionTotal, 
-                                @Total, 
-                                @UsuarioCrea
+                                @Total
                                 )
                         ";
             var result = await db.ExecuteAsync(sql, new { 
@@ -45,10 +41,8 @@
                                                         cuerpoComp.CantidadProdC,
                                                         cuerpoComp.PrecioUnitario,
                                                         cuerpoComp.Bonificacion,
-                                                        cuerpoComp.Iva,
                                                         cuerpoComp.BonificacionTotal,
-                                                        cuerpoComp.Total,
-                                                        UsuarioCrea = 1
+                                                        cuerpoComp.Total
                                                         });
             return result > 0;
         }

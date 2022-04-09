@@ -27,7 +27,6 @@ namespace PPS3.Shared.Models
         public decimal CantMinAlerta { get; set; }
         [Column(TypeName = "decimal(8,2)")]
         public decimal StockExistencia { get; set; }
-        public bool Stockeable { get; set; }
         public bool Activo { get; set; }
         public int UsuarioCrea { get; set; }
         public DateTime FechaCrea { get; set; }

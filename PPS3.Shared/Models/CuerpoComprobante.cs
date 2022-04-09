@@ -16,12 +16,9 @@ namespace PPS3.Shared.Models
         public decimal PrecioUnitario { get; set; }
         [Column(TypeName = "decimal(10,2)")]
         public decimal Bonificacion { get; set; }
-        public int Iva { get; set; }
         [Column(TypeName = "decimal(10,2)")]
         public decimal BonificacionTotal { get; set; }
         [Column(TypeName = "decimal(10,2)")]
         public decimal Total { get; set; }
-        public int UsuarioCrea { get; set; }
-        public DateTime FechaCrea { get; set; }
     }
 }
