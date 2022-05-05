@@ -1,0 +1,78 @@
+﻿@page "/"
+@inject IServProducto ServProducto
+
+<h3>ListaProductos</h3>
+
+<table>
+    <tbody>
+        <tr>
+            <td colspan="2"><a href="/detallesProducto">Agregar Producto</a></td>
+        </tr>
+    </tbody>
+</table>
+
+@if (productos == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>IdProducto</th>
+                <th>NombreProducto</th>
+                <th>Descripcion</th>
+                <th>Rubro</th>
+                <th>TipoProd</th>
+                <th>PrecioCosto</th>
+                <th>PrecioFinal</th>
+                <th>Proveedor</th>
+                <th>UnidadMedida</th>
+                <th>CantidadMinAlerta</th>
+                <th>StockExistencia</th>
+                <th>Activo</th>
+                <th>UsuarioCrea</th>
+                <th>FechaCrea</th>
+                <th>UsuarioModif</th>
+                <th>FechaUltModif</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var prod in productos)
+            {
+                <tr>
+                    <td>@prod.IdProducto</td>
+                    <td>@prod.NombreProd</td>
+                    <td>@prod.Descripcion</td>
+                    <td>@prod.Rubro</td>
+                    <td>@prod.TipoProd</td>
+                    <td>@prod.PrecioCosto</td>
+                    <td>@prod.PrecioFinal</td>
+                    <td>@prod.Proveedor</td>
+                    <td>@prod.UnidadMedida</td>
+                    <td>@prod.CantMinAlerta</td>
+                    <td>@prod.StockExistencia</td>
+                    <td>@prod.Activo</td>
+                    <td>@prod.UsuarioCrea</td>
+                    <td>@prod.FechaCrea</td>
+                    <td>@prod.UsuarioModif</td>
+                    <td>@prod.FechaUltModif</td>
+                    <td><a href="/detallesProducto/@prod.IdProducto">Modificar</a></td>
+                    <td><a href="/borrarProducto/@prod.IdProducto">Dar de Baja</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    IEnumerable<Producto>? productos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        productos = await ServProducto.ObtenerProductos();
+    }
+}

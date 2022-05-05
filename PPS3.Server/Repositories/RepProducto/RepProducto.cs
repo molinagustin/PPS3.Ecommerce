@@ -158,6 +158,7 @@
             //Se coloca el @ para que se pueda usar multiples lineas en la misma cadena, sino habria que concatenarla con +
             var sql = @"SELECT * 
                         FROM productos
+                        WHERE Activo = 1
                         ";
 
             //El metodo QueryAsync va a devolver un IEnumerable con los datos del modelo que pasamos por parametro

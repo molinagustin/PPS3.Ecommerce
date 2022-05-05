@@ -1,0 +1,85 @@
+﻿@page "/borrarProducto/{id:int}"
+@inject IServProducto ServProducto
+@inject NavigationManager NavigationManager
+
+<h3>BorrarProducto</h3>
+
+<EditForm Model="@producto" OnValidSubmit="Borrar">
+    <table>
+        <tr>
+            <td>Nombre:</td>
+            <td><input type="text" @bind="producto.NombreProd" required/></td>            
+        </tr>
+        <tr>
+            <td>Descripcion:</td>
+            <td><input type="text" @bind="producto.Descripcion" required/></td>            
+        </tr>
+        <tr>
+            <td>Rubro:</td>
+            <td><input type="number" @bind="producto.Rubro"/></td>            
+        </tr>
+        <tr>
+            <td>Tipo Producto:</td>
+            <td><input type="text" @bind="producto.TipoProd"/></td>            
+        </tr>
+        <tr>
+            <td>Precio Costo:</td>
+            <td><input type="number" @bind="producto.PrecioCosto" min="0" step="0.01" required/></td>            
+        </tr>
+        <tr>
+            <td>Precio Final:</td>
+            <td><input type="number" @bind="producto.PrecioFinal" min="0" step="0.01" required/></td>            
+        </tr>
+        <tr>
+            <td>Proveedor:</td>
+            <td><input type="number" @bind="producto.Proveedor"/></td>            
+        </tr>
+        <tr>
+            <td>Unidad Medida:</td>
+            <td><input type="number" @bind="producto.UnidadMedida"/></td>            
+        </tr>
+        <tr>
+            <td>Cantidad Minima Alerta:</td>
+            <td><input type="number" @bind="producto.CantMinAlerta" min="0" step="0.01" required/></td>            
+        </tr>
+        <tr>
+            <td>Stock Existencia:</td>
+            <td><input type="number" @bind="producto.StockExistencia" min="0" step="0.01" required/></td>            
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:center">
+                <input type="submit" class="btn-danger" value="Borrar" />
+                <input type="button" class="btn-secondary" value="Cancelar" @onclick="Cancelar" />
+            </td>
+        </tr>
+    </table>
+</EditForm>
+
+@code {
+    //Parametro que se recibe por URL para una consulta del producto
+    [Parameter]
+    public int id { get; set; }
+
+    //El producto que estara vinculado al formulario
+    Producto producto = new Producto();
+
+    //Se verifica si el formulario sera de insercion o de modificacion
+    protected override async Task OnInitializedAsync()
+    {
+        if(id > 0)
+        {
+            producto = await ServProducto.ObtenerProducto(id);
+        }        
+    }
+
+    //A traves de un metodo se va a guardar los cambios del producto
+    protected async Task Borrar()
+    {
+        //Se llama al servicio para guardar
+        await ServProducto.BorrarProducto(id);
+        //Se redirige hacia el inicio o index
+        NavigationManager.NavigateTo("/");
+    }
+
+    protected void Cancelar() => NavigationManager.NavigateTo("/");
+}
