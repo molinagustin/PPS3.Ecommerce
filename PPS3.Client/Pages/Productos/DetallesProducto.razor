@@ -77,9 +77,13 @@
     protected async Task GuardarProducto()
     {
         //Se llama al servicio para guardar
-        await ServProducto.GuardarProducto(producto);
-        //Se redirige hacia el inicio o index
-        NavigationManager.NavigateTo("/");
+        var result = await ServProducto.GuardarProducto(producto);
+
+        if (result)
+            //Se redirige hacia el inicio o index
+            NavigationManager.NavigateTo("/");
+        //else
+        //Se deberia mostrar un error
     }
 
     protected void Cancelar() => NavigationManager.NavigateTo("/");

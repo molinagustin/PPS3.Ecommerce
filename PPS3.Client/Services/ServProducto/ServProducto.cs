@@ -1,7 +1,4 @@
-﻿using System.Text;
-using System.Text.Json;
-
-namespace PPS3.Client.Services.ServProducto
+﻿namespace PPS3.Client.Services.ServProducto
 {
     public class ServProducto : IServProducto
     {
@@ -10,22 +7,35 @@ namespace PPS3.Client.Services.ServProducto
 
         public ServProducto(HttpClient httpClient) => _httpClient = httpClient;
         
-        public async Task BorrarProducto(int id)
+        public async Task<bool> BorrarProducto(int id)
         {
             //Se usa el metodo del objeto httpClient que directamente llama a una solicitud DELETE y se le pasa la ruta hacia la API, la accion y el ID
-            await _httpClient.DeleteAsync($"api/Productos/BorrarProducto/{id}");
+            var result = await _httpClient.DeleteAsync($"api/Productos/BorrarProducto/{id}");
+
+            //Verifico que se haya producido la comunicacion correctamente
+            if (result.IsSuccessStatusCode)
+                return true;
+            else
+                return false;
         }
 
-        public async Task GuardarProducto(Producto producto)
+        public async Task<bool> GuardarProducto(Producto producto)
         {
             //Se procede a Serializar el contenido del producto por parametro
             var productoJson = new StringContent(JsonSerializer.Serialize(producto), Encoding.UTF8, "application/json" );
 
+            HttpResponseMessage result = new HttpResponseMessage();
+
             //Se verifica si es un INSERT o UPDATE
             if (producto.IdProducto > 0)
-                await _httpClient.PutAsync($"api/Productos/ActualizarProducto", productoJson);
+                result = await _httpClient.PutAsync($"api/Productos/ActualizarProducto", productoJson); 
+            else            
+                result = await _httpClient.PostAsync($"api/Productos/CrearProducto", productoJson);
+
+            if (result.IsSuccessStatusCode)
+                return true;
             else
-                await _httpClient.PostAsync($"api/Productos/CrearProducto", productoJson);
+                return false;
         }
 
         public async Task<Producto> ObtenerProducto(int id)
@@ -45,9 +55,7 @@ namespace PPS3.Client.Services.ServProducto
 
             var producto = await JsonSerializer.DeserializeAsync<Producto>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
-            #pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
             return producto;
-            #pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
         }
 
         public async Task<IEnumerable<Producto>> ObtenerProductos()
@@ -57,10 +65,8 @@ namespace PPS3.Client.Services.ServProducto
 
             //Deserializo el objeto JSON a un Enumerable y se usa CASE INSENSITIVE dado que el frontend podria tener un modelo que no este respetando esta condicion, entonces es buena practica colocarlo (en este caso no haria falta porque es el mismo modelo para BACK y FRONT)
             var productos = await JsonSerializer.DeserializeAsync<IEnumerable<Producto>>(response, new JsonSerializerOptions () { PropertyNameCaseInsensitive = true });
-
-            #pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
-            return productos;
-            #pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
+                       
+            return productos;            
         }
     }
 }

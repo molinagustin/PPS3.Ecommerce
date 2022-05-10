@@ -5,7 +5,7 @@
         Task<IEnumerable<Producto>> ObtenerProductos();
         Task<Producto> ObtenerProducto(int id);
         Task<Producto> ObtenerProducto(string nombreProd);
-        Task GuardarProducto(Producto producto);
-        Task BorrarProducto(int id);
+        Task<bool> GuardarProducto(Producto producto);
+        Task<bool> BorrarProducto(int id);
     }
 }

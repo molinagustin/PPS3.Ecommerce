@@ -11,7 +11,7 @@ namespace PPS3.Server.Controllers
 
         public EncabezadosRecibosController(IRepEncabezadoRecibo repEncabRec) => _repEncabRec = repEncabRec;
         
-        [HttpGet]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<IEnumerable<EncabezadoRecibo>>> ObtenerRecibosCliente(int idCliente)
         {
             if (idCliente <= 0)
@@ -21,7 +21,7 @@ namespace PPS3.Server.Controllers
             return Ok(response);
         }
 
-        [HttpGet]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<EncabezadoRecibo>> ObtenerRecibo(int idRecibo)
         {
             if (idRecibo <= 0)

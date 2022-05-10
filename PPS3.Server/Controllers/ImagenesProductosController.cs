@@ -11,6 +11,7 @@ namespace PPS3.Server.Controllers
 
         public ImagenesProductosController(IRepImagenProducto repImagenProducto) => _repImagenProducto = repImagenProducto;
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ImagenProducto>>> ObtenerImagenes(int idProducto)
         {
@@ -21,7 +22,8 @@ namespace PPS3.Server.Controllers
                 return BadRequest();
         }
 
-        [HttpGet]
+        [AllowAnonymous]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<ImagenProducto>> ObtenerImagen(int idImagen)
         {
             var response = await _repImagenProducto.ObtenerImagen(idImagen);

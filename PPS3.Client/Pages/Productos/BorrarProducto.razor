@@ -76,9 +76,13 @@
     protected async Task Borrar()
     {
         //Se llama al servicio para guardar
-        await ServProducto.BorrarProducto(id);
-        //Se redirige hacia el inicio o index
-        NavigationManager.NavigateTo("/");
+        var result = await ServProducto.BorrarProducto(id);
+
+        if (result)
+            //Se redirige hacia el inicio o index
+            NavigationManager.NavigateTo("/");
+        //else
+        //Mostrar un error
     }
 
     protected void Cancelar() => NavigationManager.NavigateTo("/");
