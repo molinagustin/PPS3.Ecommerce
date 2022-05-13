@@ -1,4 +1,6 @@
-﻿namespace PPS3.Client.Services.ServImagenProducto
+﻿using System;
+
+namespace PPS3.Client.Services.ServImagenProducto
 {
     public class ServImagenProducto : IServImagenProducto
     {
@@ -39,16 +41,44 @@
 
             var img = await JsonSerializer.DeserializeAsync<ImagenProducto>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
+            var format = "image/png";
+            img.UrlImagen = $"data:{format};base64,{Convert.ToBase64String(img.Contenido)}";
+
 #pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
             return img;
 #pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
         }
 
-        public async Task<IEnumerable<ImagenProducto>> ObtenerImagenes()
+        public async Task<IEnumerable<ImagenProducto>> ObtenerImagenes(int idProducto)
         {
-            var response = await _httpClient.GetStreamAsync($"api/ImagenesProductos/ObtenerImagenes");
+            var response = await _httpClient.GetStreamAsync($"api/ImagenesProductos/ObtenerImagenes?idProducto={idProducto}");
 
             var imgs = await JsonSerializer.DeserializeAsync<IEnumerable<ImagenProducto>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            var format = "image/png";
+
+            foreach (var img in imgs)
+            {
+                img.UrlImagen = $"data:{format};base64,{Convert.ToBase64String(img.Contenido)}";
+            }
+
+#pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
+            return imgs;
+#pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
+        }
+
+        public async Task<IEnumerable<ImagenProducto>> ObtenerUltimasImagenes()
+        {
+            var response = await _httpClient.GetStreamAsync($"api/ImagenesProductos/ObtenerUltimasImagenes");
+
+            var imgs = await JsonSerializer.DeserializeAsync<IEnumerable<ImagenProducto>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            var format = "image/png";
+
+            foreach (var img in imgs)
+            {
+                img.UrlImagen = $"data:{format};base64,{Convert.ToBase64String(img.Contenido)}";
+            }
 
 #pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
             return imgs;

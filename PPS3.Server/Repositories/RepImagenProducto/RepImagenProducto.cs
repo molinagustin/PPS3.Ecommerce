@@ -22,14 +22,14 @@ namespace PPS3.Server.Repositories.RepImagenProducto
                         UPDATE productos_imagenes
                         SET
                             IdProducto = @IdProducto,
-                            UrlImg = @UrlImg,
+                            Contenido = @Contenido,
                             Principal = @Principal,
                             UsuarioModif = @UsuarioModif
                         WHERE IdImg = @IdImg
                         ";
             var result = await db.ExecuteAsync(sql, new { 
                                                         imagenProducto.IdProducto,
-                                                        imagenProducto.UrlImg,
+                                                        imagenProducto.Contenido,
                                                         imagenProducto.Principal,
                                                         UsuarioModif = 1,
                                                         imagenProducto.IdImg
@@ -51,7 +51,7 @@ namespace PPS3.Server.Repositories.RepImagenProducto
             return result > 0;
         }
 
-        //Agregar una imagen y guardarla en una carpeta del servidor y su url en la base de datos
+        //Guardar una imagen en la base de datos
         public async Task<bool> InsertarImagen(ImagenProducto imagenProducto)
         {
             var db = dbConnection();
@@ -59,20 +59,20 @@ namespace PPS3.Server.Repositories.RepImagenProducto
             var sql = @"
                         INSERT INTO productos_imagenes  (
                                                         IdProducto,
-                                                        UrlImg,
+                                                        Contenido,
                                                         UsuarioCrea,
                                                         UsuarioModif
                                                         )
                         VALUES  (
                                 @IdProducto,
-                                @UrlImg,
+                                @Contenido,
                                 @UsuarioCrea,
                                 @UsuarioModif
                                 )
                         ";
             var result = await db.ExecuteAsync(sql, new { 
                                                         imagenProducto.IdProducto,
-                                                        imagenProducto.UrlImg,
+                                                        imagenProducto.Contenido,
                                                         UsuarioCrea = 1,
                                                         UsuarioModif = 1
                                                         });
@@ -104,6 +104,20 @@ namespace PPS3.Server.Repositories.RepImagenProducto
                         WHERE IdProducto = @IdProducto
                         ";
             var result = await db.QueryAsync<ImagenProducto>(sql, new { IdProducto = idProducto });
+            return result;
+        }
+
+        public async Task<IEnumerable<ImagenProducto>> ObtenerUltimasImagenes()
+        {
+            var db = dbConnection();
+
+            //La consulta selecciona los ultimos 5 registros creados
+            var sql = @"
+                        SELECT TOP 5 *
+                        FROM productos_imagenes
+                        ORDER BY productos_imagenes.FechaUltModif DESC";
+
+            var result = await db.QueryAsync<ImagenProducto>(sql, new { });
             return result;
         }
     }

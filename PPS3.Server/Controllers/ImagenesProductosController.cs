@@ -2,7 +2,7 @@
 
 namespace PPS3.Server.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class ImagenesProductosController : ControllerBase
@@ -23,10 +23,21 @@ namespace PPS3.Server.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<ImagenProducto>> ObtenerImagen(int idImagen)
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ImagenProducto>>> ObtenerUltimasImagenes()
         {
-            var response = await _repImagenProducto.ObtenerImagen(idImagen);
+            var response = await _repImagenProducto.ObtenerUltimasImagenes();
+            if (response != null)
+                return Ok(response);
+            else
+                return BadRequest();
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ImagenProducto>> ObtenerImagen(int id)
+        {
+            var response = await _repImagenProducto.ObtenerImagen(id);
             if (response != null)
                 return Ok(response);
             else

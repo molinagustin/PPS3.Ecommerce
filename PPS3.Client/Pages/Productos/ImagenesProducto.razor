@@ -1,0 +1,87 @@
+﻿@page "/detallesProducto/imagenes/{id:int}"
+@page "/detallesProducto/imagenes"
+@inject IServImagenProducto ServImagenProducto
+
+<h3>Imagenes del Producto</h3>
+
+<InputFile OnChange="OnInputFileChanged" multiple/>
+
+@if(imagesDataUrls.Count > 0)
+{
+    <h4>Vista Previa de Imagenes a Guardar</h4>
+    <div class="card" style="width:50rem">
+        <div class="card-body">
+            @foreach(var image in imagesDataUrls)
+            {
+                <img class="rounded m-1" src="@image" width=250 height=250/>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <p>No se seleccionaron imagenes todavia</p>
+}
+
+<h3>Ultimas Imagenes Guardadas</h3>
+
+@if(imagenes != null)
+{
+    <h4>Imagenes Guardadas</h4>
+    <div class="card" style="width:50rem">
+        <div class="card-body">
+            @foreach(var image in imagenes)
+            {
+                <img class="rounded m-1" src="@image.UrlImagen" width=250 height=250/>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <p>No se guardaron imagenes todavia</p>
+}
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    //Lista para guardar imagenes
+    private IList<string> imagesDataUrls = new List<string>();
+
+    IEnumerable<ImagenProducto>? imagenes;
+
+    private async Task OnInputFileChanged(InputFileChangeEventArgs e)
+    {
+        var maxAllowedFiles = 4;
+        var format = "image/png";
+
+        foreach(var imageFile in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            var resisedFile = await imageFile.RequestImageFileAsync(format, 250, 250);
+            var buffer = new byte[resisedFile.Size];
+
+            await resisedFile.OpenReadStream().ReadAsync(buffer);
+
+            var imageDataUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+            //var imageBytes = System.Convert.FromBase64String(Convert.ToBase64String(buffer));
+            //var imageStrng = System.Convert.ToBase64String(imageBytes);
+            imagesDataUrls.Add(imageDataUrl);
+
+            var imagen = new ImagenProducto()
+            {
+                IdProducto = 1,
+                Contenido = buffer,
+                UsuarioCrea = 1,
+                UsuarioModif = 1
+            };
+
+            await ServImagenProducto.GuardarImagen(imagen);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        imagenes = await ServImagenProducto.ObtenerUltimasImagenes();
+    }
+}

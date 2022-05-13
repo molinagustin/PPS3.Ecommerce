@@ -3,7 +3,7 @@
 namespace PPS3.Server.Controllers
 {
     //El Decorador [Authorize] indica que el usuario debera estar Autorizado o Iniciado Sesion con un token para poder acceder a los distintos metodos.
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class ProductosController : ControllerBase
