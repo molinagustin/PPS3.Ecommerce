@@ -24,7 +24,8 @@ namespace PPS3.Server.Repositories.RepImagenProducto
                             IdProducto = @IdProducto,
                             Contenido = @Contenido,
                             Principal = @Principal,
-                            UsuarioModif = @UsuarioModif
+                            UsuarioModif = @UsuarioModif,
+                            FechaUltModif = @FechaUltModif
                         WHERE IdImg = @IdImg
                         ";
             var result = await db.ExecuteAsync(sql, new { 
@@ -32,6 +33,7 @@ namespace PPS3.Server.Repositories.RepImagenProducto
                                                         imagenProducto.Contenido,
                                                         imagenProducto.Principal,
                                                         UsuarioModif = 1,
+                                                        FechaUltModif = DateTime.Now,
                                                         imagenProducto.IdImg
                                                         });
             return result > 0;

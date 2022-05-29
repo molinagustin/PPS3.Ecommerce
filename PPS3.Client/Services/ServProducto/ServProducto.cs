@@ -102,9 +102,7 @@
 
             var producto = await JsonSerializer.DeserializeAsync<Producto>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
-            #pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
             return producto;
-            #pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
         }
 
         public async Task<Producto> ObtenerProducto(string nombreProd)
@@ -113,9 +111,7 @@
 
             var producto = await JsonSerializer.DeserializeAsync<Producto>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
-#pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
             return producto;
-#pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
         }
 
         public async Task<IEnumerable<Producto>> ObtenerProductos()
@@ -126,9 +122,7 @@
             //Deserializo el objeto JSON a un Enumerable y se usa CASE INSENSITIVE dado que el frontend podria tener un modelo que no este respetando esta condicion, entonces es buena practica colocarlo (en este caso no haria falta porque es el mismo modelo para BACK y FRONT)
             var productos = await JsonSerializer.DeserializeAsync<IEnumerable<Producto>>(response, new JsonSerializerOptions () { PropertyNameCaseInsensitive = true });
 
-#pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
             return productos;
-#pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
         }
     }
 }

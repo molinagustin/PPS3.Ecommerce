@@ -1,0 +1,46 @@
+﻿@page "/usuarios/lista"
+@inject IServUsuario ServUsuario
+
+<h3>Lista de Usuarios</h3>
+
+@if (usuarios == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>IdUsuario</th>
+                <th>NombreCompleto</th>
+                <th>NombreUs</th>
+                <th>Email</th>
+                <th>EmailVerificado</th>                
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var usu in usuarios)
+            {
+                <tr>
+                    <td>@usu.IdUsuarioAct</td>                  
+                    <td>@usu.NombreCompleto</td>
+                    <td>@usu.NombreUs</td>
+                    <td>@usu.Email</td>
+                    <td>@usu.EmailVerificado</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    IEnumerable<Usuario>? usuarios;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        //Obtengo la lista de usuarios, y luego re renderizo el componente para mostrar los cambios
+        usuarios = await ServUsuario.ObtenerUsuarios();
+        StateHasChanged();
+    }
+}

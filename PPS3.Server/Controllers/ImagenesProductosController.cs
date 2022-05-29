@@ -2,7 +2,7 @@
 
 namespace PPS3.Server.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class ImagenesProductosController : ControllerBase

@@ -12,9 +12,7 @@
 
             var tipoDoc = await JsonSerializer.DeserializeAsync<TipoDocumento>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
-#pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
             return tipoDoc;
-#pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
         }
 
         public async Task<IEnumerable<TipoDocumento>> ObtenerTiposDocs()
@@ -23,9 +21,7 @@
 
             var tiposDocs = await JsonSerializer.DeserializeAsync<IEnumerable<TipoDocumento>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
-#pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
             return tiposDocs;
-#pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
         }
     }
 }

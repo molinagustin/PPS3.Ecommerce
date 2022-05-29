@@ -3,29 +3,72 @@
     public class ServTipoTarjeta : IServTipoTarjeta
     {
         private readonly HttpClient _httpClient;
+        private readonly ISessionStorageService _sessionStorage;
 
-        public ServTipoTarjeta(HttpClient httpClient) => _httpClient = httpClient;
+        public ServTipoTarjeta(HttpClient httpClient, ISessionStorageService sessionStorage)
+        {
+            _httpClient = httpClient;
+            _sessionStorage = sessionStorage;
+        }        
         
         public async Task<IEnumerable<TipoTarjeta>> ObtenerTiposTarj()
         {
-            var response = await _httpClient.GetStreamAsync("api/TiposTarjetas");
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
 
-            var tiposTarj = await JsonSerializer.DeserializeAsync<IEnumerable<TipoTarjeta>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
 
-#pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
-            return tiposTarj;
-#pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/TiposTarjetas");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bits) y lo deserializo en un objeto apropiado
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var tarjetas = await JsonSerializer.DeserializeAsync<IEnumerable<TipoTarjeta>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return tarjetas;
+            }
+            else
+                return null;
         }
 
         public async Task<TipoTarjeta> ObtenerTipoTarj(int id)
         {
-            var response = await _httpClient.GetStreamAsync($"api/TiposTarjetas/{id}");
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
 
-            var tipoTarj = await JsonSerializer.DeserializeAsync<TipoTarjeta>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
 
-#pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
-            return tipoTarj;
-#pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/TiposTarjetas/{id}");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bits) y lo deserializo en un objeto apropiado
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var tarjeta = await JsonSerializer.DeserializeAsync<TipoTarjeta>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return tarjeta;
+            }
+            else
+                return null;
         }
     }
 }

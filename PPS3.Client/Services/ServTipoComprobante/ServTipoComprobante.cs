@@ -3,29 +3,72 @@
     public class ServTipoComprobante : IServTipoComprobante
     {
         private readonly HttpClient _httpClient;
+        private readonly ISessionStorageService _sessionStorage;
 
-        public ServTipoComprobante(HttpClient httpClient) => _httpClient = httpClient;
+        public ServTipoComprobante(HttpClient httpClient, ISessionStorageService sessionStorage)
+        {
+            _httpClient = httpClient;
+            _sessionStorage = sessionStorage;
+        }
         
         public async Task<TipoComprobante> ObtenerTipoComp(int id)
         {
-            var response = await _httpClient.GetStreamAsync($"api/TiposComprobantes/{id}");
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
 
-            var tipoComp = await JsonSerializer.DeserializeAsync<TipoComprobante>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
 
-#pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
-            return tipoComp;
-#pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/TiposComprobantes/{id}");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bites) y lo deserializo en un objeto apropiado
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var comp = await JsonSerializer.DeserializeAsync<TipoComprobante>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return comp;
+            }
+            else
+                return null;
         }
 
         public async Task<IEnumerable<TipoComprobante>> ObtenerTiposComp()
         {
-            var response = await _httpClient.GetStreamAsync($"api/TiposComprobantes");
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
 
-            var tiposComp = await JsonSerializer.DeserializeAsync<IEnumerable<TipoComprobante>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
 
-#pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
-            return tiposComp;
-#pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/TiposComprobantes");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bites) y lo deserializo en un objeto apropiado
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var comps = await JsonSerializer.DeserializeAsync<IEnumerable<TipoComprobante>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return comps;
+            }
+            else
+                return null;
         }
     }
 }
