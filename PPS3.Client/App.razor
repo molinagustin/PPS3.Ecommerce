@@ -1,6 +1,11 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
+﻿<CascadingAuthenticationState> @*Con esta etiqueta se envuelven (wrap) todas las paginas enrutadas asi se pueden utilizar distintas etiquetas de autorizacion en ellas*@
+<Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"> @*Se debe agregar el AUTHORIZE a la etiqueta de enrutamiento para permitir que los componentes llamados en ella utilizen los servicios de autenticacion*@
+            <NotAuthorized> @*Con esta etiqueta puedo mostrarle al usuario contenido en caso de que no este autorizado a ver el componente al que esta intentado acceder, por ejemplo una pagina completa*@
+                El nivel de autorizacion que posee no le permite acceder al componente solicitado. Por favor, contacte al Administrador.
+            </NotAuthorized>
+        </AuthorizeRouteView>
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
     <NotFound>
@@ -10,3 +15,4 @@
         </LayoutView>
     </NotFound>
 </Router>
+</CascadingAuthenticationState>

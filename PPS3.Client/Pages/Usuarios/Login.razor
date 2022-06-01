@@ -1,6 +1,7 @@
 ﻿@page "/login"
 @inject IServUsuario ServUsuario
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
 
 <h3>Login</h3>
 
@@ -71,7 +72,11 @@
 
         //Si fue valido el ingreso, cambio a la ruta principal nuevamente.
         if (valido)
-            NavigationManager.NavigateTo("/");
+        {
+            await AuthStateProvider.GetAuthenticationStateAsync();
+            NavigationManager.NavigateTo("/");    
+        }
+        
         else
         {
             errorIngreso = "formContainer";

@@ -148,8 +148,10 @@ namespace PPS3.Server.Controllers
                 //Datos del usuario
                 Subject = new ClaimsIdentity(new Claim[]
                 {
+                    new Claim(ClaimTypes.PrimarySid, usuarioOriginal.IdUsuarioAct.ToString()),
                     new Claim(ClaimTypes.Name, usuarioOriginal.NombreUs),
-                    new Claim(ClaimTypes.Role, privilegio.DescPrivilegio)
+                    new Claim(ClaimTypes.Role, privilegio.IdPrivi.ToString()),
+                    new Claim(ClaimTypes.Actor, usuarioOriginal.IdCliente.ToString())
                 }),
 
                 //Fecha de expiracion del token

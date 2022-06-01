@@ -1,5 +1,7 @@
 ﻿@page "/"
 @inject IServProducto ServProducto
+@*Con el atributo Authorize se procede a regular el acceso a toda la pagina por usuarios autorizados solamente*@
+@attribute [Authorize]
 
 <h3>ListaProductos</h3>
 

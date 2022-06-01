@@ -3,6 +3,8 @@ global using System.Net.Http.Json;
 global using System.Text;
 global using System.Text.Json;
 global using Blazored.SessionStorage;
+global using PPS3.Client.CustomAuthStateProvider; //El CustomAuthProvider
+global using Microsoft.AspNetCore.Components.Authorization; //Libreria que permite utilizar el Estado de Autenticacion (Authentication State)
 global using PPS3.Shared.Models;
 global using PPS3.Shared.InternalModels;
 global using PPS3.Client.Services;
@@ -49,6 +51,10 @@ builder.Services.AddServerSideBlazor();
 //Servicios Propios
 //Para las session storage
 builder.Services.AddBlazoredSessionStorage();
+
+//Servicio para el Custom Auth Provider
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+builder.Services.AddAuthorizationCore(); //
 
 //URL de la API para la inyeccion de los servicios HTTPS
 var API_URL = new Uri("https://localhost:7022");

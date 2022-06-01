@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 @inject IServUsuario ServUsuario
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>PPS3.Client</PageTitle>
 
@@ -28,6 +29,10 @@
         var result = await ServUsuario.Logout();
 
         if (result)
-            NavigationManager.NavigateTo("/");
+        {
+            await AuthStateProvider.GetAuthenticationStateAsync();
+            NavigationManager.NavigateTo("/");    
+        }
+        
     }
 }
