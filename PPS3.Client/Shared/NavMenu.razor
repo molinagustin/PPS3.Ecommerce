@@ -1,6 +1,6 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">PPS3.Client</a>
+        <a class="navbar-brand" href="/">VENTODO</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>        
@@ -9,14 +9,76 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
+
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+            <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Inicio
             </NavLink>
         </div>
+
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+            <NavLink class="nav-link" href="#" Match="NavLinkMatch.All">
+                <span class="oi oi-book" aria-hidden="true"></span> Cuentas Corrientes
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="#" Match="NavLinkMatch.All">
+                <span class="oi oi-document" aria-hidden="true"></span> Comprobantes
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="#" Match="NavLinkMatch.All">
+                <span class="oi oi-file" aria-hidden="true"></span> Recibos
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="#" Match="NavLinkMatch.All">
+                <span class="oi oi-cart" aria-hidden="true"></span> Ordenes de Compra
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/listaProductos" Match="NavLinkMatch.All">
+                <span class="oi oi-box" aria-hidden="true"></span> Productos
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/listaProductos" Match="NavLinkMatch.All">
+                <span class="oi oi-spreadsheet" aria-hidden="true"></span> Presupuestos
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="#" Match="NavLinkMatch.All">
+                <span class="oi oi-phone" aria-hidden="true"></span> Proveedores
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="#" Match="NavLinkMatch.All">
+                <span class="oi oi-bar-chart" aria-hidden="true"></span> Informes
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="#" Match="NavLinkMatch.All">
+                <span class="oi oi-person" aria-hidden="true"></span> Usuarios
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="#" Match="NavLinkMatch.All">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Varios
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="#" Match="NavLinkMatch.All">
+                <span class="oi oi-cog" aria-hidden="true"></span> Configuraciones
             </NavLink>
         </div>
     </nav>

@@ -37,10 +37,9 @@ else
 @code {
     IEnumerable<Usuario>? usuarios;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
         //Obtengo la lista de usuarios, y luego re renderizo el componente para mostrar los cambios
         usuarios = await ServUsuario.ObtenerUsuarios();
-        StateHasChanged();
-    }
+    }    
 }

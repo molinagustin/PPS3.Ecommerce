@@ -1,9 +1,14 @@
-﻿@page "/"
+﻿@page "/listaProductos"
 @inject IServProducto ServProducto
 @*Con el atributo Authorize se procede a regular el acceso a toda la pagina por usuarios autorizados solamente*@
-@attribute [Authorize]
+@attribute [Authorize(Roles = "1")]
 
 <h3>ListaProductos</h3>
+
+<AuthorizeView Roles="1">
+    <p>@context.User.Identity.Name</p>
+    <p>Valor de la Claim SID = @context.User.Claims.First().Value</p>
+</AuthorizeView>
 
 <table>
     <tbody>

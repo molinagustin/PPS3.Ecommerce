@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+//using System.Net.Http.Headers;
 
 namespace PPS3.Client.CustomAuthStateProvider
 {
@@ -7,10 +8,12 @@ namespace PPS3.Client.CustomAuthStateProvider
         //Para crear el objeto de autenticacion personalizado se debe heredar de la Clase Abstracta implementada desde la libreria Microsoft.AspNetCore.Components.Authorization e implementar su metodo obligatorio
         //Es necesario obtener el token guardado en la Session Storage para confirmar si el usuario esta o no logueado con lo que inyectamos el servicio en el Constructor de la clase
         private readonly ISessionStorageService _sessionStorage;
+        //private readonly HttpClient _httpClient; //Se puede usar este objeto para colocar en el encabezado de la solicitud HTTP el TOKEN BEARER
 
-        public CustomAuthStateProvider(ISessionStorageService sessionStorage)
+        public CustomAuthStateProvider(ISessionStorageService sessionStorage, HttpClient httpClient)
         {
             _sessionStorage = sessionStorage;
+            //_httpClient = httpClient;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -20,12 +23,15 @@ namespace PPS3.Client.CustomAuthStateProvider
 
             //Genero una Claim de identidad que tiene los valores apropiados de cada caracteristica al momento de crearse la Claim en el JWT
             var identity = new ClaimsIdentity();
+            
 
             //Si el Token obtenido es valido, se procede a llenar las Claims contenidas
             if (!string.IsNullOrEmpty(token))
             {
                 //Se guardan todas las Claims particulares del JWT en un solo objeto Claim Principal
                 identity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt");
+                //Tambien se puede colocar aca el token en el encabezado de las solicitudes http
+                //_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Replace("\"",""));
             }
 
             //Se crea un objeto que contendra todas las Claims que identifican al usuario (Nombre, Rol, Id, etc.)

@@ -138,37 +138,37 @@ namespace PPS3.Server.Controllers
             //Ahora comienzo a crear el token para el usuario registrado
             var privilegio = await _repPrivilegio.ObtenerPrivilegio(usuarioOriginal.Privilegio);
 
-            //Este objeto se encarga de crear nuevos JWT para lo cual vuelvo a usar la clave secreta de configuracion
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            byte[] key = Encoding.UTF8.GetBytes(_config["ClaveSimetrica:Key"]); //Esa es la forma para acceder a appsettings.json
-
-            //El token descriptor ayuda a configurar los datos propios del usuario, tiempo de vida del token, formas de cifrado, entre otros
-            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
+            //Lista de Claims
+            List<Claim> claims = new List<Claim>
             {
-                //Datos del usuario
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.PrimarySid, usuarioOriginal.IdUsuarioAct.ToString()),
-                    new Claim(ClaimTypes.Name, usuarioOriginal.NombreUs),
-                    new Claim(ClaimTypes.Role, privilegio.IdPrivi.ToString()),
-                    new Claim(ClaimTypes.Actor, usuarioOriginal.IdCliente.ToString())
-                }),
-
-                //Fecha de expiracion del token
-                Expires = DateTime.UtcNow.AddDays(1),
-                //Se crean las credenciales con una clave simetrica y el algoritmo de encriptado
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                new Claim(ClaimTypes.PrimarySid, usuarioOriginal.IdUsuarioAct.ToString()),
+                new Claim(ClaimTypes.Name, usuarioOriginal.NombreUs),
+                new Claim(ClaimTypes.Role, privilegio.IdPrivi.ToString()),
+                new Claim(ClaimTypes.Actor, usuarioOriginal.IdCliente.ToString())
             };
 
-            //Por ultimo se crea el token de seguridad con los datos configurados en el Descriptor, el cual se asigna al usuario correspondiente
-            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-            usuarioOriginal.Token = tokenHandler.WriteToken(token);
+            //Clave simetrica para generar el token obtenida desde el archivo de configuracion
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("ClaveSimetrica:Key").Value));
 
-            //Se comprueba que se haya escrito exitosamente y en caso afirmatio se lo devuelve al token
-            if (usuarioOriginal.Token == null || usuarioOriginal.Token == string.Empty)
+            //Se crean las credenciales con una clave simetrica y el algoritmo de encriptado
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            //Se asignan los parametros que tendra el token en base a los objetos creados anteriormente
+            var token = new JwtSecurityToken
+                (
+                    claims: claims,
+                    expires: DateTime.Now.AddDays(1),
+                    signingCredentials: credentials
+                );
+
+            //Se escribe el Token finalmente
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            //Se comprueba que se haya escrito exitosamente y en caso afirmativo se lo devuelve al token
+            if (String.IsNullOrEmpty(jwt))
                 return BadRequest(new { message = "Usuario o Contraseña Incorrecto" });
 
-            return Ok(usuarioOriginal.Token);
+            return Ok(jwt);            
         }
     }
 }
