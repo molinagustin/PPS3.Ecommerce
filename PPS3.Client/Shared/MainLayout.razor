@@ -5,8 +5,9 @@
 
 <PageTitle>PPS3.Client</PageTitle>
 
-<div class="page">
-    @*Si el usuario posee el nivel requerido de autorizacion, se le mostraran las opciones en el menu de navegacion*@
+@*Si el usuario posee el nivel requerido de autorizacion, se le mostraran las opciones en el menu de navegacion*@
+@*<div class="page">
+    
     <AuthorizeView>
         <Authorized>
             <div class="sidebar">
@@ -34,9 +35,33 @@
             @Body
         </article>
     </main>
-</div>
+</div>*@
+
+<MudLayout>    
+    <AppBar OnSidebarToggled="ToggleSideBar" Login="Login" Logout="LogoutUser" Register="Register"/>
+
+    <AuthorizeView Roles="1, 2">
+        <NavMenu SideBarOpen = "@_openSideBar"></NavMenu>
+    </AuthorizeView>
+
+    <BottomAppBar Contacto="ContactPage"/>
+
+    <MudMainContent Class="pt-16 px-16">
+        <MudContainer Class="mt-16">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+<MudThemeProvider/> @*Componente esencial para renderizar y obtener funcionalidades de MudBlazor*@
 
 @code{
+    //Variable para determinar si se muestra o no la barra lateral
+    private bool _openSideBar = false;
+
+    //Metodo para cambiar el estado de la variable simplemente y mostrar o no la barra lateral en codigo
+    private void ToggleSideBar() => _openSideBar = !_openSideBar;
+
     private async Task LogoutUser()
     {
         var result = await ServUsuario.Logout();
@@ -51,5 +76,15 @@
     private void Login()
     {
         NavigationManager.NavigateTo("/login"); 
+    }
+
+    private void Register()
+    {
+        NavigationManager.NavigateTo("/"); 
+    }
+
+    private void ContactPage()
+    {
+        NavigationManager.NavigateTo("/"); 
     }
 }

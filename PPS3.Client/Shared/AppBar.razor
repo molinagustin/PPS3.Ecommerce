@@ -1,0 +1,86 @@
+﻿@inject IServProducto ServProducto
+
+<MudAppBar Elevation="3">
+    <AuthorizeView Roles="1, 2">
+        <Authorized>
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" 
+                    Color="Color.Inherit" Edge="Edge.Start" 
+                    OnClick="async ()=> await OnSidebarToggled.InvokeAsync()" />
+        </Authorized>
+
+        <NotAuthorized>           <MudAvatar Color="Color.Transparent" Size="Size.Large" Image="images/ecommerce_logo.jpg"/>
+            <MudText Typo="Typo.h5" Color="Color.Default" Style="margin-top:10px; margin-left:15px;">E-Commerce</MudText>
+        </NotAuthorized>
+    </AuthorizeView>
+
+    <MudSpacer/>
+
+    <MudPaper Width="30em;" Style="padding:3px;">
+        <MudAutocomplete DisableUnderLine="true" Margin="Margin.Dense" T="string" 
+                        Label="Buscar Producto" @bind-Value="ValorBuscado" 
+                        SearchFunc="@BuscarEnLista"
+                        ResetValueOnEmptyText="true"
+                        CoerceText="true" CoerceValue="false"
+                        AdornmentIcon="@Icons.Material.Filled.Search" 
+                        MinCharacters="3"/>
+    </MudPaper>
+
+    <MudSpacer/>
+
+    <AuthorizeView>
+        <Authorized>
+            <MudBadge Content="@BadgeContent" Color="Color.Transparent" Overlap="true" Bordered="true" Class="mx-6 my-4">
+                <MudButton StartIcon="@Icons.Material.Filled.ShoppingCart" Color="Color.Info" Variant="Variant.Filled">Carro</MudButton>
+            </MudBadge>   
+
+            <MudMenu FullWidth="true" ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight">
+                <ActivatorContent>
+                    <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Primary">@context.User.Identity.Name</MudChip>
+                </ActivatorContent>
+                <ChildContent>
+                    <MudMenuItem Href="/">Perfil</MudMenuItem>                    
+                    <MudMenuItem OnClick="async ()=> await Logout.InvokeAsync()">Salir</MudMenuItem>
+                </ChildContent>
+            </MudMenu>
+
+        </Authorized>
+        <NotAuthorized>
+            <MudButton Class="mr-2" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" 
+                        Color="Color.Success" OnClick="async ()=> await Login.InvokeAsync()">Iniciar Sesion</MudButton>             
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AppRegistration" 
+            Color="Color.Info" OnClick="async ()=> await Register.InvokeAsync()">Registrarse</MudButton> 
+        </NotAuthorized>
+    </AuthorizeView>
+</MudAppBar>
+
+@code {
+        [Parameter]
+        public EventCallback OnSidebarToggled { get; set; }
+
+        [Parameter]
+        public EventCallback Login { get; set; }
+
+        [Parameter]
+        public EventCallback Logout { get; set; }
+
+        [Parameter]
+        public EventCallback Register { get; set; }
+
+        public int BadgeContent { get; set; } = 0;
+
+        /*PARA EL BUSCADOR*/
+        private string ValorBuscado = string.Empty;
+
+        private string[] productos = { "Ceramica 1", "Pegamento xLS" };
+
+        private async Task<IEnumerable<string>> BuscarEnLista(string value)
+        {
+            // In real life use an asynchronous function for fetching data from an api.
+            await Task.Delay(5);
+
+            // if text is null or empty, don't return values (drop-down will not open)
+            if (string.IsNullOrEmpty(value))
+                return new string[0];
+            return productos.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        }
+}

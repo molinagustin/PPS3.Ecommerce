@@ -39,6 +39,7 @@ global using PPS3.Client.Services.ServCliente;
 global using PPS3.Client.Services.ServCarroCompra;
 #endregion
 
+using MudBlazor.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -49,6 +50,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 //Servicios Propios
+//MudBlazor
+builder.Services.AddMudServices();
+
 //Para las session storage
 builder.Services.AddBlazoredSessionStorage();
 

@@ -1,4 +1,4 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@*<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">VENTODO</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -93,4 +93,101 @@
     {
         collapseNavMenu = !collapseNavMenu;
     }    
+}*@
+
+<MudDrawer @bind-Open="SideBarOpen" Elevation="1">
+    <MudDrawerHeader>
+        <MudAvatar Color="Color.Transparent" Size="Size.Large" Image="images/ecommerce_logo.jpg"/>
+        <MudText Typo="Typo.h5" Color="Color.Primary" Style="margin-top:10px; margin-left:15px;">E-Commerce</MudText>
+    </MudDrawerHeader>
+
+    <MudNavMenu>
+        <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Home">Inicio</MudNavLink>
+
+        <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.MenuBook">Cuentas Corrientes</MudNavLink>
+
+        <MudNavGroup Title="Comprobantes" Icon="@Icons.Filled.Receipt">
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Consultar</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Recibos" Icon="@Icons.Filled.ReceiptLong">
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Consultar</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ShoppingCartCheckout">Ordenes de Compra</MudNavLink>
+               
+        <MudNavGroup Title="Productos" Icon="@Icons.Filled.Tapas">
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Listado de Productos</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.PlaylistAdd">Agregar Producto</MudNavLink>
+            
+            <MudNavGroup Title="Tipos de Productos" Icon="@Icons.Filled.ViewAgenda">
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Consultar</MudNavLink>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>         
+            </MudNavGroup>
+
+            <MudNavGroup Title="Unidades de Medida" Icon="@Icons.Filled.DesignServices">
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Consultar</MudNavLink>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
+            </MudNavGroup>
+
+            <MudNavGroup Title="Rubros" Icon="@Icons.Filled.Plumbing">
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Consultar</MudNavLink>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
+            </MudNavGroup>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Presupuestos" Icon="@Icons.Filled.Summarize">
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Consultar</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Proveedores" Icon="@Icons.Filled.ContactPhone">
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Consultar</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
+
+            <MudNavGroup Title="Contacto de Proveedor" Icon="@Icons.Filled.PhoneAndroid">
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Consultar</MudNavLink>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
+            </MudNavGroup>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Informes" Icon="@Icons.Filled.PieChart">
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Sell">Informe de Ventas</MudNavLink>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.MoneyOff">Informe de Deudores</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Consultas Varias" Icon="@Icons.Filled.Layers">
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Person">Clientes</MudNavLink>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Book">Condiciones IVA</MudNavLink>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Payments">Formas de Pago</MudNavLink>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.CreditCard">Tarjetas</MudNavLink>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.CreditCard">Tipos de Tarjetas</MudNavLink>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ShoppingCart">Estados Carro Compra</MudNavLink>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.LibraryBooks">Tipos Ventas</MudNavLink>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AccountCircle">Tipos Documento</MudNavLink>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Summarize">Tipos Comprobante</MudNavLink>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.LocationOn">Localidades</MudNavLink>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.LocationOn">Provincias</MudNavLink>
+        </MudNavGroup>
+
+        <AuthorizeView Roles="1">
+            <MudNavGroup Title="Usuarios" Icon="@Icons.Filled.SupervisedUserCircle">
+                    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Consultar</MudNavLink>
+                    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
+                    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.PrivacyTip">Privilegios</MudNavLink>
+            </MudNavGroup>
+
+            <MudNavGroup Title="Configuraciones" Icon="@Icons.Filled.SettingsApplications">
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Settings">Opcion 1</MudNavLink>
+                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Settings">Opcion 2</MudNavLink>
+            </MudNavGroup>  
+        </AuthorizeView>
+    </MudNavMenu>
+</MudDrawer>
+
+@code{
+    [Parameter]
+    public bool SideBarOpen { get; set; }
 }

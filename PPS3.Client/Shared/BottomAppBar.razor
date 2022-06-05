@@ -1,0 +1,15 @@
+﻿<MudAppBar Bottom="true" Fixed="true" Color="Color.Primary" Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Inherit" Edge="Edge.Start" />
+        <MudSpacer />
+        <MudButton Class="mr-5" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Email" 
+                        Color="Color.Inherit" OnClick="async ()=> await Contacto.InvokeAsync()">¡Contactanos!</MudButton>
+        <MudAvatar Class="mr-2" Size="Size.Small" Color="Color.Primary">
+            <MudIcon Icon="@Icons.Material.Filled.Copyright"/>
+        </MudAvatar>
+        <MudText>Derechos Reservados</MudText>
+</MudAppBar>
+
+@code {
+    [Parameter]
+    public EventCallback Contacto { get; set; }
+}
