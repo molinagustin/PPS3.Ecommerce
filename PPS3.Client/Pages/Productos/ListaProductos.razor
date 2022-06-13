@@ -1,11 +1,69 @@
 ﻿@page "/listaProductos"
 @inject IServProducto ServProducto
+@inject NavigationManager NavigationManager
 @*Con el atributo Authorize se procede a regular el acceso a toda la pagina por usuarios autorizados solamente*@
-@attribute [Authorize(Roles = "1")]
+@attribute [Authorize(Roles = "1, 2")]
 
-<h3>ListaProductos</h3>
+<MudText Align="Align.Center" Typo="Typo.h5">Listado de Productos</MudText>
+  
 
-<AuthorizeView Roles="1">
+        @if(productos == null)
+        {
+            <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+        }
+        else
+        {    
+            <MudTable Items="@productos" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<ProductoListado, bool>(FilterFunc)">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Productos</MudText>
+                    <MudSpacer/>
+                    <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Outlined" Href="/detallesProducto">Agregar Nuevo</MudButton>
+                    <MudSpacer/>
+                    <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Nombre</MudTh>
+                    <MudTh>Descripcion</MudTh>
+                    <MudTh>Rubro</MudTh>
+                    <MudTh>Tipo Producto</MudTh>
+                    <MudTh>Precio Costo</MudTh>
+                    <MudTh>Precio Final</MudTh>
+                    <MudTh>Proveedor</MudTh>
+                    <MudTh>Medido en</MudTh>
+                    <MudTh>Alerta de Cantidad</MudTh>
+                    <MudTh>Stock Existencia</MudTh>
+                    <MudTh>Creado por</MudTh>
+                    <MudTh>Modificado por</MudTh>
+                    <MudTh>Fecha Creacion</MudTh>
+                    <MudTh>Fecha Ult. Modif.</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Nombre">@context.NombreProd</MudTd>
+                    <MudTd DataLabel="Descripcion">@context.Descripcion</MudTd>
+                    <MudTd DataLabel="Rubro">@context.DescRubro</MudTd>
+                    <MudTd DataLabel="Tipo Producto">@context.DescripcionTipo</MudTd>
+                    <MudTd DataLabel="Precio Costo">@context.PrecioCosto</MudTd>
+                    <MudTd DataLabel="Precio Final">@context.PrecioFinal</MudTd>
+                    <MudTd DataLabel="Proveedor">@context.NombreProv</MudTd>
+                    <MudTd DataLabel="Medido en">@context.DescripcionUnidad</MudTd>
+                    <MudTd DataLabel="Alerta de Cantidad">@context.CantMinAlerta</MudTd>
+                    <MudTd DataLabel="Stock Existencia">@context.StockExistencia</MudTd>
+                    <MudTd DataLabel="Creado por">@context.UsuarioCrea</MudTd>
+                    <MudTd DataLabel="Modificado por">@context.UsuarioModif</MudTd>
+                    <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
+                    <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>
+                    <MudTd><a href="/detallesProducto/@context.IdProducto" class="btn-sm btn-warning">Editar</a></MudTd>
+                    <MudTd>
+                        <a href="/borrarProducto/@context.IdProducto" class="btn-sm btn-danger">Eliminar</a></MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <MudTablePager/>
+                </PagerContent>
+            </MudTable>
+        }
+
+
+@*<AuthorizeView Roles="1, 2">
     <p>@context.User.Identity.Name</p>
     <p>Valor de la Claim SID = @context.User.Claims.First().Value</p>
 </AuthorizeView>
@@ -73,13 +131,24 @@ else
             }
         </tbody>
     </table>
-}
+}*@
 
 @code {
-    IEnumerable<Producto>? productos;
+    IEnumerable<ProductoListado> productos;
+    private string nombreBuscar = "";
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync() => productos = await ServProducto.ObtenerProductos();
+
+    private bool FilterFunc(ProductoListado prodList)
     {
-        productos = await ServProducto.ObtenerProductos();
+        if (string.IsNullOrWhiteSpace(nombreBuscar))
+            return true;
+        if (prodList.NombreProd.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (prodList.NombreProv.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (prodList.DescripcionTipo.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
     }
 }

@@ -8,7 +8,8 @@
                     OnClick="async ()=> await OnSidebarToggled.InvokeAsync()" />
         </Authorized>
 
-        <NotAuthorized>           <MudAvatar Color="Color.Transparent" Size="Size.Large" Image="images/ecommerce_logo.jpg"/>
+        <NotAuthorized>
+           <MudAvatar Color="Color.Transparent" Size="Size.Large" Image="images/ecommerce_logo.jpg"/>
             <MudText Typo="Typo.h5" Color="Color.Default" Style="margin-top:10px; margin-left:15px;">E-Commerce</MudText>
         </NotAuthorized>
     </AuthorizeView>
@@ -51,11 +52,18 @@
             Color="Color.Info" OnClick="async ()=> await Register.InvokeAsync()">Registrarse</MudButton> 
         </NotAuthorized>
     </AuthorizeView>
+
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" 
+                    Color="Color.Inherit" Edge="Edge.End" 
+                    OnClick="async ()=> await OnRightSidebarToggled.InvokeAsync()" /> 
 </MudAppBar>
 
 @code {
         [Parameter]
         public EventCallback OnSidebarToggled { get; set; }
+
+        [Parameter]
+        public EventCallback OnRightSidebarToggled { get; set; }
 
         [Parameter]
         public EventCallback Login { get; set; }

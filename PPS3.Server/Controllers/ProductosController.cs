@@ -17,7 +17,7 @@ namespace PPS3.Server.Controllers
         //El Decorador [AllowAnonymous] permite que a pesar de que haya que estar Autorizado para acceder a las llamadas HTTP, en estos casos, se pueda hacer de forma Anonima, es decir, sin estar Autorizado o Iniciado Sesion
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Producto>>> ObtenerProductos()
+        public async Task<ActionResult<IEnumerable<ProductoListado>>> ObtenerProductos()
         {
             var response = await _repProducto.ObtenerProductos();
             return Ok(response);

@@ -184,5 +184,21 @@ namespace PPS3.Client.Services.ServUsuario
             else
                 return null;
         }
+
+        public async Task<bool> Registrarse(UsuarioCliente usuarioCl)
+        {
+            //Serializo el objeto
+            var usuarioJson = new StringContent(JsonSerializer.Serialize(usuarioCl),
+                Encoding.UTF8, "application/json");
+
+            //Guardo el resultado
+            var response = await _httpClient.PostAsync("api/Usuarios/CrearUsuario", usuarioJson);
+
+            //Verifico la respuesta exitosa
+            if (response.IsSuccessStatusCode)
+                return true;
+            else
+                return false;
+        }
     }
 }

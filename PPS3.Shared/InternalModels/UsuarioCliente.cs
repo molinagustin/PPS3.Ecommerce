@@ -15,6 +15,7 @@ namespace PPS3.Shared.InternalModels
         public string Email { get; set; } = string.Empty;
 
         //Propiedades internas sin almacenamiento
+        [Required(ErrorMessage = "La contraseña no puede estar vacia.")]
         public string Password { get; set; } = string.Empty;
 
         //=======>>>    PROPIEDADES DE CLIENTE    <<<=======

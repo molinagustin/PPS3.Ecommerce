@@ -1,0 +1,54 @@
+﻿<MudDrawer Anchor="Anchor.End" @bind-Open="SideBarOpen" Elevation="1">
+    <MudDrawerHeader>
+        <MudAvatar Color="Color.Transparent" Size="Size.Large" Image="images/ecommerce_logo.jpg"/>
+        <MudText Typo="Typo.h5" Color="Color.Primary" Style="margin-top:10px; margin-left:15px;">CATEGORIAS</MudText>
+    </MudDrawerHeader>
+
+    <MudNavMenu>
+        <MudNavGroup Title="Adhesivos" Icon="@Icons.Filled.Receipt">
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Tipo Adhesivo 1</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Tipo Adhesivo 2</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Bachas" Icon="@Icons.Filled.Receipt">
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Tipo Bacha 1</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Tipo Bacha 2</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Ceramicas" Icon="@Icons.Filled.Receipt">
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Ceramicas de Interior</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Ceramicas de Exterior</MudNavLink>
+        </MudNavGroup>
+
+
+        <MudNavGroup Title="Exteriores" Icon="@Icons.Filled.Receipt">
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Tipo Exterior 1</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Tipo Exterior 2</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Griferia" Icon="@Icons.Filled.Receipt">
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Tipo Griferia 1</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Tipo Griferia 2</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Otros" Icon="@Icons.Filled.Receipt">
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Tipo Otro 1</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Tipo Otro 2</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Pinturas" Icon="@Icons.Filled.Receipt">
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Tipo Pintura 1</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Tipo Pintura 2</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Techo" Icon="@Icons.Filled.Receipt">
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Tipo Techo 1</MudNavLink>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Tipo Techo 2</MudNavLink>
+        </MudNavGroup>
+    </MudNavMenu>
+</MudDrawer>
+
+@code{
+    [Parameter]
+    public bool SideBarOpen { get; set; }
+}

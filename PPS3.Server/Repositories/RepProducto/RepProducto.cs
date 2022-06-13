@@ -152,17 +152,27 @@
             return result;
         }
 
-        public async Task<IEnumerable<Producto>> ObtenerProductos()
+        public async Task<IEnumerable<ProductoListado>> ObtenerProductos()
         {
             var db = dbConnection();
             //Se coloca el @ para que se pueda usar multiples lineas en la misma cadena, sino habria que concatenarla con +
-            var sql = @"SELECT * 
-                        FROM productos
-                        WHERE Activo = 1
+            var sql = @"
+                        SELECT  prod.IdProducto, prod.NombreProd, prod.Descripcion, r.DescRubro,                    tp.DescripcionTipo, prod.PrecioCosto, 
+                                prod.PrecioFinal, prov.NombreProv, um.DescripcionUnidad, prod.CantMinAlerta,      prod.StockExistencia, u.NombreUs as UsuarioCrea, u2.NombreUs as UsuarioModif, 
+                                prod.FechaCrea, prod.FechaUltModif
+                        FROM productos as prod
+                        INNER JOIN rubros as r ON prod.Rubro = r.IdRubro
+                        INNER JOIN productos_tipos as tp ON prod.TipoProd = tp.IdTipo
+                        INNER JOIN proveedores as prov ON prod.Proveedor = prov.IdProveedor
+                        INNER JOIN unidades_medida as um ON prod.UnidadMedida = um.IdUnidad
+                        INNER JOIN usuarios as u ON prod.UsuarioCrea = u.IdUsuarioAct
+                        INNER JOIN usuarios as u2 ON prod.UsuarioModif = u2.IdUsuarioAct
+                        WHERE prod.Activo = 1
+                        ORDER BY prod.NombreProd
                         ";
 
             //El metodo QueryAsync va a devolver un IEnumerable con los datos del modelo que pasamos por parametro
-            var result = await db.QueryAsync<Producto>(sql, new { });
+            var result = await db.QueryAsync<ProductoListado>(sql, new { });
             return result;
         }                
     }

@@ -2,67 +2,42 @@
 @inject IServUsuario ServUsuario
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 
-<center>
-    <div class="col-8 card">
+<EditForm Model="@usuarioReq" OnValidSubmit="@Validar">
+    <DataAnnotationsValidator/>
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="5">
+            <MudCardMedia Image="images/ecommerce_logo.jpg" Height="300"/>
+        </MudItem>
 
-        <div class="col-12 row">
-            <p>&nbsp;</p>
-        </div>
-
-        <div class="col-12 row">
-
-            <div class="col-6" style="border-right:groove">
-                <img src="images/ecommerce_logo.jpg" width="400" height="400" />
-            </div>
-
-            <div class="col-6 @errorIngreso" style="border-left:thick">
-                <EditForm Model="@usuarioReq" OnValidSubmit="@Validar">
-                    <div>
-                        <br /><br /><br /><br /><br />
-                    </div>
-                    <div>
-                        <h3 style="font-weight:bold; color:purple">Iniciar Sesi&oacute;n</h3>
-                    </div>
-                    <div>
-                        <br />
-                    </div>
-                    <div class="col-12 row">
-                        <input type="text" class="form-control col-12" @bind="usuarioReq.NombreUs" placeholder="Usuario" @onfocus="@Respuesta"/>
-                    </div>
-                    <br />
-                    <div class="col-12 row">
-                        <input type="password" class="form-control col-12" @bind="usuarioReq.Password" placeholder="Contraseña" @onfocus="@Respuesta"/>
-                    </div>
-                    <br />
-                    <div class="col-12 row">
-                        <span class="col-12"></span>
-                        <input type="submit" class="form-control btn btn-primary btn-block" value="INGRESAR" />
-                        <div class="col-6 row">
-                            <input type="button" class="form-control btn btn-info btn-block" value="REGISTRARSE" />
-                        </div>
-                        <div class="col-6 row">
-                            <input type="button" class="form-control btn btn-secondary btn-block" value="REGRESAR" />
-                        </div>
-                    </div>
-                    <br />
-                    <div class="col-12 row" style="text-align:center; font-weight:bold">
-                        <span class="col-12" style="color:red">@respuesta</span>
-                    </div>
-                </EditForm>
-            </div>
-        </div>
-        <div class="col-12 row">
-            <p>&nbsp;</p>
-        </div>
-    </div>
-</center>
+        <MudItem xs="5" >
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Iniciar Sesion</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTextField Label="Nombre Usuario" HelperText="Mayusculas y Minusculas no son iguales"
+                              @bind-Value="usuarioReq.NombreUs" For="@(() => usuarioReq.NombreUs)"
+                              AutoFocus = "true"/>
+                    <MudTextField Label="Password" HelperText="Colocar bien completo" Class="mt-3"
+                                  @bind-Value="usuarioReq.Password" For="@(() => usuarioReq.Password)" 
+                                  InputType="InputType.Password"/>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Login" Color="Color.Success" ButtonType="ButtonType.Submit">INGRESAR</MudButton>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Login" Color="Color.Info" Href="/registro">REGISTRARSE</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
 
 @code {
     //Objeto que guardara los datos de login
     private UsuarioRequest usuarioReq = new UsuarioRequest();
-    private string respuesta = "";
-    private string errorIngreso = "";
 
     private async Task Validar()
     {
@@ -73,18 +48,8 @@
         {
             await AuthStateProvider.GetAuthenticationStateAsync();
             NavigationManager.NavigateTo("/");    
-        }
-        
-        else
-        {
-            errorIngreso = "formContainer";
-            respuesta = "Usuario y/o Contraseña Incorrectos.";
         }        
-    }
-
-    private void Respuesta()
-    {
-        errorIngreso = "";
-        respuesta = "";
+        else
+            Snackbar.Add($"El usuario y/o contraseña no son correctos", Severity.Error);      
     }
 }

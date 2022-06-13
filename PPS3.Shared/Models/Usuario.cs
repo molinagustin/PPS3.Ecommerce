@@ -22,6 +22,7 @@ namespace PPS3.Shared.Models
         public DateTime FechaUltModif { get; set; }
 
         //Propiedades internas sin almacenamiento
+        [Required(ErrorMessage = "La contraseña es un campo obligatorio.")]
         public string Password { get; set; } = string.Empty;
         public string Token { get; set; } = string.Empty;
     }

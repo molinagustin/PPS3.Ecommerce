@@ -38,29 +38,34 @@
 </div>*@
 
 <MudLayout>    
-    <AppBar OnSidebarToggled="ToggleSideBar" Login="Login" Logout="LogoutUser" Register="Register"/>
+    <AppBar OnSidebarToggled="ToggleSideBar" OnRightSidebarToggled="ToggleRightSideBar" Login="Login" Logout="LogoutUser" Register="Register"/>
 
     <AuthorizeView Roles="1, 2">
         <NavMenu SideBarOpen = "@_openSideBar"></NavMenu>
     </AuthorizeView>
 
+    <RightNavMenu SideBarOpen="@_openRightSideBar"/>
+
     <BottomAppBar Contacto="ContactPage"/>
 
     <MudMainContent Class="pt-16 px-16">
-        <MudContainer Class="mt-16">
+        <MudContainer Class="mt-16 mud-container-maxwidth-xl">
             @Body
         </MudContainer>
     </MudMainContent>
 </MudLayout>
 
 <MudThemeProvider/> @*Componente esencial para renderizar y obtener funcionalidades de MudBlazor*@
+<MudSnackbarProvider/> @*Componente requerido para utilizar las notificaciones SnackBar *@
 
 @code{
     //Variable para determinar si se muestra o no la barra lateral
     private bool _openSideBar = false;
+    private bool _openRightSideBar = true;
 
     //Metodo para cambiar el estado de la variable simplemente y mostrar o no la barra lateral en codigo
     private void ToggleSideBar() => _openSideBar = !_openSideBar;
+    private void ToggleRightSideBar() => _openRightSideBar = !_openRightSideBar;
 
     private async Task LogoutUser()
     {
@@ -73,18 +78,9 @@
         }        
     }
 
-    private void Login()
-    {
-        NavigationManager.NavigateTo("/login"); 
-    }
+    private void Login() => NavigationManager.NavigateTo("/login"); 
 
-    private void Register()
-    {
-        NavigationManager.NavigateTo("/"); 
-    }
+    private void Register() => NavigationManager.NavigateTo("/registro"); 
 
-    private void ContactPage()
-    {
-        NavigationManager.NavigateTo("/"); 
-    }
+    private void ContactPage() => NavigationManager.NavigateTo("/");
 }

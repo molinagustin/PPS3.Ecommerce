@@ -114,13 +114,13 @@
             return producto;
         }
 
-        public async Task<IEnumerable<Producto>> ObtenerProductos()
+        public async Task<IEnumerable<ProductoListado>> ObtenerProductos()
         {
             //Se obtiene el resultado de los productos solicitados a la ruta de la API, el cual viene como cadena y deber ser deserializado
             var response = await _httpClient.GetStreamAsync($"api/Productos/ObtenerProductos");
 
             //Deserializo el objeto JSON a un Enumerable y se usa CASE INSENSITIVE dado que el frontend podria tener un modelo que no este respetando esta condicion, entonces es buena practica colocarlo (en este caso no haria falta porque es el mismo modelo para BACK y FRONT)
-            var productos = await JsonSerializer.DeserializeAsync<IEnumerable<Producto>>(response, new JsonSerializerOptions () { PropertyNameCaseInsensitive = true });
+            var productos = await JsonSerializer.DeserializeAsync<IEnumerable<ProductoListado>>(response, new JsonSerializerOptions () { PropertyNameCaseInsensitive = true });
 
             return productos;
         }

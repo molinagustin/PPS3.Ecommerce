@@ -42,6 +42,7 @@ global using PPS3.Client.Services.ServCarroCompra;
 using MudBlazor.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using MudBlazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,8 +51,18 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 //Servicios Propios
-//MudBlazor
-builder.Services.AddMudServices();
+//MudBlazor y configuraciones para snackbar global
+builder.Services.AddMudServices(config =>
+{
+    config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopRight;
+    config.SnackbarConfiguration.PreventDuplicates = true;
+    config.SnackbarConfiguration.NewestOnTop = false;
+    config.SnackbarConfiguration.ShowCloseIcon = true;
+    config.SnackbarConfiguration.VisibleStateDuration = 10000;
+    config.SnackbarConfiguration.HideTransitionDuration = 500;
+    config.SnackbarConfiguration.ShowTransitionDuration = 500;
+    config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+});
 
 //Para las session storage
 builder.Services.AddBlazoredSessionStorage();
@@ -59,6 +70,9 @@ builder.Services.AddBlazoredSessionStorage();
 //Servicio para el Custom Auth Provider
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddAuthorizationCore(); //
+
+//Snackbar
+builder.Services.AddMudBlazorSnackbar();
 
 //URL de la API para la inyeccion de los servicios HTTPS
 var API_URL = new Uri("https://localhost:7022");

@@ -1,0 +1,183 @@
+﻿@page "/registro"
+@inject IServUsuario ServUsuario
+@inject IServCondicionIVA ServCondIVA
+@inject IServTipoDocumento ServTipoDoc
+@inject IServLocalidad ServLocalidad
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+
+<MudText Typo="Typo.h3" Align="Align.Center">Registrar Nuevo Cliente</MudText>
+
+<EditForm Model="@usuarioCliente" OnValidSubmit="@Registrarse">
+    <DataAnnotationsValidator/>
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="6">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos de Sesion</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTextField Label="Nombre Completo" HelperText="Apellido-Nombre para mejor servicio"
+                              @bind-Value="usuarioCliente.NombreCompleto" For="@(() => usuarioCliente.NombreCompleto)"
+                              AutoFocus = "true"/>
+                    <MudTextField Label="Nombre de Usuario" HelperText="Nombre para iniciar sesion"
+                              @bind-Value="usuarioCliente.NombreUs" For="@(() => usuarioCliente.NombreUs)"/>
+                    <MudTextField Label="Email" HelperText="Correo electronico"
+                              @bind-Value="usuarioCliente.Email" For="@(() => usuarioCliente.Email)"/>
+                    <MudTextField Label="Contraseña" HelperText="Minimo 6 caracteres" Class="mt-3"
+                                  @bind-Value="usuarioCliente.Password" For="@(() => usuarioCliente.Password)" 
+                                  InputType="InputType.Password"/>
+                    <MudTextField Label="Repetir Contraseña" HelperText="Minimo 6 caracteres" Class="mt-3"
+                                  @bind-Value="password2" For="@(() => usuarioCliente.Password)" InputType="InputType.Password"/>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="6">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos de Comprobantes</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudStack Row="true">
+                        <MudStack Style="width:50%">
+                            <MudSelect T="string" @bind-Value="@tipoCl" Label="Tipo de Cliente/Persona" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                <MudSelectItem Value="@("Fisica")" />
+                                <MudSelectItem Value="@("Juridica")" />
+                            </MudSelect>
+                        </MudStack>
+                        <MudStack Style="width:50%">
+                            @if (condIva != null)
+                            {
+                                <MudSelect T="int" @bind-Value="@cond" Label="Condicion IVA" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                    @foreach(var condicion in condIva)
+                                    {
+                                        <MudSelectItem Value="@condicion.IdCondicion">@condicion.DescripcionCond</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            }
+                            else
+                            {
+                                <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                            }
+                        </MudStack>
+                    </MudStack>
+                    
+                    @if(tipoCl == "Fisica")
+                    {
+                        <MudSelect T="string" @bind-Value="@genero" Label="Genero" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                            <MudSelectItem Value="@("Masculino")" />
+                            <MudSelectItem Value="@("Femenino")" />
+                            <MudSelectItem Value="@("Otro")" />
+                        </MudSelect>
+                    }
+                    
+                    <MudStack Row="true">
+                        <MudStack Style="width:50%">
+                            @if (tipoDoc != null)
+                            {
+                                <MudSelect T="int" @bind-Value="@tipoDocu" Label="Tipo de Documento" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                    @foreach(var tipos in tipoDoc)
+                                    {
+                                        <MudSelectItem Value="@tipos.IdTipoDoc">@tipos.Sigla</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            }
+                            else
+                            {
+                                <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                            }
+                        </MudStack>
+                        <MudStack Style="width:50%">
+                            <MudTextField Label="Numero de Documento" HelperText="Solo numeros por favor :D"
+                                      @bind-Value="usuarioCliente.NumDocumento" For="@(() => usuarioCliente.NumDocumento)"/>
+                        </MudStack>
+                    </MudStack>
+
+                    <MudStack Row="true" Justify="Justify.Center">
+                        <MudStack Style="width:50%">
+                            @if (loc != null)
+                            {
+                                <MudSelect T="int" @bind-Value="@loca" Label="Localidad" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                    @foreach(var local in loc)
+                                    {
+                                        <MudSelectItem Value="@local.IdLocalidad">@local.NombreLoc</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            }
+                            else
+                            {
+                                <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                            } 
+                        </MudStack>
+                        <MudStack Style="width:50%">
+                            <MudTextField Label="Numero de Telefono" HelperText="Sin 15 ni 0"
+                                      @bind-Value="usuarioCliente.Telefono" For="@(() => usuarioCliente.Telefono)"/>
+                        </MudStack>
+                    </MudStack>
+
+                    <MudTextField Label="Domicilio" HelperText="Lo mas claro posible"
+                                  @bind-Value="usuarioCliente.DomicilioC" For="@(() => usuarioCliente.DomicilioC)"/>
+
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.AppRegistration" Color="Color.Success" ButtonType="ButtonType.Submit">REGISTRARSE</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    //Objeto para almacenar datos del registro
+    private UsuarioCliente usuarioCliente = new UsuarioCliente();
+
+    //Objetos para CBO
+    private IEnumerable<CondicionIVA> condIva;
+    private IEnumerable<TipoDocumento> tipoDoc;
+    private IEnumerable<Localidad> loc;
+
+    private string tipoCl = "Fisica";
+    private string genero = "Masculino";
+    private int cond = 3;
+    private int tipoDocu = 3;
+    private int loca = 1;
+
+    private string password2 = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        condIva = await ServCondIVA.ObtenerCondiciones();
+        tipoDoc = await ServTipoDoc.ObtenerTiposDocs();
+        loc = await ServLocalidad.ObtenerLocalidades();
+    }
+
+    private async Task Registrarse()
+    {
+        if(string.IsNullOrEmpty(usuarioCliente.Password) || string.IsNullOrEmpty(password2))
+            Snackbar.Add($"Las contraseñas no pueden estar vacias", Severity.Error);
+        else
+            if (usuarioCliente.Password == password2)
+            {
+                //Asigno los valores apropiados
+                usuarioCliente.TipoCliente = Convert.ToChar(tipoCl.Substring(0, 1));
+                usuarioCliente.Genero = Convert.ToChar(genero.Substring(0, 1));
+                usuarioCliente.CondIva = cond;
+                usuarioCliente.TipoDocumento = tipoDocu;
+                usuarioCliente.LocalidadC = loca;
+
+                var registrado = await ServUsuario.Registrarse(usuarioCliente);
+
+                if (registrado)
+                    NavigationManager.NavigateTo("/login");
+                else
+                    Snackbar.Add($"No se pudo crear el usuario", Severity.Error); 
+            }
+            else
+                Snackbar.Add($"Las contraseñas no coinciden", Severity.Error);              
+    }
+}

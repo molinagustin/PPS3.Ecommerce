@@ -4,6 +4,7 @@
     {
         Task<bool> Login(UsuarioRequest usuarioReq);
         Task<bool> Logout();
+        Task<bool> Registrarse(UsuarioCliente usuarioCl);
         Task<IEnumerable<Usuario>> ObtenerUsuarios();
         Task<Usuario> ObtenerUsuario(int id);
         Task<Usuario> ObtenerUsuario(string nombreUsuario);

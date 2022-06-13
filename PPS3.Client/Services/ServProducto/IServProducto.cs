@@ -2,7 +2,7 @@
 {
     public interface IServProducto
     {
-        Task<IEnumerable<Producto>> ObtenerProductos();
+        Task<IEnumerable<ProductoListado>> ObtenerProductos();
         Task<Producto> ObtenerProducto(int id);
         Task<Producto> ObtenerProducto(string nombreProd);
         Task<bool> GuardarProducto(Producto producto);
