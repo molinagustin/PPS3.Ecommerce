@@ -26,10 +26,10 @@
                               @bind-Value="usuarioCliente.NombreUs" For="@(() => usuarioCliente.NombreUs)"/>
                     <MudTextField Label="Email" HelperText="Correo electronico"
                               @bind-Value="usuarioCliente.Email" For="@(() => usuarioCliente.Email)"/>
-                    <MudTextField Label="Contraseña" HelperText="Minimo 6 caracteres" Class="mt-3"
+                    <MudTextField Label="Contraseña" HelperText="Minimo 4 caracteres" Class="mt-3"
                                   @bind-Value="usuarioCliente.Password" For="@(() => usuarioCliente.Password)" 
                                   InputType="InputType.Password"/>
-                    <MudTextField Label="Repetir Contraseña" HelperText="Minimo 6 caracteres" Class="mt-3"
+                    <MudTextField Label="Repetir Contraseña" HelperText="Minimo 4 caracteres" Class="mt-3"
                                   @bind-Value="password2" For="@(() => usuarioCliente.Password)" InputType="InputType.Password"/>
                 </MudCardContent>
             </MudCard>
@@ -93,7 +93,7 @@
                             }
                         </MudStack>
                         <MudStack Style="width:50%">
-                            <MudTextField Label="Numero de Documento" HelperText="Solo numeros por favor :D"
+                            <MudTextField Label="Numero de Documento" HelperText="Solo numeros."
                                       @bind-Value="usuarioCliente.NumDocumento" For="@(() => usuarioCliente.NumDocumento)"/>
                         </MudStack>
                     </MudStack>
@@ -115,12 +115,12 @@
                             } 
                         </MudStack>
                         <MudStack Style="width:50%">
-                            <MudTextField Label="Numero de Telefono" HelperText="Sin 15 ni 0"
+                            <MudTextField Label="Numero de Telefono" HelperText="Sin 15, 0 ni espacios o caracteres especiales."
                                       @bind-Value="usuarioCliente.Telefono" For="@(() => usuarioCliente.Telefono)"/>
                         </MudStack>
                     </MudStack>
 
-                    <MudTextField Label="Domicilio" HelperText="Lo mas claro posible"
+                    <MudTextField Label="Domicilio" HelperText="Mas detalle, mejor servicio."
                                   @bind-Value="usuarioCliente.DomicilioC" For="@(() => usuarioCliente.DomicilioC)"/>
 
                 </MudCardContent>

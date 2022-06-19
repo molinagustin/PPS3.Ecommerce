@@ -1,0 +1,62 @@
+﻿@page "/listaTiposDoc"
+@inject IServTipoDocumento ServTipoDoc
+@attribute [Authorize(Roles = "1")]
+
+<MudText Align="Align.Center" Typo="Typo.h5">Listado de Tipos de Documentos</MudText>
+
+@if(tiposDoc == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{
+    <MudTable Items="@tiposDoc" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<TipoDocumento, bool>(FilterFunc)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Tipos de Documentos</MudText>
+            <MudSpacer/>
+            <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Id Tipo Documento</MudTh>
+            <MudTh>Sigla</MudTh>
+            <MudTh>Descripcion</MudTh>
+            <MudTh>Activo</MudTh>
+            <MudTh>Usuario Creacion</MudTh>
+            <MudTh>Fecha Creacion</MudTh>
+            <MudTh>Usuario Ult. Modif.</MudTh>
+            <MudTh>Fecha Ult. Modif.</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id Tipo Documento">@context.IdTipoDoc</MudTd>
+            <MudTd DataLabel="Sigla">@context.Sigla</MudTd>
+            <MudTd DataLabel="Descripcion">@context.DescripcionTD</MudTd>
+            <MudTd DataLabel="Activo">@context.Activo</MudTd>
+            <MudTd DataLabel="Usuario Creacion">@context.UsuarioCrea</MudTd>
+            <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
+            <MudTd DataLabel="Usuario Ult. Modif.">@context.UsuarioModif</MudTd>
+            <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager/>
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    IEnumerable<TipoDocumento>? tiposDoc;
+    private string nombreBuscar = "";
+
+    //Obtengo la lista de tipo documento
+    protected override async Task OnInitializedAsync() => tiposDoc = await ServTipoDoc.ObtenerTiposDocs();
+
+    private bool FilterFunc(TipoDocumento td)
+    {
+        if (string.IsNullOrWhiteSpace(nombreBuscar))
+            return true;
+        if (td.DescripcionTD.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (td.Sigla.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}

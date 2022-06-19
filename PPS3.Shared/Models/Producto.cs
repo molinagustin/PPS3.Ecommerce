@@ -15,6 +15,7 @@ namespace PPS3.Shared.Models
         public int TipoProd { get; set; }
         [Required(ErrorMessage = "El Precio de Costo debe ser introducido.")]
         [Column(TypeName = "decimal(8,2)")]
+        [RegularExpression(@"^\d+(?:[,]\d{0,2})?$", ErrorMessage = "El precio no es correcto")]
         public decimal PrecioCosto { get; set; }
         [Required(ErrorMessage = "El Precio Final debe ser introducido.")]
         [Column(TypeName = "decimal(8,2)")]

@@ -22,7 +22,7 @@
                     <MudTextField Label="Nombre Usuario" HelperText="Mayusculas y Minusculas no son iguales"
                               @bind-Value="usuarioReq.NombreUs" For="@(() => usuarioReq.NombreUs)"
                               AutoFocus = "true"/>
-                    <MudTextField Label="Password" HelperText="Colocar bien completo" Class="mt-3"
+                    <MudTextField Label="Password" Class="mt-3"
                                   @bind-Value="usuarioReq.Password" For="@(() => usuarioReq.Password)" 
                                   InputType="InputType.Password"/>
                 </MudCardContent>
@@ -48,6 +48,7 @@
         {
             await AuthStateProvider.GetAuthenticationStateAsync();
             NavigationManager.NavigateTo("/");    
+            Snackbar.Add($"¡Nos alegramos de volver a verte por aca!", Severity.Success); 
         }        
         else
             Snackbar.Add($"El usuario y/o contraseña no son correctos", Severity.Error);      

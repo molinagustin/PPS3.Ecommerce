@@ -3,6 +3,7 @@
     public interface IRepProveedor
     {
         Task<IEnumerable<Proveedor>> ObtenerProveedores();
+        Task<IEnumerable<ProveedorListado>> ObtenerProveedoresListado();
         Task<Proveedor> ObtenerProveedor(int id);
         Task<bool> InsertarProveedor(Proveedor proveedor);
         Task<bool> ActualizarProveedor(Proveedor proveedor);

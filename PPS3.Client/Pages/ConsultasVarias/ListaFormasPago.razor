@@ -1,0 +1,58 @@
+﻿@page "/listaFormasPago"
+@inject IServFormaPago ServFormaPago
+@attribute [Authorize(Roles = "1")]
+
+<MudText Align="Align.Center" Typo="Typo.h5">Listado de Formas Pago</MudText>
+
+@if(formasP == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{
+    <MudTable Items="@formasP" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<FormaPago, bool>(FilterFunc)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Formas de Pago</MudText>
+            <MudSpacer/>
+            <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Id Forma Pago</MudTh>
+            <MudTh>Forma de Pago</MudTh>
+            <MudTh>Activo</MudTh>
+            <MudTh>Usuario Creacion</MudTh>
+            <MudTh>Fecha Creacion</MudTh>
+            <MudTh>Usuario Ult. Modif.</MudTh>
+            <MudTh>Fecha Ult. Modif.</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id Forma Pago">@context.IdFormaP</MudTd>
+            <MudTd DataLabel="Forma de Pago">@context.FormaP</MudTd>
+            <MudTd DataLabel="Activo">@context.Activo</MudTd>
+            <MudTd DataLabel="Usuario Creacion">@context.UsuarioCrea</MudTd>
+            <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
+            <MudTd DataLabel="Usuario Ult. Modif.">@context.UsuarioModif</MudTd>
+            <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager/>
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    IEnumerable<FormaPago>? formasP;
+    private string nombreBuscar = "";
+
+    //Obtengo la lista de formas de pago
+    protected override async Task OnInitializedAsync() => formasP = await ServFormaPago.ObtenerFormasPago();
+    
+    private bool FilterFunc(FormaPago fp)
+    {
+        if (string.IsNullOrWhiteSpace(nombreBuscar))
+            return true;
+        if (fp.FormaP.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}

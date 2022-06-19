@@ -1,0 +1,72 @@
+﻿@page "/listaClientes"
+@inject IServCliente ServCliente
+@attribute [Authorize(Roles = "1")]
+
+<MudText Align="Align.Center" Typo="Typo.h5">Listado de Clientes</MudText>
+
+@if(clientes == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{
+    <MudTable Items="@clientes" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<Cliente, bool>(FilterFunc)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Clientes</MudText>
+            <MudSpacer/>
+            <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Id Cliente</MudTh>
+            <MudTh>Tipo de Cliente</MudTh>
+            <MudTh>Genero</MudTh>
+            <MudTh>Tipo de Documento</MudTh>
+            <MudTh>Numero de Documento</MudTh>
+            <MudTh>Nombre Completo</MudTh>
+            <MudTh>Condicion IVA</MudTh>
+            <MudTh>Domicilio</MudTh>
+            <MudTh>Telefono</MudTh>
+            <MudTh>Localidad</MudTh>
+            <MudTh>Activo</MudTh>
+            <MudTh>Fecha Creacion</MudTh>
+            <MudTh>Fecha Ult. Modif.</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id Cliente">@context.IdCliente</MudTd>
+            <MudTd DataLabel="Tipo de Cliente">@context.TipoCliente</MudTd>
+            <MudTd DataLabel="Genero">@context.Genero</MudTd>
+            <MudTd DataLabel="Tipo de Documento">@context.TipoDocumento</MudTd>
+            <MudTd DataLabel="Numero de Documento">@context.NumDocumento</MudTd>
+            <MudTd DataLabel="Nombre Completo">@context.NombreCompleto</MudTd>
+            <MudTd DataLabel="Condicion IVA">@context.CondIva</MudTd>
+            <MudTd DataLabel="Domicilio">@context.DomicilioC</MudTd>
+            <MudTd DataLabel="Telefono">@context.Telefono</MudTd>                                
+            <MudTd DataLabel="Localidad">@context.LocalidadC</MudTd>
+            <MudTd DataLabel="Activo">@context.Activo</MudTd>
+            <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
+            <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager/>
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    IEnumerable<Cliente>? clientes;
+    private string nombreBuscar = "";
+
+    //Obtengo la lista de clientes
+    protected override async Task OnInitializedAsync() => clientes = await ServCliente.ObtenerClientes();
+    
+    private bool FilterFunc(Cliente cliente)
+    {
+        if (string.IsNullOrWhiteSpace(nombreBuscar))
+            return true;
+        if (cliente.NombreCompleto.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (cliente.NumDocumento.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}

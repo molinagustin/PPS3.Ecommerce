@@ -7,5 +7,6 @@
         Task<ImagenProducto> ObtenerImagen(int id);
         Task<bool> GuardarImagen(ImagenProducto imagen);
         Task<bool> BorrarImagen(int id);
+        Task<bool> ImagenFavorita(ImagenProducto imagen);
     }
 }

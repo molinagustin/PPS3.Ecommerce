@@ -3,6 +3,7 @@
     public interface IRepContactoProveedor
     {
         Task<IEnumerable<ContactoProveedor>> ObtenerTodosContactos();
+        Task<IEnumerable<ContactoProvListado>> ObtenerContactosListado();
         Task<ContactoProveedor> ObtenerContactoProveedor(int id);
         Task<ContactoProveedor> ObtenerContactoProveedor(string nombreContacto);
         Task<bool> InsertarContactoProveedor(ContactoProveedor contactoProveedor);

@@ -1,0 +1,72 @@
+﻿@page "/listaContactosProv"
+@inject IServContactoProveedor ServContactoProv
+@attribute [Authorize(Roles = "1, 2")]
+
+<MudText Align="Align.Center" Typo="Typo.h5">Listado de Proveedores</MudText>
+
+@if(contactos == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{
+    <MudTable Items="@contactos" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<ContactoProvListado, bool>(FilterFunc)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Contactos de Proveedores</MudText>
+            <MudSpacer/>
+            <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Outlined" Href="/detallesContactosProv">Agregar Nuevo</MudButton>
+            <MudSpacer/>
+            <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Id Contacto</MudTh>
+            <MudTh>Nombre</MudTh>
+            <MudTh>Domicilio</MudTh>
+            <MudTh>Telefono</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Nombre Proveedor</MudTh>
+            <MudTh>Activo</MudTh>
+            <MudTh>Creado por</MudTh>
+            <MudTh>Modificado por</MudTh>
+            <MudTh>Fecha Creacion</MudTh>
+            <MudTh>Fecha Ult. Modif.</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id Contacto">@context.IdProvCont</MudTd>
+            <MudTd DataLabel="Nombre">@context.Nombre</MudTd>
+            <MudTd DataLabel="Domicilio">@context.Domicilio</MudTd>
+            <MudTd DataLabel="Telefono">@context.Telefono</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Nombre Proveedor">@context.NombreProv</MudTd>
+            <MudTd DataLabel="Activo">@context.Activo</MudTd>
+            <MudTd DataLabel="Creado por">@context.UsuarioCrea</MudTd>
+            <MudTd DataLabel="Modificado por">@context.UsuarioModif</MudTd>
+            <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
+            <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>                    
+            <MudTd><a href="/detallesContactosProv/@context.IdProvCont" class="btn-sm btn-warning">Editar</a></MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager/>
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    IEnumerable<ContactoProvListado> contactos;
+    private string nombreBuscar = "";
+
+    protected override async Task OnInitializedAsync() => contactos = await ServContactoProv.ObtenerContactosListado();
+
+    private bool FilterFunc(ContactoProvListado cont)
+    {
+        if (string.IsNullOrWhiteSpace(nombreBuscar))
+            return true;
+        if (cont.Nombre.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (cont.NombreProv.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (cont.Domicilio.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}

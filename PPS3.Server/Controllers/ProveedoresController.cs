@@ -3,7 +3,7 @@
 namespace PPS3.Server.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ProveedoresController : ControllerBase
     {
@@ -29,6 +29,13 @@ namespace PPS3.Server.Controllers
                 return Ok(response);            
             else
                 return NotFound(); //Code 404
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ProveedorListado>>> ObtenerProveedoresListado()
+        {
+            var response = await _repProveedor.ObtenerProveedoresListado();
+            return Ok(response);
         }
 
         [HttpPost]

@@ -32,7 +32,7 @@ namespace PPS3.Server.Repositories.RepImagenProducto
                                                         imagenProducto.IdProducto,
                                                         imagenProducto.Contenido,
                                                         imagenProducto.Principal,
-                                                        UsuarioModif = 1,
+                                                        imagenProducto.UsuarioModif,
                                                         FechaUltModif = DateTime.Now,
                                                         imagenProducto.IdImg
                                                         });
@@ -75,8 +75,8 @@ namespace PPS3.Server.Repositories.RepImagenProducto
             var result = await db.ExecuteAsync(sql, new { 
                                                         imagenProducto.IdProducto,
                                                         imagenProducto.Contenido,
-                                                        UsuarioCrea = 1,
-                                                        UsuarioModif = 1
+                                                        imagenProducto.UsuarioCrea,
+                                                        imagenProducto.UsuarioModif
                                                         });
             return result > 0;
         }
@@ -104,6 +104,7 @@ namespace PPS3.Server.Repositories.RepImagenProducto
                         SELECT *
                         FROM productos_imagenes
                         WHERE IdProducto = @IdProducto
+                        ORDER BY Principal DESC
                         ";
             var result = await db.QueryAsync<ImagenProducto>(sql, new { IdProducto = idProducto });
             return result;
@@ -121,6 +122,39 @@ namespace PPS3.Server.Repositories.RepImagenProducto
 
             var result = await db.QueryAsync<ImagenProducto>(sql, new { });
             return result;
+        }
+
+        public async Task<bool> ImagenFavorita(ImagenProducto imagenFav)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        UPDATE productos_imagenes
+                        SET
+                            Principal = 0
+                        WHERE IdProducto = @IdProducto
+                        ";
+            var result = await db.ExecuteAsync(sql, new{ imagenFav.IdProducto });
+
+            if (result > 0)
+            {
+                var sqlFav = @"
+                                UPDATE productos_imagenes
+                                SET
+                                    Principal = 1,
+                                    UsuarioModif = @UsuarioModif,
+                                    FechaUltModif = @FechaUltModif
+                                WHERE IdImg = @IdImg
+                                ";
+                var resultFav = await db.ExecuteAsync(sqlFav, new { 
+                                                                imagenFav.UsuarioModif,
+                                                                FechaUltModif = DateTime.Now,
+                                                                imagenFav.IdImg
+                                                                });
+                return resultFav > 0;
+            }
+
+            return false;
         }
     }
 }

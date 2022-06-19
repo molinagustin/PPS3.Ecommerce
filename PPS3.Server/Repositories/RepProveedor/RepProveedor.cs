@@ -20,15 +20,16 @@
                         SET
                             NombreProv=@NombreProv,
                             DomicilioProv=@DomicilioProv,
+                            Activo=@Activo,
                             UsuarioModif=@UsuarioModif,
-                            FechaUltModif=@FechaUltModif
-                        
+                            FechaUltModif=@FechaUltModif                        
                         WHERE IdProveedor = @IdProveedor
                         ";
             var result = await db.ExecuteAsync(sql, new {
                                                         proveedor.NombreProv,
                                                         proveedor.DomicilioProv,
-                                                        UsuarioModif = 1,
+                                                        proveedor.Activo,
+                                                        proveedor.UsuarioModif,
                                                         FechaUltModif = DateTime.Now,
                                                         proveedor.IdProveedor
                                                         });
@@ -79,8 +80,8 @@
             var result = await db.ExecuteAsync(sql, new { 
                                                         proveedor.NombreProv,
                                                         proveedor.DomicilioProv,
-                                                        UsuarioCrea = 1,
-                                                        UsuarioModif = 1
+                                                        proveedor.UsuarioCrea,
+                                                        proveedor.UsuarioModif
                                                         });
             return result > 0;
         }
@@ -109,6 +110,23 @@
                         ";
 
             var result = await db.QueryAsync<Proveedor>(sql, new {});
+            return result;
+        }
+
+        public async Task<IEnumerable<ProveedorListado>> ObtenerProveedoresListado()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT prov.IdProveedor, prov.NombreProv, prov.DomicilioProv, prov.Activo,              us1.NombreUs as UsuarioCrea, 
+                            us2.NombreUs as UsuarioModif, prov.FechaCrea, prov.FechaUltModif
+                        FROM proveedores as prov
+                        INNER JOIN usuarios as us1 ON prov.UsuarioCrea = us1.IdUsuarioAct
+                        INNER JOIN usuarios as us2 ON prov.UsuarioModif = us2.IdUsuarioAct
+                        ORDER BY prov.NombreProv
+                        ";
+
+            var result = await db.QueryAsync<ProveedorListado>(sql, new { });
             return result;
         }
     }

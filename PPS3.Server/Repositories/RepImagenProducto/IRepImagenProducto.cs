@@ -9,5 +9,6 @@
         Task<bool> InsertarImagen(ImagenProducto imagenProducto);
         Task<bool> ActualizarImagen(ImagenProducto imagenProducto);
         Task<bool> BorrarImagen(int id);
+        Task<bool> ImagenFavorita(ImagenProducto imagenFav);
     }
 }

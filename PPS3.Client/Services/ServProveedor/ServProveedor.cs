@@ -23,7 +23,7 @@ namespace PPS3.Client.Services.ServProveedor
                 return false;
 
             //Creo una solicitud Http de tipo delete
-            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/Proveedores/{id}");
+            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/Proveedores/BorrarProveedor/{id}");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 
@@ -56,7 +56,7 @@ namespace PPS3.Client.Services.ServProveedor
             if (proveedor.IdProveedor > 0)
             {
                 //Creo una solicitud Http de tipo PUT
-                var request = new HttpRequestMessage(HttpMethod.Put, $"api/Proveedores");
+                var request = new HttpRequestMessage(HttpMethod.Put, $"api/Proveedores/ActualizarProveedor");
                 //Agrego el token al Encabezado Http
                 request.Headers.Add("Authorization", "Bearer " + token);
                 //Agrego el JSON al BODY
@@ -67,7 +67,7 @@ namespace PPS3.Client.Services.ServProveedor
             else
             {
                 //Creo una solicitud Http de tipo POST
-                var request = new HttpRequestMessage(HttpMethod.Post, $"api/Proveedores");
+                var request = new HttpRequestMessage(HttpMethod.Post, $"api/Proveedores/CrearProveedor");
                 //Agrego el token al Encabezado Http
                 request.Headers.Add("Authorization", "Bearer " + token);
                 //Agrego el JSON al BODY
@@ -84,7 +84,7 @@ namespace PPS3.Client.Services.ServProveedor
 
         public async Task<Proveedor> ObtenerProveedor(int id)
         {
-            var response = await _httpClient.GetStreamAsync($"api/Proveedores/{id}");
+            var response = await _httpClient.GetStreamAsync($"api/Proveedores/ObtenerProveedor/{id}");
 
             var proveedor = await JsonSerializer.DeserializeAsync<Proveedor>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
@@ -93,11 +93,41 @@ namespace PPS3.Client.Services.ServProveedor
 
         public async Task<IEnumerable<Proveedor>> ObtenerProveedores()
         {
-            var response = await _httpClient.GetStreamAsync($"api/Proveedores");
+            var response = await _httpClient.GetStreamAsync($"api/Proveedores/ObtenerProveedores");
 
             var proveedores = await JsonSerializer.DeserializeAsync<IEnumerable<Proveedor>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
             return proveedores;
+        }
+
+        public async Task<IEnumerable<ProveedorListado>> ObtenerProveedoresListado()
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
+
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/Proveedores/ObtenerProveedoresListado");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bites) y lo deserializo en un objeto apropiado (Enumerable de ProveedoresListado)
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var provs = await JsonSerializer.DeserializeAsync<IEnumerable<ProveedorListado>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return provs;
+            }
+            else
+                return null;
         }
     }
 }

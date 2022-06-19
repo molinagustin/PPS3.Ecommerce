@@ -1,0 +1,99 @@
+﻿@page "/detallesUsuario/{id:int}"
+@inject IServUsuario ServUsuario
+@inject IServPrivilegio ServPrivi
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@attribute [Authorize(Roles = "1")]
+
+<MudText Align="Align.Center" Typo="Typo.h5">Detalles del Usuario</MudText>
+
+<EditForm Model="@usuario" OnValidSubmit="GuardarUsuario">
+    <DataAnnotationsValidator/>
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="6">
+            <MudCard Elevation="1" >
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos del Usuario</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTextField Label="Nombre Real del Usuario" HelperText="Nombre Completo" @bind-Value="usuario.NombreCompleto" For="@(() => usuario.NombreCompleto)" AutoFocus = "true" Required="true"/>
+
+                    <MudTextField Label="Nombre de Usuario" HelperText="Nombre Inicio Sesion" @bind-Value="usuario.NombreUs" For="@(() => usuario.NombreUs)" Required="true"/>
+
+                    @if(privilegios != null)
+                    {
+                        <MudSelect T="int" @bind-value="@priv" Label="Privilegio" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                            @foreach(var priv in privilegios)
+                            {
+                                <MudSelectItem Value="@priv.IdPrivi">@priv.DescPrivilegio</MudSelectItem>
+                            }
+                        </MudSelect>
+                    }
+                    else
+                    {
+                        <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                    }
+
+                    <MudTextField Label="Email" HelperText="Correo electronico"
+                                @bind-Value="usuario.Email" For="@(() => usuario.Email)"/>
+
+                    <MudSwitch @bind-Checked="emailChecked" Label="Email Confirmado" Color="Color.Success"/>
+
+                    <MudSwitch @bind-Checked="activeUser" Label="Usuario Activo" Color="Color.Success"/>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Save" Color="Color.Success" ButtonType="ButtonType.Submit">Guardar</MudButton>
+                    <MudDivider/>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.ExitToApp" Color="Color.Error" OnClick="Cancelar">Cancelar</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    //Parametro que se recibe por URL para una consulta del objeto
+    [Parameter]
+    public int id { get; set; }
+
+    Usuario usuario = new Usuario();
+
+    private IEnumerable<Privilegio> privilegios;
+    private int priv;
+
+    private bool emailChecked;
+    private bool activeUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Obtengo los privilegios y el usuario del ID
+        privilegios = await ServPrivi.ObtenerPrivilegios();
+        usuario = await ServUsuario.ObtenerUsuario(id);
+        priv = usuario.Privilegio;
+        emailChecked = usuario.EmailVerificado;
+        activeUser = usuario.Activo;
+    }
+
+    protected async Task GuardarUsuario()
+    {
+        //Asigno los datos de los controles fuera del model usuario
+        usuario.Privilegio = priv;
+        usuario.EmailVerificado = emailChecked;
+        usuario.Activo = activeUser;
+
+        var result = await ServUsuario.ActualizarUsuario(usuario);
+
+        if(result)
+        {
+            //Se redirige hacia el listado de productos
+            NavigationManager.NavigateTo("/listaUsuarios");
+            Snackbar.Add($"Usuario modificado de forma exitosa", Severity.Success);
+        }
+        else
+            Snackbar.Add($"No se pudo actualizar el usuario", Severity.Error);
+    }
+
+    protected void Cancelar() => NavigationManager.NavigateTo("/listaUsuarios");
+}

@@ -84,6 +84,33 @@ namespace PPS3.Client.Services.ServImagenProducto
                 return false;
         }
 
+        public async Task<bool> ImagenFavorita(ImagenProducto imagen)
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return false;
+
+            //Se procede a Serializar el contenido del producto por parametro
+            var imgJson = new StringContent(JsonSerializer.Serialize(imagen), Encoding.UTF8, "application/json");
+
+            //Creo una solicitud Http de tipo PUT
+            var request = new HttpRequestMessage(HttpMethod.Put, $"api/ImagenesProductos/ImagenFavorita");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+            //Agrego el JSON al BODY
+            request.Content = imgJson;
+            //Envio la solicitud HTTP
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            if (response.IsSuccessStatusCode)
+                return true;
+            else
+                return false;
+        }
+
         public async Task<ImagenProducto> ObtenerImagen(int id)
         {
             var response = await _httpClient.GetStreamAsync($"api/ImagenesProductos/ObtenerImagen/{id}");

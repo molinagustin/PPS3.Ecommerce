@@ -1,0 +1,113 @@
+﻿@page "/listaTarjetas"
+@inject IServTarjeta ServTarjeta
+@inject IServTipoTarjeta ServTipoTarj
+@attribute [Authorize(Roles = "1")]
+
+<MudText Align="Align.Center" Typo="Typo.h5">Listado de Tarjetas</MudText>
+
+@if(tarjetas == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{
+     <MudTable Items="@tarjetas" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<Tarjeta, bool>(FilterFunc)">
+         <ToolBarContent>
+            <MudText Typo="Typo.h6">Tarjetas</MudText>
+            <MudSpacer/>
+            <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Id Tarjeta</MudTh>
+            <MudTh>Nombre Tarjeta</MudTh>
+            <MudTh>Tipo Tarjeta</MudTh>
+            <MudTh>Activo</MudTh>
+            <MudTh>Usuario Creacion</MudTh>
+            <MudTh>Fecha Creacion</MudTh>
+            <MudTh>Usuario Ult. Modif.</MudTh>
+            <MudTh>Fecha Ult. Modif.</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id Tarjeta">@context.IdTarjeta</MudTd>
+            <MudTd DataLabel="Nombre Tarjeta">@context.NombreTarj</MudTd>
+            <MudTd DataLabel="Tipo Tarjeta">@context.TipoTarj</MudTd>
+            <MudTd DataLabel="Activo">@context.Activo</MudTd>
+            <MudTd DataLabel="Usuario Creacion">@context.UsuarioCrea</MudTd>
+            <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
+            <MudTd DataLabel="Usuario Ult. Modif.">@context.UsuarioModif</MudTd>
+            <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager/>
+        </PagerContent>
+     </MudTable>
+}
+
+<MudDivider Style="height: 10px"/>
+
+@if(tiposTarj == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{
+    <MudTable Items="@tiposTarj" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<TipoTarjeta, bool>(FilterFunc2)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Tipos de Tarjetas</MudText>
+            <MudSpacer/>
+            <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Id Tipo Tarjeta</MudTh>
+            <MudTh>Descripcion</MudTh>
+            <MudTh>Activo</MudTh>
+            <MudTh>Usuario Creacion</MudTh>
+            <MudTh>Fecha Creacion</MudTh>
+            <MudTh>Usuario Ult. Modif.</MudTh>
+            <MudTh>Fecha Ult. Modif.</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id Tipo Tarjeta">@context.IdTipoTarj</MudTd>
+            <MudTd DataLabel="Descripcion">@context.Descripcion</MudTd>
+            <MudTd DataLabel="Activo">@context.Activo</MudTd>
+            <MudTd DataLabel="Usuario Creacion">@context.UsuarioCrea</MudTd>
+            <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
+            <MudTd DataLabel="Usuario Ult. Modif.">@context.UsuarioModif</MudTd>
+            <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager/>
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    IEnumerable<Tarjeta>? tarjetas;
+    IEnumerable<TipoTarjeta>? tiposTarj;
+    private string nombreBuscar = "";
+
+    //Obtengo la lista de tarjetas
+    protected override async Task OnInitializedAsync()
+    {
+        tarjetas = await ServTarjeta.ObtenerTarjetas();
+        tiposTarj = await ServTipoTarj.ObtenerTiposTarj();
+    }
+
+    private bool FilterFunc(Tarjeta tarj)
+    {
+        if (string.IsNullOrWhiteSpace(nombreBuscar))
+            return true;
+        if (tarj.NombreTarj.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    private bool FilterFunc2(TipoTarjeta tipo)
+    {
+        if (string.IsNullOrWhiteSpace(nombreBuscar))
+            return true;
+        if (tipo.Descripcion.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}

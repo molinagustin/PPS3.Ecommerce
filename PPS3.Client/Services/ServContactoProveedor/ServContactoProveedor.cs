@@ -23,7 +23,7 @@ namespace PPS3.Client.Services.ServContactoProveedor
                 return false;
 
             //Creo una solicitud Http de tipo delete
-            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/ContactosProveedores/{id}");
+            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/ContactosProveedores/BorrarContactoProveedor/{id}");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 
@@ -47,7 +47,7 @@ namespace PPS3.Client.Services.ServContactoProveedor
                 return false;
 
             //Se procede a Serializar el contenido del producto por parametro
-            var contactoJson = new StringContent(JsonSerializer.Serialize(contacto), Encoding.UTF8, "applicattion/json");
+            var contactoJson = new StringContent(JsonSerializer.Serialize(contacto), Encoding.UTF8, "application/json");
 
             //Creo el objeto donde se guardara el mensaje devuelto
             var response = new HttpResponseMessage();
@@ -56,7 +56,7 @@ namespace PPS3.Client.Services.ServContactoProveedor
             if (contacto.IdProvCont > 0)
             {
                 //Creo una solicitud Http de tipo PUT
-                var request = new HttpRequestMessage(HttpMethod.Put, $"api/ContactosProveedores");
+                var request = new HttpRequestMessage(HttpMethod.Put, $"api/ContactosProveedores/ActualizarContactoProveedor");
                 //Agrego el token al Encabezado Http
                 request.Headers.Add("Authorization", "Bearer " + token);
                 //Agrego el JSON al BODY
@@ -67,7 +67,7 @@ namespace PPS3.Client.Services.ServContactoProveedor
             else
             {
                 //Creo una solicitud Http de tipo POST
-                var request = new HttpRequestMessage(HttpMethod.Post, $"api/ContactosProveedores");
+                var request = new HttpRequestMessage(HttpMethod.Post, $"api/ContactosProveedores/CrearNuevoContacto");
                 //Agrego el token al Encabezado Http
                 request.Headers.Add("Authorization", "Bearer " + token);
                 //Agrego el JSON al BODY
@@ -92,7 +92,7 @@ namespace PPS3.Client.Services.ServContactoProveedor
                 return null;
 
             //Creo una solicitud Http de tipo GET
-            var request = new HttpRequestMessage(HttpMethod.Get, $"api/ContactosProveedores/{nombreContacto}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/ContactosProveedores/ObtenerContactoProveedor/{nombreContacto}");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 
@@ -122,7 +122,7 @@ namespace PPS3.Client.Services.ServContactoProveedor
                 return null;
 
             //Creo una solicitud Http de tipo GET
-            var request = new HttpRequestMessage(HttpMethod.Get, $"api/ContactosProveedores/{id}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/ContactosProveedores/ObtenerContactoProveedor/{id}");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 
@@ -152,7 +152,7 @@ namespace PPS3.Client.Services.ServContactoProveedor
                 return null;
 
             //Creo una solicitud Http de tipo GET
-            var request = new HttpRequestMessage(HttpMethod.Get, $"api/ContactosProveedores");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/ContactosProveedores/ObtenerTodosContactos");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 
@@ -165,6 +165,36 @@ namespace PPS3.Client.Services.ServContactoProveedor
                 var stream = await response.Content.ReadAsStreamAsync();
 
                 var contactos = await JsonSerializer.DeserializeAsync<IEnumerable<ContactoProveedor>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return contactos;
+            }
+            else
+                return null;
+        }
+
+        public async Task<IEnumerable<ContactoProvListado>> ObtenerContactosListado()
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
+
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/ContactosProveedores/ObtenerContactosListado");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bits) y lo deserializo en un objeto apropiado
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var contactos = await JsonSerializer.DeserializeAsync<IEnumerable<ContactoProvListado>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                 return contactos;
             }

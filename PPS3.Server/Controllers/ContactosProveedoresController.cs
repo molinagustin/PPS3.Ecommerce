@@ -3,7 +3,7 @@
 namespace PPS3.Server.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ContactosProveedoresController : ControllerBase
     {
@@ -36,6 +36,13 @@ namespace PPS3.Server.Controllers
                 return Ok(response);
             else
                 return BadRequest();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ContactoProvListado>>> ObtenerContactosListado()
+        {
+            var response = await _repContactoProveedor.ObtenerContactosListado();
+            return Ok(response);
         }
 
         [HttpPost]

@@ -1,61 +1,80 @@
 ﻿@page "/detallesProducto/imagenes/{id:int}"
-@page "/detallesProducto/imagenes"
 @inject IServImagenProducto ServImagenProducto
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
+@attribute [Authorize(Roles = "1, 2")]
 
-<h3>Imagenes del Producto</h3>
+<AuthorizeView Context="usCont">
+    <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+</AuthorizeView>
 
-<InputFile OnChange="OnInputFileChanged" multiple/>
+<MudText Align="Align.Center" Typo="Typo.h3">Imagenes del Producto</MudText>
 
-@if(imagesDataUrls.Count > 0)
-{
-    <h4>Vista Previa de Imagenes a Guardar</h4>
-    <div class="card" style="width:50rem">
-        <div class="card-body">
-            @foreach(var image in imagesDataUrls)
+<MudItem xs="4">
+        <MudText Align="Align.Center" Typo="Typo.h5" Color="Color.Primary">Las imagenes seleccionadas se guardan automaticamente</MudText>
+        <InputFile OnChange="OnInputFileChanged" multiple/>
+</MudItem>
+
+<MudItem xs="4">
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Default" OnClick="Volver">VOLVER </MudIconButton>
+</MudItem>
+
+<MudText Align="Align.Center" Typo="Typo.h5">Imagenes Guardadas</MudText>
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudStack Row="true" Style="max-width:max-content;">
+            @if(imagenes != null && imagenes.Count() > 0)
             {
-                <img class="rounded m-1" src="@image" width=250 height=250/>
+                @foreach(var image in imagenes)
+                {
+                    <MudItem xs="3">
+                        <MudCard>                    
+                            <MudCardContent>
+                                <MudImage Elevation="2" ObjectFit="ObjectFit.Fill" Src="@image.UrlImagen" Style="width:250px; height:250px; margin:5px;"/>
+                            </MudCardContent>
+                            <MudCardActions>
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => BorrarImagen(image.IdImg))"/>
+                                    @if(image.Principal)
+                                    {
+                                        <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Primary"/>
+                                    }
+                                    else
+                                    {
+                                        <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" OnClick="@(() => ImagenFavorita(image))"/>
+                                    }
+                            </MudCardActions>                    
+                        </MudCard>
+                    </MudItem>
+                }
             }
-        </div>
-    </div>
-}
-else
-{
-    <p>No se seleccionaron imagenes todavia</p>
-}
-
-<h3>Ultimas Imagenes Guardadas</h3>
-
-@if(imagenes != null)
-{
-    <h4>Imagenes Guardadas</h4>
-    <div class="card" style="width:50rem">
-        <div class="card-body">
-            @foreach(var image in imagenes)
+            else
             {
-                <img class="rounded m-1" src="@image.UrlImagen" width=250 height=250/>
+                <MudText Align="Align.Center" Typo="Typo.h5" Color="Color.Error">El producto no posee imagenes todavia</MudText>
             }
-        </div>
-    </div>
-}
-else
-{
-    <p>No se guardaron imagenes todavia</p>
-}
+        </MudStack>
+    </MudItem>    
+</MudGrid>
 
 @code {
     [Parameter]
     public int id { get; set; }
 
+    private int idUsAct;
+
+    //Inyeccion de servicio para el Dialogo del boton
+    [Inject] private IDialogService DialogService { get; set; }
+
     //Lista para guardar imagenes
-    private IList<string> imagesDataUrls = new List<string>();
+    //private IList<string> imagesDataUrls = new List<string>();
 
     IEnumerable<ImagenProducto>? imagenes;
+    private int maxAllowedFiles = 10;
+    private string format = "image/png";
 
     private async Task OnInputFileChanged(InputFileChangeEventArgs e)
     {
-        var maxAllowedFiles = 4;
-        var format = "image/png";
-
         foreach(var imageFile in e.GetMultipleFiles(maxAllowedFiles))
         {
             var resisedFile = await imageFile.RequestImageFileAsync(format, 250, 250);
@@ -63,25 +82,65 @@ else
 
             await resisedFile.OpenReadStream().ReadAsync(buffer);
 
-            var imageDataUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+            //var imageDataUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
             //var imageBytes = System.Convert.FromBase64String(Convert.ToBase64String(buffer));
             //var imageStrng = System.Convert.ToBase64String(imageBytes);
-            imagesDataUrls.Add(imageDataUrl);
+            //imagesDataUrls.Add(imageDataUrl);
 
             var imagen = new ImagenProducto()
             {
-                IdProducto = 1,
+                IdProducto = id,
                 Contenido = buffer,
-                UsuarioCrea = 1,
-                UsuarioModif = 1
+                UsuarioCrea = idUsAct,
+                UsuarioModif = idUsAct
             };
 
             await ServImagenProducto.GuardarImagen(imagen);
         }
+
+        NavigationManager.NavigateTo($"/detallesProducto/imagenes/{id}", forceLoad: true);
     }
 
     protected override async Task OnInitializedAsync()
     {
-        imagenes = await ServImagenProducto.ObtenerUltimasImagenes();
+        imagenes = await ServImagenProducto.ObtenerImagenes(id);
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        //Guardo el ID del usuario actual
+        idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+    }
+
+    private async void BorrarImagen(int idImagen)
+    {
+        var result = await DialogService.ShowMessageBox(
+                    "¡Atencion!", 
+                    "Se procede a borrar la imagen y no podra ser recuperada. ¿Desea continuar?", 
+                    yesText:"Borrar", cancelText:"Cancelar");
+
+        if (result == true)
+        {
+            var borrado = await ServImagenProducto.BorrarImagen(idImagen);
+            if (borrado)
+                NavigationManager.NavigateTo($"/detallesProducto/imagenes/{id}", forceLoad: true);
+            else
+                Snackbar.Add($"No se pudo completar la accion", Severity.Info);  
+        }  
+        else    
+            Snackbar.Add($"Se cancelo la accion", Severity.Info);        
+    }
+
+    private async void ImagenFavorita(ImagenProducto imagenFavorita)
+    {        
+        imagenFavorita.UsuarioModif = idUsAct;
+
+        var result = await ServImagenProducto.ImagenFavorita(imagenFavorita);
+        if(result)
+            NavigationManager.NavigateTo($"/detallesProducto/imagenes/{id}", forceLoad: true);
+        else
+            Snackbar.Add($"La modificacion no se pudo llevar a cabo", Severity.Info); 
+    }
+
+    private void Volver() => NavigationManager.NavigateTo($"/detallesProducto/{id}");
 }

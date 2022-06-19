@@ -144,12 +144,12 @@
         </MudNavGroup>
 
         <MudNavGroup Title="Proveedores" Icon="@Icons.Filled.ContactPhone">
-            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Consultar</MudNavLink>
-            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
+            <MudNavLink Href="/listaProveedores" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Consultar</MudNavLink>
+            <MudNavLink Href="/detallesProveedor" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
 
             <MudNavGroup Title="Contacto de Proveedor" Icon="@Icons.Filled.PhoneAndroid">
-                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Consultar</MudNavLink>
-                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
+                <MudNavLink Href="/listaContactosProv" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Consultar</MudNavLink>
+                <MudNavLink Href="/detallesContactosProv" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
             </MudNavGroup>
         </MudNavGroup>
 
@@ -158,25 +158,23 @@
                 <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.MoneyOff">Informe de Deudores</MudNavLink>
         </MudNavGroup>
 
-        <MudNavGroup Title="Consultas Varias" Icon="@Icons.Filled.Layers">
-                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Person">Clientes</MudNavLink>
-                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Book">Condiciones IVA</MudNavLink>
-                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Payments">Formas de Pago</MudNavLink>
-                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.CreditCard">Tarjetas</MudNavLink>
-                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.CreditCard">Tipos de Tarjetas</MudNavLink>
-                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ShoppingCart">Estados Carro Compra</MudNavLink>
-                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.LibraryBooks">Tipos Ventas</MudNavLink>
-                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AccountCircle">Tipos Documento</MudNavLink>
-                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Summarize">Tipos Comprobante</MudNavLink>
-                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.LocationOn">Localidades</MudNavLink>
-                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.LocationOn">Provincias</MudNavLink>
-        </MudNavGroup>
-
         <AuthorizeView Roles="1">
+            <MudNavGroup Title="Consultas Varias" Icon="@Icons.Filled.Layers">
+                    <MudNavLink Href="/listaClientes" Match="NavLinkMatch.All" Icon="@Icons.Filled.Person">Clientes</MudNavLink>
+                    <MudNavLink Href="/listaCondIva" Match="NavLinkMatch.All" Icon="@Icons.Filled.Book">Condiciones IVA</MudNavLink>
+                    <MudNavLink Href="/listaFormasPago" Match="NavLinkMatch.All" Icon="@Icons.Filled.Payments">Formas de Pago</MudNavLink>
+                    <MudNavLink Href="/listaTarjetas" Match="NavLinkMatch.All" Icon="@Icons.Filled.CreditCard">Tarjetas</MudNavLink>
+                    <MudNavLink Href="/listaEstadosCarro" Match="NavLinkMatch.All" Icon="@Icons.Filled.ShoppingCart">Estados Carro Compra</MudNavLink>
+                    <MudNavLink Href="/listaTiposVentas" Match="NavLinkMatch.All" Icon="@Icons.Filled.LibraryBooks">Tipos Ventas</MudNavLink>
+                    <MudNavLink Href="/listaTiposDoc" Match="NavLinkMatch.All" Icon="@Icons.Filled.AccountCircle">Tipos Documento</MudNavLink>
+                    <MudNavLink Href="/listaTiposComp" Match="NavLinkMatch.All" Icon="@Icons.Filled.Summarize">Tipos Comprobante</MudNavLink>
+                    <MudNavLink Href="/listaLocalidades" Match="NavLinkMatch.All" Icon="@Icons.Filled.LocationOn">Localidades</MudNavLink>
+                    <MudNavLink Href="/listaProvincias" Match="NavLinkMatch.All" Icon="@Icons.Filled.LocationOn">Provincias</MudNavLink>
+            </MudNavGroup>
+        
             <MudNavGroup Title="Usuarios" Icon="@Icons.Filled.SupervisedUserCircle">
-                    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Consultar</MudNavLink>
-                    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
-                    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.PrivacyTip">Privilegios</MudNavLink>
+                    <MudNavLink Href="/listaUsuarios" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Consultar</MudNavLink>
+                    <MudNavLink Href="/registro" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
             </MudNavGroup>
 
             <MudNavGroup Title="Configuraciones" Icon="@Icons.Filled.SettingsApplications">

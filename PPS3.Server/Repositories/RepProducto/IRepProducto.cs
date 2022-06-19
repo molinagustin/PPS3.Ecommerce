@@ -7,6 +7,7 @@
         Task<Producto> ObtenerProducto(string nombreProd);
         Task<bool> InsertarProducto(Producto producto);
         Task<bool> ActualizarProducto(Producto producto);
-        Task<bool> BorrarProducto(int id);
+        Task<bool> BorrarProducto(int id, int idUsu);
+        Task<int> UltimoProductoCreado(int idUsuario);
     }
 }

@@ -1,58 +1,105 @@
 ﻿@page "/borrarProducto/{id:int}"
 @inject IServProducto ServProducto
+@inject IServRubro ServRubro
+@inject IServTipoProducto ServTipoProd
+@inject IServProveedor ServProv
+@inject IServUnidadMedida ServUnidadMed
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
 @inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "1, 2")]
 
-<h3>BorrarProducto</h3>
+<AuthorizeView Context="usCont">
+    <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+</AuthorizeView>
 
-<EditForm Model="@producto" OnValidSubmit="Borrar">
-    <table>
-        <tr>
-            <td>Nombre:</td>
-            <td><input type="text" @bind="producto.NombreProd" required/></td>            
-        </tr>
-        <tr>
-            <td>Descripcion:</td>
-            <td><input type="text" @bind="producto.Descripcion" required/></td>            
-        </tr>
-        <tr>
-            <td>Rubro:</td>
-            <td><input type="number" @bind="producto.Rubro"/></td>            
-        </tr>
-        <tr>
-            <td>Tipo Producto:</td>
-            <td><input type="text" @bind="producto.TipoProd"/></td>            
-        </tr>
-        <tr>
-            <td>Precio Costo:</td>
-            <td><input type="number" @bind="producto.PrecioCosto" min="0" step="0.01" required/></td>            
-        </tr>
-        <tr>
-            <td>Precio Final:</td>
-            <td><input type="number" @bind="producto.PrecioFinal" min="0" step="0.01" required/></td>            
-        </tr>
-        <tr>
-            <td>Proveedor:</td>
-            <td><input type="number" @bind="producto.Proveedor"/></td>            
-        </tr>
-        <tr>
-            <td>Unidad Medida:</td>
-            <td><input type="number" @bind="producto.UnidadMedida"/></td>            
-        </tr>
-        <tr>
-            <td>Cantidad Minima Alerta:</td>
-            <td><input type="number" @bind="producto.CantMinAlerta" min="0" step="0.01" required/></td>            
-        </tr>
-        <tr>
-            <td>Stock Existencia:</td>
-            <td><input type="number" @bind="producto.StockExistencia" min="0" step="0.01" required/></td>            
-        </tr>
-        <tr>
-            <td colspan="2" style="text-align:center">
-                <input type="submit" class="btn-danger" value="Borrar" />
-                <input type="button" class="btn-secondary" value="Cancelar" @onclick="Cancelar" />
-            </td>
-        </tr>
-    </table>
+<MudText Align="Align.Center" Typo="Typo.h5" Color="Color.Error">Verificar Datos del Producto a Borrar</MudText>
+
+<EditForm Model="@producto" OnValidSubmit="Borrar" Context="conForm">
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="6">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos del Producto</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTextField Label="Nombre del Producto" HelperText="Nombre Visible" @bind-Value="producto.NombreProd" For="@(() => producto.NombreProd)" AutoFocus = "true" Required="true" ReadOnly="true"/>
+                
+                <MudTextField Label="Descripcion del Producto" HelperText="Detalles para mejor entendimiento" @bind-Value="producto.Descripcion" For="@(() => producto.Descripcion)" Required="true" ReadOnly="true"/>
+                
+                @if (rubros != null)
+                {
+                    <MudSelect T="int" @bind-Value="@rub" Label="Rubro" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
+                        @foreach(var rubro in rubros)
+                        {
+                            <MudSelectItem Value="@rubro.IdRubro">@rubro.DescRubro</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
+                else
+                {
+                    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                }
+                
+                @if (tiposProds != null)
+                {
+                    <MudSelect T="int" @bind-Value="@tipo" Label="Tipo de Producto" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
+                        @foreach(var tp in tiposProds)
+                        {
+                            <MudSelectItem Value="@tp.IdTipo">@tp.DescripcionTipo</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
+                else
+                {
+                    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                }
+
+                <MudTextField Label="Precio de Costo" HelperText="Sin los adicionales" @bind-Value="producto.PrecioCosto" For="@(() => producto.PrecioCosto)" Required="true" ReadOnly="true"/>
+
+                <MudTextField Label="Precio Final" HelperText="El precio a la venta" @bind-Value="producto.PrecioFinal" For="@(() => producto.PrecioFinal)" Required="true" ReadOnly="true"/>
+
+                @if (provs != null)
+                {
+                    <MudSelect T="int" @bind-Value="@prov" Label="Proveedor" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
+                        @foreach(var pv in provs)
+                        {
+                            <MudSelectItem Value="@pv.IdProveedor">@pv.NombreProv</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
+                else
+                {
+                    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                }
+
+                @if (unids != null)
+                {
+                    <MudSelect T="int" @bind-Value="@uni" Label="Unidad de Medida" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
+                        @foreach(var um in unids)
+                        {
+                            <MudSelectItem Value="@um.IdUnidad">@um.DescripcionUnidad</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
+                else
+                {
+                    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                }
+
+                <MudTextField Label="Cantidad Minima para Alerta" HelperText="El valor que se tomara para avisar de poco stock" @bind-Value="producto.CantMinAlerta" For="@(() => producto.CantMinAlerta)" ReadOnly="true"/>
+
+                <MudTextField Label="Stock en Existencia" HelperText="Productos que quedan" @bind-Value="producto.StockExistencia" For="@(() => producto.StockExistencia)" ReadOnly="true"/>
+
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" ButtonType="ButtonType.Submit">BORRAR</MudButton>
+                <MudDivider/>
+                <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.ExitToApp" Color="Color.Primary" OnClick="Cancelar">Cancelar</MudButton>
+            </MudCardActions>
+        </MudItem>
+    </MudGrid>        
 </EditForm>
 
 @code {
@@ -60,30 +107,64 @@
     [Parameter]
     public int id { get; set; }
 
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
     //El producto que estara vinculado al formulario
     Producto producto = new Producto();
+
+    //Objetos para los CBO
+    private IEnumerable<Rubro> rubros;
+    private IEnumerable<TipoProducto> tiposProds;
+    private IEnumerable<Proveedor> provs;
+    private IEnumerable<UnidadMedida> unids;
+
+    //Objetos para guardar los valores
+    private int rub = 1;
+    private int tipo = 1;
+    private int prov = 1;
+    private int uni = 1;
 
     //Se verifica si el formulario sera de insercion o de modificacion
     protected override async Task OnInitializedAsync()
     {
-        if(id > 0)
-        {
-            producto = await ServProducto.ObtenerProducto(id);
-        }        
+        //Obtengo los elementos para los CBO
+        rubros = await ServRubro.ObtenerRubros();
+        tiposProds = await ServTipoProd.ObtenerTiposProd();
+        provs = await ServProv.ObtenerProveedores();
+        unids = await ServUnidadMed.ObtenerUnidades();
+
+        //Obtengo los datos del producto
+        producto = await ServProducto.ObtenerProducto(id);
+
+        //Guardo los ID de los SELECTORES
+        rub = producto.Rubro;
+        tipo = producto.TipoProd;
+        prov = producto.Proveedor;
+        uni = producto.UnidadMedida;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        //Guardo el ID del usuario actual
+        idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
     }
 
     //A traves de un metodo se va a guardar los cambios del producto
     protected async Task Borrar()
     {
         //Se llama al servicio para guardar
-        var result = await ServProducto.BorrarProducto(id);
+        var result = await ServProducto.BorrarProducto(id, idUsAct);
 
         if (result)
+        {
             //Se redirige hacia el inicio o index
-            NavigationManager.NavigateTo("/");
-        //else
-        //Mostrar un error
+            NavigationManager.NavigateTo("/listaProductos");
+            Snackbar.Add($"El producto fue eliminado de forma exitosa", Severity.Success);
+        }
+        else
+            Snackbar.Add($"El producto no pudo ser eliminado correctamente", Severity.Error);
     }
 
-    protected void Cancelar() => NavigationManager.NavigateTo("/");
+    protected void Cancelar() => NavigationManager.NavigateTo("/listaProductos");
 }

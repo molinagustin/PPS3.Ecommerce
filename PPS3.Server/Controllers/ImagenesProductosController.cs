@@ -80,6 +80,24 @@ namespace PPS3.Server.Controllers
                 return BadRequest();
         }
 
+        [HttpPut]
+        public async Task<ActionResult> ImagenFavorita([FromBody] ImagenProducto imagenFav)
+        {
+            if (imagenFav == null)
+                return BadRequest();
+
+            if (ModelState.IsValid)
+            {
+                var response = await _repImagenProducto.ImagenFavorita(imagenFav);
+                if (response != false)
+                    return Ok();
+                else
+                    return BadRequest();
+            }
+            else
+                return BadRequest();
+        }
+
         [HttpDelete("{id}")]
         public async Task<ActionResult> BorrarImagenProducto(int id)
         {

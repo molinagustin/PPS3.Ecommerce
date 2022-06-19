@@ -47,14 +47,14 @@
                                                         producto.UnidadMedida, 
                                                         producto.CantMinAlerta, 
                                                         producto.StockExistencia,
-                                                        UsuarioModif = 1, 
+                                                        producto.UsuarioModif, 
                                                         FechaUltModif = DateTime.Now, 
                                                         producto.IdProducto 
                                                         });
             return result > 0;
         }
 
-        public async Task<bool> BorrarProducto(int id)
+        public async Task<bool> BorrarProducto(int id, int idUsu)
         {
             var db = dbConnection();
 
@@ -67,7 +67,7 @@
                         ";
 
             var result = await db.ExecuteAsync(sql, new { 
-                                                        UsuarioModif = 1,
+                                                        UsuarioModif = idUsu,
                                                         FechaUltModif = DateTime.Now,
                                                         IdProducto = id
                                                         });
@@ -121,8 +121,8 @@
                                                         producto.UnidadMedida, 
                                                         producto.CantMinAlerta, 
                                                         producto.StockExistencia,
-                                                        UsuarioCrea = 1, 
-                                                        UsuarioModif = 1 });
+                                                        producto.UsuarioCrea, 
+                                                        producto.UsuarioModif });
             return result > 0;
         }
 
@@ -174,6 +174,19 @@
             //El metodo QueryAsync va a devolver un IEnumerable con los datos del modelo que pasamos por parametro
             var result = await db.QueryAsync<ProductoListado>(sql, new { });
             return result;
-        }                
+        }
+
+        public async Task<int> UltimoProductoCreado(int idUsuario)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT MAX(productos.IdProducto)
+                        FROM productos
+                        WHERE UsuarioCrea = @UsuarioCrea
+                        ";
+            var result = await db.ExecuteScalarAsync<int>(sql, new { UsuarioCrea = idUsuario });
+            return result;
+        }
     }
 }

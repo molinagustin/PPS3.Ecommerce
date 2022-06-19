@@ -1,45 +1,73 @@
-﻿@page "/usuarios/lista"
+﻿@page "/listaUsuarios"
 @inject IServUsuario ServUsuario
+@attribute [Authorize(Roles = "1")]
 
-<h3>Lista de Usuarios</h3>
+<MudText Align="Align.Center" Typo="Typo.h5">Listado de Usuarios</MudText>
 
-@if (usuarios == null)
+@if(usuarios == null)
 {
-    <p><em>Cargando...</em></p>
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
 }
 else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>IdUsuario</th>
-                <th>NombreCompleto</th>
-                <th>NombreUs</th>
-                <th>Email</th>
-                <th>EmailVerificado</th>                
-            </tr>
-        </thead>
-        <tbody>
-            @foreach(var usu in usuarios)
-            {
-                <tr>
-                    <td>@usu.IdUsuarioAct</td>                  
-                    <td>@usu.NombreCompleto</td>
-                    <td>@usu.NombreUs</td>
-                    <td>@usu.Email</td>
-                    <td>@usu.EmailVerificado</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+{    
+    <MudTable Items="@usuarios" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<Usuario, bool>(FilterFunc)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Usuarios</MudText>
+            <MudSpacer/>
+            <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Outlined" Href="/registro">Agregar Nuevo</MudButton>
+            <MudSpacer/>
+            <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Id Usuario</MudTh>
+            <MudTh>Nombre Completo</MudTh>
+            <MudTh>Nombre Usuario</MudTh>
+            <MudTh>Privilegio</MudTh>
+            <MudTh>Id Cliente</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Email Verificado</MudTh>
+            <MudTh>Activo</MudTh>
+            <MudTh>Fecha Creacion</MudTh>
+            <MudTh>Fecha Ult. Modif.</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id Usuario">@context.IdUsuarioAct</MudTd>
+            <MudTd DataLabel="Nombre Completo">@context.NombreCompleto</MudTd>
+            <MudTd DataLabel="Nombre Usuario">@context.NombreUs</MudTd>
+            <MudTd DataLabel="Privilegio">@context.Privilegio</MudTd>
+            <MudTd DataLabel="Id Cliente">@context.IdCliente</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Email Verificado">@context.EmailVerificado</MudTd>
+            <MudTd DataLabel="Activo">@context.Activo</MudTd>
+            <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>                                
+            <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>  
+            <MudTd><a href="/detallesUsuario/@context.IdUsuarioAct" class="btn-sm btn-warning">Editar</a></MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager/>
+        </PagerContent>
+    </MudTable>
 }
 
 @code {
     IEnumerable<Usuario>? usuarios;
+    private string nombreBuscar = "";
 
-    protected override async Task OnInitializedAsync()
+    //Obtengo la lista de usuarios
+    protected override async Task OnInitializedAsync() => usuarios = await ServUsuario.ObtenerUsuarios();
+    
+    private bool FilterFunc(Usuario usuario)
     {
-        //Obtengo la lista de usuarios, y luego re renderizo el componente para mostrar los cambios
-        usuarios = await ServUsuario.ObtenerUsuarios();
-    }    
+        if (string.IsNullOrWhiteSpace(nombreBuscar))
+            return true;
+        if (usuario.NombreCompleto.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (usuario.NombreUs.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (usuario.Email.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (usuario.Privilegio.ToString().Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
 }

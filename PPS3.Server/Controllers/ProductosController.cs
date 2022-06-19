@@ -48,6 +48,17 @@ namespace PPS3.Server.Controllers
                 return BadRequest();
         }
 
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<int>> UltimoProductoCreado(int idUsuario)
+        {
+            var response = await _repProducto.UltimoProductoCreado(idUsuario);
+
+            if (response > 0)
+                return Ok(response);
+            else
+                return BadRequest();
+        }
+
         [HttpPost]
         public async Task<ActionResult> CrearProducto([FromBody] Producto producto)
         {
@@ -88,9 +99,9 @@ namespace PPS3.Server.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> BorrarProducto(int id)
+        public async Task<ActionResult> BorrarProducto(int id, int idUsu)
         {
-            var response = await _repProducto.BorrarProducto(id);
+            var response = await _repProducto.BorrarProducto(id, idUsu);
             if (response != false)
                 return Ok();
             else

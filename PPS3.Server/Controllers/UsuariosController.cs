@@ -96,7 +96,7 @@ namespace PPS3.Server.Controllers
                 if (response != false)
                     return Ok();
                 else
-                    return BadRequest();
+                    return StatusCode(500);
             }
             else
                 return Problem();

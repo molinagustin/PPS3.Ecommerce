@@ -24,12 +24,10 @@ namespace PPS3.Server.Repositories.RepUsuario
                         SET
                             NombreCompleto = @NombreCompleto,
                             NombreUs = @NombreUs,
-                            SaltCont = @SaltCont,
-                            HashCont = @HashCont,
                             Privilegio = @Privilegio,
-                            IdCliente = @IdCliente,
                             Email = @Email,
                             EmailVerificado = @EmailVerificado,
+                            Activo = @Activo,
                             FechaUltModif = @FechaUltModif
                         WHERE IdUsuarioAct = @IdUsuarioAct
                         ";
@@ -37,12 +35,10 @@ namespace PPS3.Server.Repositories.RepUsuario
             var result = await db.ExecuteAsync(sql, new {
                 usuario.NombreCompleto,
                 usuario.NombreUs,
-                usuario.SaltCont,
-                usuario.HashCont,
                 usuario.Privilegio,
-                usuario.IdCliente,
                 usuario.Email,
                 usuario.EmailVerificado,
+                usuario.Activo,
                 FechaUltModif = DateTime.Now,
                 usuario.IdUsuarioAct
             });

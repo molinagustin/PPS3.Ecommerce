@@ -3,6 +3,7 @@
     public interface IServContactoProveedor
     {
         Task<IEnumerable<ContactoProveedor>> ObtenerContactos();
+        Task<IEnumerable<ContactoProvListado>> ObtenerContactosListado();
         Task<ContactoProveedor> ObtenerContacto(int id);
         Task<ContactoProveedor> ObtenerConctacto(string nombreContacto);
         Task<bool> GuardarContacto(ContactoProveedor contacto);

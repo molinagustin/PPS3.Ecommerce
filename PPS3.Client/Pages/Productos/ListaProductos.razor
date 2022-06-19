@@ -1,137 +1,64 @@
 ﻿@page "/listaProductos"
 @inject IServProducto ServProducto
-@inject NavigationManager NavigationManager
 @*Con el atributo Authorize se procede a regular el acceso a toda la pagina por usuarios autorizados solamente*@
 @attribute [Authorize(Roles = "1, 2")]
 
 <MudText Align="Align.Center" Typo="Typo.h5">Listado de Productos</MudText>
-  
 
-        @if(productos == null)
-        {
-            <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
-        }
-        else
-        {    
-            <MudTable Items="@productos" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<ProductoListado, bool>(FilterFunc)">
-                <ToolBarContent>
-                    <MudText Typo="Typo.h6">Productos</MudText>
-                    <MudSpacer/>
-                    <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Outlined" Href="/detallesProducto">Agregar Nuevo</MudButton>
-                    <MudSpacer/>
-                    <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh>Nombre</MudTh>
-                    <MudTh>Descripcion</MudTh>
-                    <MudTh>Rubro</MudTh>
-                    <MudTh>Tipo Producto</MudTh>
-                    <MudTh>Precio Costo</MudTh>
-                    <MudTh>Precio Final</MudTh>
-                    <MudTh>Proveedor</MudTh>
-                    <MudTh>Medido en</MudTh>
-                    <MudTh>Alerta de Cantidad</MudTh>
-                    <MudTh>Stock Existencia</MudTh>
-                    <MudTh>Creado por</MudTh>
-                    <MudTh>Modificado por</MudTh>
-                    <MudTh>Fecha Creacion</MudTh>
-                    <MudTh>Fecha Ult. Modif.</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Nombre">@context.NombreProd</MudTd>
-                    <MudTd DataLabel="Descripcion">@context.Descripcion</MudTd>
-                    <MudTd DataLabel="Rubro">@context.DescRubro</MudTd>
-                    <MudTd DataLabel="Tipo Producto">@context.DescripcionTipo</MudTd>
-                    <MudTd DataLabel="Precio Costo">@context.PrecioCosto</MudTd>
-                    <MudTd DataLabel="Precio Final">@context.PrecioFinal</MudTd>
-                    <MudTd DataLabel="Proveedor">@context.NombreProv</MudTd>
-                    <MudTd DataLabel="Medido en">@context.DescripcionUnidad</MudTd>
-                    <MudTd DataLabel="Alerta de Cantidad">@context.CantMinAlerta</MudTd>
-                    <MudTd DataLabel="Stock Existencia">@context.StockExistencia</MudTd>
-                    <MudTd DataLabel="Creado por">@context.UsuarioCrea</MudTd>
-                    <MudTd DataLabel="Modificado por">@context.UsuarioModif</MudTd>
-                    <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
-                    <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>
-                    <MudTd><a href="/detallesProducto/@context.IdProducto" class="btn-sm btn-warning">Editar</a></MudTd>
-                    <MudTd>
-                        <a href="/borrarProducto/@context.IdProducto" class="btn-sm btn-danger">Eliminar</a></MudTd>
-                </RowTemplate>
-                <PagerContent>
-                    <MudTablePager/>
-                </PagerContent>
-            </MudTable>
-        }
-
-
-@*<AuthorizeView Roles="1, 2">
-    <p>@context.User.Identity.Name</p>
-    <p>Valor de la Claim SID = @context.User.Claims.First().Value</p>
-</AuthorizeView>
-
-<table>
-    <tbody>
-        <tr>
-            <td colspan="2"><a href="/detallesProducto">Agregar Producto</a></td>
-        </tr>
-    </tbody>
-</table>
-
-@if (productos == null)
+@if(productos == null)
 {
-    <p><em>Cargando...</em></p>
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
 }
 else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>IdProducto</th>
-                <th>NombreProducto</th>
-                <th>Descripcion</th>
-                <th>Rubro</th>
-                <th>TipoProd</th>
-                <th>PrecioCosto</th>
-                <th>PrecioFinal</th>
-                <th>Proveedor</th>
-                <th>UnidadMedida</th>
-                <th>CantidadMinAlerta</th>
-                <th>StockExistencia</th>
-                <th>Activo</th>
-                <th>UsuarioCrea</th>
-                <th>FechaCrea</th>
-                <th>UsuarioModif</th>
-                <th>FechaUltModif</th>
-                <th></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach(var prod in productos)
-            {
-                <tr>
-                    <td>@prod.IdProducto</td>
-                    <td>@prod.NombreProd</td>
-                    <td>@prod.Descripcion</td>
-                    <td>@prod.Rubro</td>
-                    <td>@prod.TipoProd</td>
-                    <td>@prod.PrecioCosto</td>
-                    <td>@prod.PrecioFinal</td>
-                    <td>@prod.Proveedor</td>
-                    <td>@prod.UnidadMedida</td>
-                    <td>@prod.CantMinAlerta</td>
-                    <td>@prod.StockExistencia</td>
-                    <td>@prod.Activo</td>
-                    <td>@prod.UsuarioCrea</td>
-                    <td>@prod.FechaCrea</td>
-                    <td>@prod.UsuarioModif</td>
-                    <td>@prod.FechaUltModif</td>
-                    <td><a href="/detallesProducto/@prod.IdProducto">Modificar</a></td>
-                    <td><a href="/borrarProducto/@prod.IdProducto">Dar de Baja</a></td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}*@
+{    
+    <MudTable Items="@productos" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<ProductoListado, bool>(FilterFunc)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Productos</MudText>
+            <MudSpacer/>
+            <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Outlined" Href="/detallesProducto">Agregar Nuevo</MudButton>
+            <MudSpacer/>
+            <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Nombre</MudTh>
+            <MudTh>Descripcion</MudTh>
+            <MudTh>Rubro</MudTh>
+            <MudTh>Tipo Producto</MudTh>
+            <MudTh>Precio Costo</MudTh>
+            <MudTh>Precio Final</MudTh>
+            <MudTh>Proveedor</MudTh>
+            <MudTh>Medido en</MudTh>
+            <MudTh>Alerta de Cantidad</MudTh>
+            <MudTh>Stock Existencia</MudTh>
+            <MudTh>Creado por</MudTh>
+            <MudTh>Modificado por</MudTh>
+            <MudTh>Fecha Creacion</MudTh>
+            <MudTh>Fecha Ult. Modif.</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Nombre">@context.NombreProd</MudTd>
+            <MudTd DataLabel="Descripcion">@context.Descripcion</MudTd>
+            <MudTd DataLabel="Rubro">@context.DescRubro</MudTd>
+            <MudTd DataLabel="Tipo Producto">@context.DescripcionTipo</MudTd>
+            <MudTd DataLabel="Precio Costo">@context.PrecioCosto</MudTd>
+            <MudTd DataLabel="Precio Final">@context.PrecioFinal</MudTd>
+            <MudTd DataLabel="Proveedor">@context.NombreProv</MudTd>
+            <MudTd DataLabel="Medido en">@context.DescripcionUnidad</MudTd>
+            <MudTd DataLabel="Alerta de Cantidad">@context.CantMinAlerta</MudTd>
+            <MudTd DataLabel="Stock Existencia">@context.StockExistencia</MudTd>
+            <MudTd DataLabel="Creado por">@context.UsuarioCrea</MudTd>
+            <MudTd DataLabel="Modificado por">@context.UsuarioModif</MudTd>
+            <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
+            <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>                    
+            <MudTd><a href="/detallesProducto/@context.IdProducto" class="btn-sm btn-warning">Editar</a></MudTd>
+            <MudTd><a href="/detallesProducto/imagenes/@context.IdProducto" class="btn-sm btn-info">Imagenes</a></MudTd>
+            <MudTd><a href="/borrarProducto/@context.IdProducto" class="btn-sm btn-danger">Eliminar</a></MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager/>
+        </PagerContent>
+    </MudTable>
+}
 
 @code {
     IEnumerable<ProductoListado> productos;

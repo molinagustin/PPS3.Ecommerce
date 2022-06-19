@@ -49,14 +49,15 @@
     <BottomAppBar Contacto="ContactPage"/>
 
     <MudMainContent Class="pt-16 px-16">
-        <MudContainer Class="mt-16 mud-container-maxwidth-xl">
+        <MudContainer Class="mt-16 mb-16 mud-container-maxwidth-xl">
             @Body
         </MudContainer>
     </MudMainContent>
 </MudLayout>
 
 <MudThemeProvider/> @*Componente esencial para renderizar y obtener funcionalidades de MudBlazor*@
-<MudSnackbarProvider/> @*Componente requerido para utilizar las notificaciones SnackBar *@
+<MudDialogProvider/> @*Componente opcional que sirve para los menu de dialogo*@
+<MudSnackbarProvider/> @*Componente opcional que sirve para utilizar las notificaciones SnackBar *@
 
 @code{
     //Variable para determinar si se muestra o no la barra lateral

@@ -21,7 +21,7 @@
                 return null;
 
             //Creo una solicitud Http de tipo GET
-            var request = new HttpRequestMessage(HttpMethod.Get, $"api/TiposVentas/ObtenerTiposVentas");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/TiposVentas");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 
@@ -57,7 +57,7 @@
                 return null;
 
             //Creo una solicitud Http de tipo GET
-            var request = new HttpRequestMessage(HttpMethod.Get, $"api/TiposVentas/ObtenerTipoVenta/{id}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/TiposVentas/{id}");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 

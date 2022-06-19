@@ -1,0 +1,97 @@
+﻿@page "/detallesProveedor"
+@page "/detallesProveedor/{id:int}"
+@inject IServProveedor ServProv
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
+@attribute [Authorize(Roles = "1, 2")]
+
+<AuthorizeView Context="usCont">
+    <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+</AuthorizeView>
+
+<MudText Align="Align.Center" Typo="Typo.h5">Detalles de Proveedor</MudText>
+
+<EditForm Model="@prov" OnValidSubmit="GuardarProveedor" Context="conForm">
+    <DataAnnotationsValidator/>
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="6">
+            <MudCard Elevation="1">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos del Proveedor</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTextField Label="Nombre del Proveedor" HelperText="Nombre Completo" @bind-Value="prov.NombreProv" For="@(() => prov.NombreProv)" AutoFocus = "true" Required="true"/>
+
+                    <MudTextField Label="Domicilio del Proveedor" HelperText="Bien Detallado" @bind-Value="prov.DomicilioProv" For="@(() => prov.DomicilioProv)"/>
+
+                    <AuthorizeView Roles="1">
+                        @if(id > 0)
+                        {
+                            <MudSwitch @bind-Checked="active" Label="Proveedor Activo" Color="Color.Success"/>
+                        }                        
+                    </AuthorizeView>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Save" Color="Color.Success" ButtonType="ButtonType.Submit">Guardar</MudButton>
+                    <MudDivider/>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.ExitToApp" Color="Color.Error" OnClick="Cancelar">Cancelar</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    //Parametro que se recibe por URL para una consulta del objeto
+    [Parameter]
+    public int id { get; set; }
+
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
+    private bool active;
+
+    Proveedor prov = new Proveedor();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (id > 0)
+        {
+            prov = await ServProv.ObtenerProveedor(id);
+            active = prov.Activo;
+        }                
+    }
+
+    //Guardo el ID del usuario actual
+    protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+
+    protected async Task GuardarProveedor()
+    {
+        if (prov.IdProveedor > 0)
+        {
+            prov.Activo = active;
+            prov.UsuarioModif = idUsAct;
+        }        
+        else
+        {
+            prov.UsuarioCrea = idUsAct;
+            prov.UsuarioModif = idUsAct;
+        }
+
+        var result = await ServProv.GuardarProveedor(prov);
+
+        if (result)
+        {              
+            //Se redirige hacia el listado de productos
+            NavigationManager.NavigateTo("/listaProveedores");
+            Snackbar.Add($"Proveedor agregado de forma exitosa", Severity.Success);
+        }        
+        else
+            Snackbar.Add($"No se pudo crear/modificar el proveedor", Severity.Error);
+    }
+
+    protected void Cancelar() => NavigationManager.NavigateTo("/listaProveedores");
+}
