@@ -23,7 +23,7 @@ namespace PPS3.Client.Services.ServRubro
                 return false;
 
             //Creo una solicitud Http de tipo delete
-            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/Rubros/{id}");
+            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/Rubros/BorrarRubro/{id}");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 
@@ -56,7 +56,7 @@ namespace PPS3.Client.Services.ServRubro
             if (rubro.IdRubro > 0)
             {
                 //Creo una solicitud Http de tipo PUT
-                var request = new HttpRequestMessage(HttpMethod.Put, $"api/Rubros");
+                var request = new HttpRequestMessage(HttpMethod.Put, $"api/Rubros/ActualizarRubro");
                 //Agrego el token al Encabezado Http
                 request.Headers.Add("Authorization", "Bearer " + token);
                 //Agrego el JSON al BODY
@@ -67,7 +67,7 @@ namespace PPS3.Client.Services.ServRubro
             else
             {
                 //Creo una solicitud Http de tipo POST
-                var request = new HttpRequestMessage(HttpMethod.Post, $"api/Rubros");
+                var request = new HttpRequestMessage(HttpMethod.Post, $"api/Rubros/CrearRubro");
                 //Agrego el token al Encabezado Http
                 request.Headers.Add("Authorization", "Bearer " + token);
                 //Agrego el JSON al BODY
@@ -84,7 +84,7 @@ namespace PPS3.Client.Services.ServRubro
 
         public async Task<Rubro> ObtenerRubro(int id)
         {
-            var response = await _httpClient.GetStreamAsync($"api/Rubros/{id}");
+            var response = await _httpClient.GetStreamAsync($"api/Rubros/ObtenerRubro/{id}");
 
             var rubro = await JsonSerializer.DeserializeAsync<Rubro>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
@@ -93,11 +93,41 @@ namespace PPS3.Client.Services.ServRubro
 
         public async Task<IEnumerable<Rubro>> ObtenerRubros()
         {
-            var response = await _httpClient.GetStreamAsync($"api/Rubros");
+            var response = await _httpClient.GetStreamAsync($"api/Rubros/ObtenerRubros");
 
             var rubros = await JsonSerializer.DeserializeAsync<IEnumerable<Rubro>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
             return rubros;
+        }
+
+        public async Task<IEnumerable<RubroListado>> ObtenerRubrosListado()
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
+
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/Rubros/ObtenerRubrosListado");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bites) y lo deserializo en un objeto apropiado (Enumerable de rubros)
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var rubros = await JsonSerializer.DeserializeAsync<IEnumerable<RubroListado>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return rubros;
+            }
+            else
+                return null;
         }
     }
 }

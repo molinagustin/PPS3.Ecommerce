@@ -19,6 +19,7 @@
                         UPDATE rubros
                         SET
                             DescRubro = @DescRubro,
+                            Activo = @Activo,
                             UsuarioModif = @UsuarioModif,
                             FechaUltModif = @FechaUltModif
                         WHERE IdRubro = @IdRubro
@@ -26,7 +27,8 @@
 
             var result = await db.ExecuteAsync(sql, new { 
                                                         rubro.DescRubro, 
-                                                        UsuarioModif = 1, 
+                                                        rubro.Activo,
+                                                        rubro.UsuarioModif, 
                                                         FechaUltModif = DateTime.Now, 
                                                         rubro.IdRubro
                                                         });
@@ -73,8 +75,8 @@
 
             var result = await db.ExecuteAsync(sql, new { 
                                                         rubro.DescRubro, 
-                                                        UsuarioCrea = 1, 
-                                                        UsuarioModif = 1
+                                                        rubro.UsuarioCrea, 
+                                                        rubro.UsuarioModif
                                                         });
             return result > 0;
         }
@@ -103,6 +105,22 @@
                         ";
 
             var result = await db.QueryAsync<Rubro>(sql, new { });
+            return result;
+        }
+
+        public async Task<IEnumerable<RubroListado>> ObtenerRubrosListado()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT r.IdRubro, r.DescRubro, r.Activo, u1.NombreUs as UsuarioCrea, u2.NombreUs as UsuarioModif, r.FechaCrea, r.FechaUltModif
+                        FROM rubros as r
+                        INNER JOIN usuarios as u1 ON r.UsuarioCrea = u1.IdUsuarioAct
+                        INNER JOIN usuarios as u2 ON r.UsuarioModif = u2.IdUsuarioAct
+                        ORDER BY r.DescRubro
+                        ";
+
+            var result = await db.QueryAsync<RubroListado>(sql, new { });
             return result;
         }
     }

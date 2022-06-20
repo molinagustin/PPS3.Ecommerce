@@ -3,7 +3,7 @@
 namespace PPS3.Server.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class TiposProductosController : ControllerBase
     {
@@ -28,6 +28,13 @@ namespace PPS3.Server.Controllers
                 return Ok(response);
             else
                 return BadRequest();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<TiposProductosListado>>> ObtenerTiposProdList()
+        {
+            var response = await _repTipoProducto.ObtenerTiposProdList();
+            return Ok(response);
         }
 
         [HttpPost]

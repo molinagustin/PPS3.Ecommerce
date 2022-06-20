@@ -1,0 +1,95 @@
+﻿@page "/detallesUnidadesMed"
+@page "/detallesUnidadesMed/{id:int}"
+@inject IServUnidadMedida ServUnidadMed
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
+@attribute [Authorize(Roles = "1, 2")]
+
+<AuthorizeView Context="usCont">
+    <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+</AuthorizeView>
+
+<MudText Align="Align.Center" Typo="Typo.h5">Detalles de la Unidad de Medida</MudText>
+
+<EditForm Model="@unidad" OnValidSubmit="GuardarUnidad" Context="conForm">
+    <DataAnnotationsValidator/>
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="6">
+            <MudCard Elevation="1">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos de la Unidad de Medida</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTextField Label="Nombre de la Unidad de Medida" HelperText="Nombre Completo" @bind-Value="unidad.DescripcionUnidad" For="@(() => unidad.DescripcionUnidad)" AutoFocus = "true" Required="true"/>
+
+                    <AuthorizeView Roles="1">
+                        @if(id > 0)
+                        {
+                            <MudSwitch @bind-Checked="active" Label="Unidad de Medida Activa" Color="Color.Success"/>
+                        }
+                    </AuthorizeView>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Save" Color="Color.Success" ButtonType="ButtonType.Submit">Guardar</MudButton>
+                    <MudDivider/>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.ExitToApp" Color="Color.Error" OnClick="Cancelar">Cancelar</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    //Parametro que se recibe por URL para una consulta del objeto
+    [Parameter]
+    public int id { get; set; }
+
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
+    UnidadMedida unidad = new UnidadMedida();
+
+    private bool active;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (id > 0)
+        {
+            unidad = await ServUnidadMed.ObtenerUnidad(id);
+            active = unidad.Activo;
+        }
+    }
+
+    //Guardo el ID del usuario actual
+    protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+
+    protected async Task GuardarUnidad()
+    {
+        if(unidad.IdUnidad > 0)
+        {
+            unidad.UsuarioModif = idUsAct;
+            unidad.Activo = active;
+        }
+        else
+        {
+            unidad.UsuarioCrea = idUsAct;
+            unidad.UsuarioModif = idUsAct;
+        }
+
+        var result = await ServUnidadMed.GuardarUnidad(unidad);
+
+        if (result)
+        {              
+            //Se redirige hacia el listado de productos
+            NavigationManager.NavigateTo("/listaUnidadesMed");
+            Snackbar.Add($"Unidad de Medida agregada/modificada de forma exitosa", Severity.Success);
+        }        
+        else
+            Snackbar.Add($"No se pudo crear/modificar la Unidad de Medida", Severity.Error);
+    }
+
+    protected void Cancelar() => NavigationManager.NavigateTo("/listaUnidadesMed");
+}

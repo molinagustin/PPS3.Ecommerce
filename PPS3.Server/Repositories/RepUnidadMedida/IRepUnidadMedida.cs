@@ -3,6 +3,7 @@
     public interface IRepUnidadMedida
     {
         Task<IEnumerable<UnidadMedida>> ObtenerUnidadesMedida();
+        Task<IEnumerable<UnidadesMedidaListado>> ObtenerUnidadMedListado();
         Task<UnidadMedida> ObtenerUnidadMedida(int id);
         Task<bool> InsertarUnidadMedida(UnidadMedida unidadMedida);
         Task<bool> ActualizarUnidadMedida(UnidadMedida unidadMedida);

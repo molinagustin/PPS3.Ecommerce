@@ -19,6 +19,7 @@
                         UPDATE productos_tipos
                         SET
                             DescripcionTipo = @DescripcionTipo,
+                            Activo = @Activo,
                             UsuarioModif = @UsuarioModif,
                             FechaUltModif = @FechaUltModif
                         WHERE IdTipo = @IdTipo
@@ -26,7 +27,8 @@
 
             var result = await db.ExecuteAsync(sql, new {
                                                         tipoProducto.DescripcionTipo,
-                                                        UsuarioModif = 1,
+                                                        tipoProducto.Activo,
+                                                        tipoProducto.UsuarioModif,
                                                         FechaUltModif = DateTime.Now,
                                                         tipoProducto.IdTipo
                                                         });
@@ -73,8 +75,8 @@
 
             var result = await db.ExecuteAsync(sql, new { 
                                                         tipoProducto.DescripcionTipo,
-                                                        UsuarioCrea = 1,
-                                                        UsuarioModif = 1
+                                                        tipoProducto.UsuarioCrea,
+                                                        tipoProducto.UsuarioModif
                                                         });
             return result > 0;
         }
@@ -103,6 +105,23 @@
                         ";
 
             var result = await db.QueryAsync<TipoProducto>(sql, new { });
+            return result;
+        }
+
+        public async Task<IEnumerable<TiposProductosListado>> ObtenerTiposProdList()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT pt.IdTipo, pt.DescripcionTipo, pt.Activo, u1.NombreUs as UsuarioCrea, u2.NombreUs as UsuarioModif,
+                        pt.FechaCrea, pt.FechaUltModif
+                        FROM productos_tipos as pt
+                        INNER JOIN usuarios as u1 ON pt.UsuarioCrea = u1.IdUsuarioAct
+                        INNER JOIN usuarios as u2 ON pt.UsuarioModif = u2.IdUsuarioAct
+                        ORDER BY pt.DescripcionTipo
+                        ";
+
+            var result = await db.QueryAsync<TiposProductosListado>(sql, new { });
             return result;
         }
     }

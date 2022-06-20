@@ -1,0 +1,58 @@
+﻿@page "/listaRubros"
+@inject IServRubro ServRubro
+@attribute [Authorize(Roles = "1, 2")]
+
+<MudText Align="Align.Center" Typo="Typo.h5">Listado de Rubros</MudText>
+
+@if(rubros == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{
+    <MudTable Items="@rubros" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<RubroListado, bool>(FilterFunc)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Rubros</MudText>
+            <MudSpacer/>
+            <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Outlined" Href="/detallesRubro">Agregar Nuevo</MudButton>
+            <MudSpacer/>
+            <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Rubro</MudTh>
+            <MudTh>Activo</MudTh>
+            <MudTh>Creado por</MudTh>
+            <MudTh>Modificado por</MudTh>
+            <MudTh>Fecha Creacion</MudTh>
+            <MudTh>Fecha Ult. Modif.</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Rubro">@context.DescRubro</MudTd>
+            <MudTd DataLabel="Activo">@context.Activo</MudTd>
+            <MudTd DataLabel="Creado por">@context.UsuarioCrea</MudTd>
+            <MudTd DataLabel="Modificado por">@context.UsuarioModif</MudTd>
+            <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
+            <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>                    
+            <MudTd><a href="/detallesRubro/@context.IdRubro" class="btn-sm btn-warning">Editar</a></MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager/>
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    IEnumerable<RubroListado> rubros;
+    private string nombreBuscar = "";
+
+    protected override async Task OnInitializedAsync() => rubros = await ServRubro.ObtenerRubrosListado();
+
+    private bool FilterFunc(RubroListado rubro)
+    {
+        if (string.IsNullOrWhiteSpace(nombreBuscar))
+            return true;
+        if (rubro.DescRubro.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}

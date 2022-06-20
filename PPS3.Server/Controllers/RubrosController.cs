@@ -3,7 +3,7 @@
 namespace PPS3.Server.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class RubrosController : ControllerBase
     {
@@ -29,6 +29,13 @@ namespace PPS3.Server.Controllers
                 return Ok(response);
             else
                 return BadRequest();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<RubroListado>>> ObtenerRubrosListado()
+        {
+            var response = await _repRubro.ObtenerRubrosListado();
+            return Ok(response);
         }
 
         [HttpPost]

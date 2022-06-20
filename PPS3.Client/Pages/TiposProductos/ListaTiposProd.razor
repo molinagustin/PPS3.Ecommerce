@@ -1,0 +1,58 @@
+﻿@page "/listaTiposProd"
+@inject IServTipoProducto ServTipoProd
+@attribute [Authorize(Roles = "1, 2")]
+
+<MudText Align="Align.Center" Typo="Typo.h5">Listado de Tipos de Productos</MudText>
+
+@if(tiposProdList == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{
+    <MudTable Items="@tiposProdList" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<TiposProductosListado, bool>(FilterFunc)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Tipos de Productos</MudText>
+            <MudSpacer/>
+            <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Outlined" Href="/detallesTiposProd">Agregar Nuevo</MudButton>
+            <MudSpacer/>
+            <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Tipo de Producto</MudTh>
+            <MudTh>Activo</MudTh>
+            <MudTh>Creado por</MudTh>
+            <MudTh>Modificado por</MudTh>
+            <MudTh>Fecha Creacion</MudTh>
+            <MudTh>Fecha Ult. Modif.</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Tipo de Producto">@context.DescripcionTipo</MudTd>
+            <MudTd DataLabel="Activo">@context.Activo</MudTd>
+            <MudTd DataLabel="Creado por">@context.UsuarioCrea</MudTd>
+            <MudTd DataLabel="Modificado por">@context.UsuarioModif</MudTd>
+            <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
+            <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>                    
+            <MudTd><a href="/detallesTiposProd/@context.IdTipo" class="btn-sm btn-warning">Editar</a></MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager/>
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    IEnumerable<TiposProductosListado> tiposProdList;
+    private string nombreBuscar = "";
+
+    protected override async Task OnInitializedAsync() => tiposProdList = await ServTipoProd.ObtenerTiposProdList();
+
+    private bool FilterFunc(TiposProductosListado tpl)
+    {
+        if (string.IsNullOrWhiteSpace(nombreBuscar))
+            return true;
+        if (tpl.DescripcionTipo.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}

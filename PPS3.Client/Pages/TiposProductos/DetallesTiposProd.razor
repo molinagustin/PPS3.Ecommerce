@@ -1,0 +1,95 @@
+﻿@page "/detallesTiposProd"
+@page "/detallesTiposProd/{id:int}"
+@inject IServTipoProducto ServTipoProd
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
+@attribute [Authorize(Roles = "1, 2")]
+
+<AuthorizeView Context="usCont">
+    <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+</AuthorizeView>
+
+<MudText Align="Align.Center" Typo="Typo.h5">Detalles de Tipos de Productos</MudText>
+
+<EditForm Model="@tipoProd" OnValidSubmit="GuardarTipoProducto" Context="conForm">
+    <DataAnnotationsValidator/>
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="6">
+            <MudCard Elevation="1">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos del Tipo de Producto</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTextField Label="Nombre del Tipo de Producto" HelperText="Nombre Completo" @bind-Value="tipoProd.DescripcionTipo" For="@(() => tipoProd.DescripcionTipo)" AutoFocus = "true" Required="true"/>
+
+                    <AuthorizeView Roles="1">
+                        @if(id > 0)
+                        {
+                            <MudSwitch @bind-Checked="active" Label="Tipo Producto Activo" Color="Color.Success"/>
+                        }
+                    </AuthorizeView>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Save" Color="Color.Success" ButtonType="ButtonType.Submit">Guardar</MudButton>
+                    <MudDivider/>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.ExitToApp" Color="Color.Error" OnClick="Cancelar">Cancelar</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    //Parametro que se recibe por URL para una consulta del objeto
+    [Parameter]
+    public int id { get; set; }
+
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
+    TipoProducto tipoProd = new TipoProducto();
+
+    private bool active;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (id > 0)
+        {
+            tipoProd = await ServTipoProd.ObtenerTipoProd(id);
+            active = tipoProd.Activo;
+        }
+    }
+
+    //Guardo el ID del usuario actual
+    protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+
+    protected async Task GuardarTipoProducto()
+    {
+        if(tipoProd.IdTipo > 0)
+        {
+            tipoProd.UsuarioModif = idUsAct;
+            tipoProd.Activo = active;
+        }
+        else
+        {
+            tipoProd.UsuarioCrea = idUsAct;
+            tipoProd.UsuarioModif = idUsAct;
+        }
+
+        var result = await ServTipoProd.GuardarTipoProd(tipoProd);
+
+        if (result)
+        {              
+            //Se redirige hacia el listado de productos
+            NavigationManager.NavigateTo("/listaTiposProd");
+            Snackbar.Add($"Tipo de Producto agregado/modificado de forma exitosa", Severity.Success);
+        }        
+        else
+            Snackbar.Add($"No se pudo crear/modificar el Tipo de Producto", Severity.Error);
+    }
+
+    protected void Cancelar() => NavigationManager.NavigateTo("/listaTiposProd");
+}

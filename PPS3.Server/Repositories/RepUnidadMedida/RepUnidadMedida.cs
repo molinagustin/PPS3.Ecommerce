@@ -21,6 +21,7 @@ namespace PPS3.Server.Repositories.RepUnidadMedida
                         UPDATE unidades_medida
                         SET
                             DescripcionUnidad = @DescripcionUnidad,
+                            Activo = @Activo,
                             UsuarioModif = @UsuarioModif,
                             FechaUltModif = @FechaUltModif
                         WHERE IdUnidad = @IdUnidad
@@ -28,7 +29,8 @@ namespace PPS3.Server.Repositories.RepUnidadMedida
 
             var result = await db.ExecuteAsync(sql, new {
                                                         unidadMedida.DescripcionUnidad,
-                                                        UsuarioModif = 1,
+                                                        unidadMedida.Activo,
+                                                        unidadMedida.UsuarioModif,
                                                         FechaUltModif = DateTime.Now,
                                                         unidadMedida.IdUnidad
                                                         });
@@ -75,8 +77,8 @@ namespace PPS3.Server.Repositories.RepUnidadMedida
 
             var result = await db.ExecuteAsync(sql, new { 
                                                         unidadMedida.DescripcionUnidad,
-                                                        UsuarioCrea = 1,
-                                                        UsuarioModif = 1
+                                                        unidadMedida.UsuarioCrea,
+                                                        unidadMedida.UsuarioModif
                                                         });
             return result > 0;
         }
@@ -105,6 +107,22 @@ namespace PPS3.Server.Repositories.RepUnidadMedida
                         ";
 
             var result = await db.QueryFirstOrDefaultAsync<UnidadMedida>(sql, new { IdUnidad = id });
+            return result;
+        }
+
+        public async Task<IEnumerable<UnidadesMedidaListado>> ObtenerUnidadMedListado()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT um.IdUnidad, um.DescripcionUnidad, um.Activo, u1.NombreUs as UsuarioCrea, u2.NombreUs as UsuarioModif, um.FechaCrea, um.FechaUltModif
+                        FROM unidades_medida as um
+                        INNER JOIN usuarios as u1 ON um.UsuarioCrea = u1.IdUsuarioAct
+                        INNER JOIN usuarios as u2 ON um.UsuarioModif = u2.IdUsuarioAct
+                        ORDER BY um.DescripcionUnidad
+                        ";
+
+            var result = await db.QueryAsync<UnidadesMedidaListado>(sql, new { });
             return result;
         }
     }

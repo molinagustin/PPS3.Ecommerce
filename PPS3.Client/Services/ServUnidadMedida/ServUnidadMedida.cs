@@ -21,7 +21,7 @@
                 return false;
 
             //Creo una solicitud Http de tipo delete
-            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/UnidadesMedida/{id}");
+            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/UnidadesMedida/BorrarUnidadMedida/{id}");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 
@@ -58,7 +58,7 @@
             if(unidad.IdUnidad > 0)
             {
                 //Creo una solicitud Http de tipo PUT
-                var request = new HttpRequestMessage(HttpMethod.Put, $"api/UnidadesMedida");
+                var request = new HttpRequestMessage(HttpMethod.Put, $"api/UnidadesMedida/ActualizarUnidadMedida");
                 //Agrego el token al Encabezado Http
                 request.Headers.Add("Authorization", "Bearer " + token);
                 //Agrego el JSON al BODY
@@ -69,7 +69,7 @@
             else
             {
                 //Creo una solicitud Http de tipo POST
-                var request = new HttpRequestMessage(HttpMethod.Post, $"api/UnidadesMedida");
+                var request = new HttpRequestMessage(HttpMethod.Post, $"api/UnidadesMedida/CrearUnidadMedida");
                 //Agrego el token al Encabezado Http
                 request.Headers.Add("Authorization", "Bearer " + token);
                 //Agrego el JSON al BODY
@@ -91,7 +91,7 @@
 
         public async Task<UnidadMedida> ObtenerUnidad(int id)
         {
-            var response = await _httpClient.GetStreamAsync($"api/UnidadesMedida/{id}");
+            var response = await _httpClient.GetStreamAsync($"api/UnidadesMedida/ObtenerUnidadMedida/{id}");
 
             var unidad = await JsonSerializer.DeserializeAsync<UnidadMedida>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
@@ -100,11 +100,41 @@
 
         public async Task<IEnumerable<UnidadMedida>> ObtenerUnidades()
         {
-            var response = await _httpClient.GetStreamAsync($"api/UnidadesMedida");
+            var response = await _httpClient.GetStreamAsync($"api/UnidadesMedida/ObtenerUnidadesMedida");
 
             var unidades = await JsonSerializer.DeserializeAsync<IEnumerable<UnidadMedida>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
             return unidades;
+        }
+
+        public async Task<IEnumerable<UnidadesMedidaListado>> ObtenerUnidadMedListado()
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
+
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/UnidadesMedida/ObtenerUnidadMedListado");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bites) y lo deserializo en un objeto apropiado (Enumerable de unidades medida)
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var ums = await JsonSerializer.DeserializeAsync<IEnumerable<UnidadesMedidaListado>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return ums;
+            }
+            else
+                return null;
         }
     }
 }

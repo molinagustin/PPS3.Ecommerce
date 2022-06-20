@@ -1,0 +1,58 @@
+﻿@page "/listaUnidadesMed"
+@inject IServUnidadMedida ServUnidadMed
+@attribute [Authorize(Roles = "1, 2")]
+
+<MudText Align="Align.Center" Typo="Typo.h5">Listado de Unidades de Medida</MudText>
+
+@if (uniMedList == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{
+    <MudTable Items="@uniMedList" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<UnidadesMedidaListado, bool>(FilterFunc)">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Unidades de Medida</MudText>
+            <MudSpacer/>
+            <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Outlined" Href="/detallesUnidadesMed">Agregar Nueva</MudButton>
+            <MudSpacer/>
+            <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Unidad de Medida</MudTh>
+            <MudTh>Activo</MudTh>
+            <MudTh>Creado por</MudTh>
+            <MudTh>Modificado por</MudTh>
+            <MudTh>Fecha Creacion</MudTh>
+            <MudTh>Fecha Ult. Modif.</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Unidad de Medida">@context.DescripcionUnidad</MudTd>
+            <MudTd DataLabel="Activo">@context.Activo</MudTd>
+            <MudTd DataLabel="Creado por">@context.UsuarioCrea</MudTd>
+            <MudTd DataLabel="Modificado por">@context.UsuarioModif</MudTd>
+            <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
+            <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>                    
+            <MudTd><a href="/detallesUnidadesMed/@context.IdUnidad" class="btn-sm btn-warning">Editar</a></MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager/>
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    IEnumerable<UnidadesMedidaListado> uniMedList;
+    private string nombreBuscar = "";
+
+    protected override async Task OnInitializedAsync() => uniMedList = await ServUnidadMed.ObtenerUnidadMedListado();
+
+    private bool FilterFunc(UnidadesMedidaListado uml)
+    {
+        if (string.IsNullOrWhiteSpace(nombreBuscar))
+            return true;
+        if (uml.DescripcionUnidad.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}

@@ -3,7 +3,7 @@
 namespace PPS3.Server.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class UnidadesMedidaController : ControllerBase
     {
@@ -28,6 +28,13 @@ namespace PPS3.Server.Controllers
                 return Ok(response);
             else
                 return BadRequest();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UnidadesMedidaListado>>> ObtenerUnidadMedListado()
+        {
+            var response = await _repUnidadMedida.ObtenerUnidadMedListado();
+            return Ok(response);
         }
 
         [HttpPost]

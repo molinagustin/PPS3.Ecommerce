@@ -1,0 +1,95 @@
+﻿@page "/detallesRubro"
+@page "/detallesRubro/{id:int}"
+@inject IServRubro ServRubro
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
+@attribute [Authorize(Roles = "1, 2")]
+
+<AuthorizeView Context="usCont">
+    <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+</AuthorizeView>
+
+<MudText Align="Align.Center" Typo="Typo.h5">Detalles del Rubro</MudText>
+
+<EditForm Model="@rubro" OnValidSubmit="GuardarRubro" Context="conForm">
+    <DataAnnotationsValidator/>
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="6">
+            <MudCard Elevation="1">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos del Rubro</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTextField Label="Nombre del Rubro" HelperText="Nombre Completo" @bind-Value="rubro.DescRubro" For="@(() => rubro.DescRubro)" AutoFocus = "true" Required="true"/>
+
+                    <AuthorizeView Roles="1">
+                        @if(id > 0)
+                        {
+                            <MudSwitch @bind-Checked="active" Label="Rubro Activo" Color="Color.Success"/>
+                        }
+                    </AuthorizeView>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Save" Color="Color.Success" ButtonType="ButtonType.Submit">Guardar</MudButton>
+                    <MudDivider/>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.ExitToApp" Color="Color.Error" OnClick="Cancelar">Cancelar</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    //Parametro que se recibe por URL para una consulta del objeto
+    [Parameter]
+    public int id { get; set; }
+
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
+    Rubro rubro = new Rubro();
+
+    private bool active;
+
+    protected async Task GuardarRubro()
+    {
+        if(rubro.IdRubro > 0)
+        {
+            rubro.UsuarioModif = idUsAct;
+            rubro.Activo = active;
+        }
+        else
+        {
+            rubro.UsuarioCrea = idUsAct;
+            rubro.UsuarioModif = idUsAct;
+        }
+
+        var result = await ServRubro.GuardarRubro(rubro);
+
+        if (result)
+        {              
+            //Se redirige hacia el listado de productos
+            NavigationManager.NavigateTo("/listaRubros");
+            Snackbar.Add($"Rubro agregado/modificado de forma exitosa", Severity.Success);
+        }        
+        else
+            Snackbar.Add($"No se pudo crear/modificar el Rubro", Severity.Error);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (id > 0)
+        {
+            rubro = await ServRubro.ObtenerRubro(id);
+            active = rubro.Activo;
+        }
+    }
+
+    //Guardo el ID del usuario actual
+    protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+    
+    protected void Cancelar() => NavigationManager.NavigateTo("/listaRubros");
+}

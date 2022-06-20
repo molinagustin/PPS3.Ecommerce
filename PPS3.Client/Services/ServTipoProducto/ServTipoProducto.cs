@@ -23,7 +23,7 @@ namespace PPS3.Client.Services.ServTipoProducto
                 return false;
 
             //Creo una solicitud Http de tipo delete
-            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/TiposProductos/{id}");
+            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/TiposProductos/BorrarTipoProducto/{id}");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 
@@ -56,7 +56,7 @@ namespace PPS3.Client.Services.ServTipoProducto
             if (tipoProd.IdTipo > 0)
             {
                 //Creo una solicitud Http de tipo PUT
-                var request = new HttpRequestMessage(HttpMethod.Put, $"api/TiposProductos");
+                var request = new HttpRequestMessage(HttpMethod.Put, $"api/TiposProductos/ActualizarTipoProducto");
                 //Agrego el token al Encabezado Http
                 request.Headers.Add("Authorization", "Bearer " + token);
                 //Agrego el JSON al BODY
@@ -67,7 +67,7 @@ namespace PPS3.Client.Services.ServTipoProducto
             else
             {
                 //Creo una solicitud Http de tipo POST
-                var request = new HttpRequestMessage(HttpMethod.Post, $"api/TiposProductos");
+                var request = new HttpRequestMessage(HttpMethod.Post, $"api/TiposProductos/CrearTipoProducto");
                 //Agrego el token al Encabezado Http
                 request.Headers.Add("Authorization", "Bearer " + token);
                 //Agrego el JSON al BODY
@@ -84,7 +84,7 @@ namespace PPS3.Client.Services.ServTipoProducto
 
         public async Task<TipoProducto> ObtenerTipoProd(int id)
         {
-            var response = await _httpClient.GetStreamAsync($"api/TiposProductos/{id}");
+            var response = await _httpClient.GetStreamAsync($"api/TiposProductos/ObtenerTipoProducto/{id}");
 
             var tipoProd = await JsonSerializer.DeserializeAsync<TipoProducto>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
@@ -93,11 +93,41 @@ namespace PPS3.Client.Services.ServTipoProducto
 
         public async Task<IEnumerable<TipoProducto>> ObtenerTiposProd()
         {
-            var response = await _httpClient.GetStreamAsync("api/TiposProductos");
+            var response = await _httpClient.GetStreamAsync("api/TiposProductos/ObtenerTiposProductos");
 
             var tiposProd = await JsonSerializer.DeserializeAsync<IEnumerable<TipoProducto>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
             return tiposProd;
+        }
+
+        public async Task<IEnumerable<TiposProductosListado>> ObtenerTiposProdList()
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
+
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/TiposProductos/ObtenerTiposProdList");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bites) y lo deserializo en un objeto apropiado (Enumerable de tipos productos)
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var tps = await JsonSerializer.DeserializeAsync<IEnumerable<TiposProductosListado>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return tps;
+            }
+            else
+                return null;
         }
     }
 }
