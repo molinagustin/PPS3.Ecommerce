@@ -1,8 +1,250 @@
 ﻿@page "/detallesPresupuesto"
-@page "/detallesPresupuesto/{id:int}"
+@inject IServEncabezadoPresupuesto ServEncabPres
+@inject IServCuerpoPresupuesto ServCuerpoPres
+@inject IServProducto ServProducto
+@using Radzen.Blazor
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
+@attribute [Authorize(Roles = "1, 2")]
 
-<h3>DetallesPresupuesto</h3>
+<AuthorizeView Context="usCont">
+    <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+</AuthorizeView>
+
+<MudText Align="Align.Center" Typo="Typo.h5">Listado de Productos Disponibles</MudText>
+
+<MudGrid Justify="Justify.Center">
+    <MudItem lg="10">
+                            @*LISTADO DE PRODUCTOS*@
+        @if(productosDisponibles == null)
+        {
+            <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+        }
+        else
+        {    
+            <RadzenGrid Data="@productosDisponibles" TItem="ProductoListado" RowSelect="@(args => prodSelect = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
+                <Columns>
+                    <RadzenGridColumn TItem="ProductoListado" Property="NombreProd" Title="Nombre Producto"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripcion"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ProductoListado" Property="DescRubro" Title="Rubro"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ProductoListado" Property="DescripcionTipo" Title="Tipo Producto"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ProductoListado" Property="PrecioFinal" Title="Precio Venta"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ProductoListado" Property="DescripcionUnidad" Title="Unidad Medida"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ProductoListado" Property="NombreProv" Title="Proveedor"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ProductoListado" Property="StockExistencia" Title="Stock Existente"></RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+        }
+    </MudItem>
+    <MudItem xs="2">
+        <MudStack Row="true" Justify="Justify.Center">
+            <MudStack Style="width:50%">
+                <MudTextField Label="Cantidad" HelperText="Formato 9,99 ó 9" @bind-Value="cant"/>
+            </MudStack>
+            <MudStack>
+                <MudTextField Label="% Bonificacion" HelperText="Formato 9,99 ó 9" @bind-Value="bonif"/>
+            </MudStack>
+        </MudStack>
+        <MudStack Justify="Justify.Center">
+            <MudButton StartIcon="@Icons.Material.Filled.AddCircle" Color="Color.Primary" Variant="Variant.Outlined" OnClick="AgregarProducto">Agregar Producto</MudButton>
+        </MudStack>    
+    </MudItem>
+</MudGrid>
+
+<MudText Align="Align.Center" Typo="Typo.h5">Detalles del Presupuesto</MudText>
+
+@if(productosAgregados != null && productosAgregados.Count() > 0)
+{    
+    <MudGrid Justify="Justify.Center">
+        <MudItem lg="10">
+            <MudSimpleTable Striped="true">
+                <thead>
+                    <tr>
+                        <td>Nombre Producto</td>
+                        <td>Descripcion</td>
+                        <td>Unidad Medida</td>
+                        <td>Precio Venta</td>
+                        <td>Cantidad</td>
+                        <td>% Bonificacion</td>
+                        <td>Bonificacion Total</td>
+                        <td>Sub Total</td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var pr in productosAgregados)
+                    {
+                        <tr>
+                            <td>@pr.NombreProd</td>
+                            <td>@pr.Descripcion</td>
+                            <td>@pr.DescripcionUnidad</td>
+                            <td>@pr.PrecioFinal</td>
+                            <td>@pr.Cantidad</td>
+                            <td>@pr.Bonificacion</td>
+                            <td>@pr.BonificacionTotal</td>
+                            <td>@pr.SubTotal</td>
+                            <td><MudIconButton Icon="@Icons.Material.Filled.RemoveCircle" OnClick="@(e => RemoverProducto(pr.IdProducto))" Color="Color.Error"/></td>
+                        </tr>
+                    }
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>TOTAL:</td>
+                        <td><b>@productosAgregados.Sum(s => s.SubTotal)</b></td>
+                    </tr>
+                </tbody>
+            </MudSimpleTable>
+        </MudItem>
+        <MudItem xs="2">
+            <MudStack Justify="Justify.Center">
+                <MudStack>
+                    <MudTextField T="string" Label="Observaciones" Variant="Variant.Outlined" @bind-Value="observ" Lines="5" />
+                </MudStack>
+                <MudStack>
+                    <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success" Variant="Variant.Outlined" OnClick="GenerarPresupuesto">Generar Presupuesto</MudButton>
+                </MudStack>
+            </MudStack>
+        </MudItem>
+    </MudGrid>
+}
+else
+{
+    <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Error">NINGUN PRODUCTO AGREGADO</MudText>
+}
 
 @code {
+    //PARA MOSTRAR LOS PRODUCTOS Y BUSCARLOS
+    IEnumerable<ProductoListado> productosDisponibles;
+    List<ProductoListado>? productosAgregados;
+    ProductoListado? prodSelect;
 
+    //Para completar el formulario
+    private int cant = 1;
+    private decimal bonif = 0;
+    private string observ = "";
+
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
+    protected override async Task OnInitializedAsync()
+    {
+        productosDisponibles = await ServProducto.ObtenerProductos();
+        productosAgregados = new List<ProductoListado>();
+    }    
+
+    //Guardo el ID del usuario actual
+    protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));    
+
+    protected void AgregarProducto()
+    {
+        if (prodSelect != null)
+        {
+            //Verifico que el producto no se encuentre en la lista agregada
+            var prodYaAgregado = productosAgregados.Exists(a => a.IdProducto == prodSelect.IdProducto);
+            if(!prodYaAgregado)
+            {
+                //Realizo los calculos y asignaciones correspondientes
+                prodSelect.Cantidad = cant;
+                prodSelect.Bonificacion = bonif;
+                var precioTotCant = prodSelect.Cantidad * prodSelect.PrecioFinal;
+                var bonifUnit = (prodSelect.Bonificacion * prodSelect.PrecioFinal) / 100;
+                prodSelect.BonificacionTotal = bonifUnit * cant;
+                prodSelect.SubTotal = precioTotCant - prodSelect.BonificacionTotal;
+
+                //Agrego el producto al listado y reestablezco los controles
+                productosAgregados.Add(prodSelect);
+                prodSelect = null;
+                cant = 1;
+                bonif = 0;
+            }
+            else
+                Snackbar.Add($"El producto que intenta agregar, ya se encuentra en el presupuesto, debe seleccionar otro o bien remover el existente del listado del presupuesto", Severity.Error);
+
+        }
+        else
+            Snackbar.Add($"Debe seleccionar el producto a agregar", Severity.Error);
+    }
+
+    protected string RemoverProducto(int id)
+    {
+        if(id > 0)
+        {
+            if(productosAgregados != null && productosAgregados.Count() > 1)
+            {
+                var producto = productosAgregados.Find(x => x.IdProducto == id);
+                productosAgregados.Remove(producto);
+                Snackbar.Add($"Producto Removido", Severity.Success);
+            }
+            else
+                productosAgregados.Clear();
+        }
+        else
+            Snackbar.Add($"Debe seleccionar el producto a remover", Severity.Error);
+        return "";
+    }
+
+    private async Task GenerarPresupuesto()
+    {
+        if(productosAgregados != null && productosAgregados.Count() > 0)
+        {
+            //Creo un objeto para el encabezado del presupuesto que sera lo primero a guardarse
+            EncabezadoPresupuesto encab = new EncabezadoPresupuesto();
+            encab.Observaciones = observ;
+            encab.UsuarioCrea = idUsAct;
+            //Guardo el encabezado y si me devuelve el valor correcto, prosigo con el resto de operaciones
+            var numEncab = await ServEncabPres.CrearEncabezado(encab);
+
+            if(numEncab > 0)
+            {
+                //Al haberse creado el encabezado, se lo asigno a cada elemento a guardarse de la lista de detalles del presupuesto
+                //Voy a comprobar que se guarden todos los registros
+                var cantProd = productosAgregados.Count();
+                var cantProdGuard = 0;
+
+                foreach (var prod in productosAgregados)
+                {
+                    var detalle = new CuerpoPresupuesto();
+                    detalle.IdEncab = numEncab;
+                    detalle.Producto = prod.IdProducto;
+                    detalle.Cantidad = prod.Cantidad;
+                    detalle.PrecioUnit = prod.PrecioFinal;
+                    detalle.Bonificacion = prod.Bonificacion;
+                    detalle.BonificacionTotal = prod.BonificacionTotal;
+                    detalle.SubTotal = prod.SubTotal;
+
+                    //Guardo cada registro del detalle
+                    var detalleGuardado = await ServCuerpoPres.CrearCuerpo(detalle);
+                    if (detalleGuardado)
+                    {
+                        cantProdGuard++;
+                        continue;
+                    }
+                    else
+                    {
+                        Snackbar.Add($"No se pudo generar el presupuesto", Severity.Error);
+                        break;                        
+                    }
+                }
+
+                if(cantProdGuard == cantProd)
+                {
+                    //Si se guardaron todos los detalles de forma exitosa, navego hacia el listado de presupuestos
+                NavigationManager.NavigateTo("/listaPresupuestos");
+                Snackbar.Add($"Presupuesto Generado Correctamente", Severity.Success);
+                }
+                else
+                    Snackbar.Add($"No se pudo generar el presupuesto", Severity.Error);
+            }
+            else
+                Snackbar.Add($"No se pudo generar el presupuesto", Severity.Error);
+        }
+        else
+            Snackbar.Add($"No se puede generar el presupuesto porque el listado de productos es incorrecto", Severity.Error);
+    }
 }

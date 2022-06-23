@@ -3,7 +3,9 @@
     public interface IServEncabezadoPresupuesto
     {
         Task<IEnumerable<EncabezadoPresupuesto>> ObtenerEncabezados();
+        Task<IEnumerable<Presupuesto>> ObtenerPresupuestosList();
+        Task<IEnumerable<DetallePresupuesto>> ObtenerDetallesPresupuestosList();
         Task<EncabezadoPresupuesto> ObtenerEncabezado(int id);
-        Task<bool> CrearEncabezado(EncabezadoPresupuesto encabPres);
+        Task<int> CrearEncabezado(EncabezadoPresupuesto encabPres);
     }
 }

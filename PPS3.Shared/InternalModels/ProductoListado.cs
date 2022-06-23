@@ -23,5 +23,15 @@ namespace PPS3.Shared.InternalModels
         public string? UsuarioModif { get; set; }
         public DateTime FechaCrea { get; set; }
         public DateTime FechaUltModif { get; set; }
+
+        //Propiedades para los presupuestos
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal Cantidad { get; set; }
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal Bonificacion { get; set; }
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal BonificacionTotal { get; set; }
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal SubTotal { get; set; }
     }
 }

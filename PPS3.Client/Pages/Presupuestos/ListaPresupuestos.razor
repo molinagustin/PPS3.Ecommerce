@@ -1,7 +1,92 @@
 ﻿@page "/listaPresupuestos"
+@inject IServEncabezadoPresupuesto ServEncabPres
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@using Radzen.Blazor
+@attribute [Authorize(Roles = "1, 2")]
 
-<h3>ListaPresupuestos</h3>
+<MudText Align="Align.Center" Typo="Typo.h5">Listado de Presupuestos</MudText>
 
-@code {
+@if(presupuestos == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{        
+    <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Outlined" Href="/detallesPresupuesto">Agregar Nuevo</MudButton>
+    <MudIconButton OnClick="ImprimirPresupuesto" Icon="@Icons.Material.Filled.Print" Color="Color.Primary"/>
 
+    @*LISTADO DE PRESUPUESTOS*@
+    <RadzenGrid Data="@presupuestos" TItem="Presupuesto" RowSelect="@(args => presu = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;">
+        <Columns>
+            <RadzenGridColumn TItem="Presupuesto" Property="NumPresu" Title="N° Presupuesto"></RadzenGridColumn>
+            <RadzenGridColumn TItem="Presupuesto" Property="Observaciones" Title="Observaciones"></RadzenGridColumn>
+            <RadzenGridColumn TItem="Presupuesto" Property="UsuarioCrea" Title="Emitido Por"></RadzenGridColumn>
+            <RadzenGridColumn TItem="Presupuesto" Property="FechaCrea" Title="Fecha">
+                @*<Template Context="data">
+                    @string.Format("{0:d}", data.FechaCrea)
+                </Template>*@
+            </RadzenGridColumn>
+        </Columns>
+    </RadzenGrid>
+
+    @*DETALLES DE CADA PRESUPUESTO*@
+    <RadzenTabs>
+        <Tabs>
+            <RadzenTabsItem Text="Detalles del Presupuesto">
+                <RadzenGrid Data="@presu.DetallePresupuesto" TItem="DetallePresupuesto" AllowFiltering="true" AllowPaging="true" AllowSorting="true">
+                    <Columns>
+                        <RadzenGridColumn TItem="DetallePresupuesto" Property="NombreProducto" Title="Nombre del Producto"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="DetallePresupuesto" Property="Cantidad" Title="Cantidad"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="DetallePresupuesto" Property="DescripcionUnidad" Title="Unidad Medida"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="DetallePresupuesto" Property="PrecioUnit" Title="Precio por Unidad">
+                            <Template Context="PrecUn">
+                                @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", PrecUn.PrecioUnit)
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="DetallePresupuesto" Property="Bonificacion" Title="% Bonificado">
+                            <Template Context="bonif">
+                                @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", bonif.Bonificacion)
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="DetallePresupuesto" Property="BonificacionTotal" Title="Bonificacion Total">
+                            <Template Context="bonifT">
+                                @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", bonifT.BonificacionTotal)
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="DetallePresupuesto" Property="SubTotal" Title="Sub Total">
+                            <Template Context="SubT">
+                                @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", SubT.SubTotal)
+                            </Template>
+                            <FooterTemplate>
+                                TOTAL:
+                                @if(presu.DetallePresupuesto != null)
+                                {
+                                     <b>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", presu.DetallePresupuesto.Sum(s => s.SubTotal))</b>
+                                }
+                            </FooterTemplate>
+                        </RadzenGridColumn>
+                    </Columns>
+                </RadzenGrid>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+}
+
+@code 
+{
+    //Objetos para guardar datos de todos los presupuestos y el que se haya seleccionado
+    IEnumerable<Presupuesto> presupuestos;
+    Presupuesto presu = new Presupuesto();
+
+    protected override async Task OnInitializedAsync() => presupuestos = await ServEncabPres.ObtenerPresupuestosList();
+
+    protected void ImprimirPresupuesto()
+    {
+        @if(presu.NumPresu > 0)
+        {
+            Snackbar.Add($"Se comienza a imprimir el presupuesto", Severity.Success);
+        }
+        else
+            Snackbar.Add($"Debe seleccionar un presupuesto para imprimirlo", Severity.Error);
+    }
 }

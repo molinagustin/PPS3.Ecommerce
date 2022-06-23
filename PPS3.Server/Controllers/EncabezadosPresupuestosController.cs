@@ -3,7 +3,7 @@
 namespace PPS3.Server.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class EncabezadosPresupuestosController : ControllerBase
     {
@@ -28,8 +28,22 @@ namespace PPS3.Server.Controllers
                 return BadRequest();
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Presupuesto>>> ObtenerPresupuestosList()
+        {
+            var response = await _repEncab.ObtenerPresupuestosList();
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<DetallePresupuesto>>> ObtenerDetallesPresupuestosList()
+        {
+            var response = await _repEncab.ObtenerDetallesPresupuestosList();
+            return Ok(response);
+        }
+
         [HttpPost]
-        public async Task<ActionResult> CrearEncabezado([FromBody] EncabezadoPresupuesto encabezadoPresupuesto)
+        public async Task<ActionResult<int>> CrearEncabezado([FromBody] EncabezadoPresupuesto encabezadoPresupuesto)
         { 
             if (encabezadoPresupuesto == null)
                 return BadRequest();
@@ -37,8 +51,8 @@ namespace PPS3.Server.Controllers
             if (ModelState.IsValid)
             {
                 var response = await _repEncab.InsertarPresupuesto(encabezadoPresupuesto);
-                if (response != false)
-                    return Ok();
+                if (response > 0)
+                    return Ok(response);
                 else
                     return BadRequest();
             }
