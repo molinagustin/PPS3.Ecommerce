@@ -4,6 +4,7 @@ global using System.Text;
 global using System.Text.Json;
 global using Blazored.SessionStorage;
 global using PPS3.Client.CustomAuthStateProvider; //El CustomAuthProvider
+global using PPS3.Client.Data;
 global using Microsoft.AspNetCore.Components.Authorization; //Libreria que permite utilizar el Estado de Autenticacion (Authentication State)
 global using PPS3.Shared.Models;
 global using PPS3.Shared.InternalModels;

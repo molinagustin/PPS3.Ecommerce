@@ -29,7 +29,11 @@
                     <RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripcion"></RadzenGridColumn>
                     <RadzenGridColumn TItem="ProductoListado" Property="DescRubro" Title="Rubro"></RadzenGridColumn>
                     <RadzenGridColumn TItem="ProductoListado" Property="DescripcionTipo" Title="Tipo Producto"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductoListado" Property="PrecioFinal" Title="Precio Venta"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ProductoListado" Property="PrecioFinal" Title="Precio Venta">
+                        <Template Context="pVta">
+                            @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pVta.PrecioFinal)
+                        </Template>
+                    </RadzenGridColumn>
                     <RadzenGridColumn TItem="ProductoListado" Property="DescripcionUnidad" Title="Unidad Medida"></RadzenGridColumn>
                     <RadzenGridColumn TItem="ProductoListado" Property="NombreProv" Title="Proveedor"></RadzenGridColumn>
                     <RadzenGridColumn TItem="ProductoListado" Property="StockExistencia" Title="Stock Existente"></RadzenGridColumn>
@@ -79,11 +83,11 @@
                             <td>@pr.NombreProd</td>
                             <td>@pr.Descripcion</td>
                             <td>@pr.DescripcionUnidad</td>
-                            <td>@pr.PrecioFinal</td>
+                            <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pr.PrecioFinal)</td>
                             <td>@pr.Cantidad</td>
-                            <td>@pr.Bonificacion</td>
-                            <td>@pr.BonificacionTotal</td>
-                            <td>@pr.SubTotal</td>
+                            <td>@pr.Bonificacion %</td>
+                            <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pr.BonificacionTotal)</td>
+                            <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pr.SubTotal)</td>
                             <td><MudIconButton Icon="@Icons.Material.Filled.RemoveCircle" OnClick="@(e => RemoverProducto(pr.IdProducto))" Color="Color.Error"/></td>
                         </tr>
                     }
@@ -96,7 +100,7 @@
                         <td></td>
                         <td></td>
                         <td>TOTAL:</td>
-                        <td><b>@productosAgregados.Sum(s => s.SubTotal)</b></td>
+                        <td><b>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", productosAgregados.Sum(s => s.SubTotal))</b></td>
                     </tr>
                 </tbody>
             </MudSimpleTable>

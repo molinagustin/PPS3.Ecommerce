@@ -1,6 +1,7 @@
 ﻿@page "/listaPresupuestos"
 @inject IServEncabezadoPresupuesto ServEncabPres
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment env
 @using Radzen.Blazor
 @attribute [Authorize(Roles = "1, 2")]
 
@@ -45,7 +46,7 @@ else
                         </RadzenGridColumn>
                         <RadzenGridColumn TItem="DetallePresupuesto" Property="Bonificacion" Title="% Bonificado">
                             <Template Context="bonif">
-                                @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", bonif.Bonificacion)
+                                @bonif.Bonificacion %
                             </Template>
                         </RadzenGridColumn>
                         <RadzenGridColumn TItem="DetallePresupuesto" Property="BonificacionTotal" Title="Bonificacion Total">
@@ -84,7 +85,12 @@ else
     {
         @if(presu.NumPresu > 0)
         {
-            Snackbar.Add($"Se comienza a imprimir el presupuesto", Severity.Success);
+            //Mando a imprimir el objeto
+            var impresion = new pdfPrinter(env);
+            var result = impresion.GenerarPdfPresupuesto(presu);
+
+            if(!result)
+                Snackbar.Add($"No se pudo imprimir el pdf", Severity.Error);
         }
         else
             Snackbar.Add($"Debe seleccionar un presupuesto para imprimirlo", Severity.Error);
