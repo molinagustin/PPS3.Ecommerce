@@ -3,7 +3,7 @@
 namespace PPS3.Server.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class CarrosComprasController : ControllerBase
     {
@@ -15,6 +15,13 @@ namespace PPS3.Server.Controllers
         public async Task<ActionResult<IEnumerable<CarroCompra>>> ObtenerCarrosCompras()
         {
             var response = await _repCarroCompra.ObtenerCarrosCompras();
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<OrdenesCompraListado>>> ObtenerOrdenesCompra()
+        {
+            var response = await _repCarroCompra.ObtenerOrdenesCompra();
             return Ok(response);
         }
 

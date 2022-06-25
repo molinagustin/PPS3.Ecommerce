@@ -1,0 +1,370 @@
+﻿@page "/listaOrdenesCompra"
+@inject IServCarroCompra ServCarro
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@using Radzen.Blazor
+@attribute [Authorize(Roles = "1, 2")]
+
+<MudText Align="Align.Center" Typo="Typo.h5">Listado de Ordenes de Compra</MudText>
+
+<MudDivider Style="height:10px;"/>
+
+@if(fullOrders == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{
+    <MudGrid Justify="Justify.Center">
+            @if(ordenesPendientes == null)
+            {
+                <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+            }
+            else
+            {
+                <RadzenGrid Data="@ordenesPendientes" TItem="OrdenesCompraListado" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:30px;" AllowColumnResize="true">
+                    <Columns>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="N° Orden"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Estado" Title="Estado">
+                            <Template Context="est">
+                                <div style="color:green;">@est.Estado</div>
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="UsuarioCrea" Title="Solicitado por"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaOrden" Title="Fecha de Orden"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaEntrega" Title="Fecha de Entrega">
+                            <Template Context="fecEnt">
+                                @if(fecEnt.FechaEntrega == null)
+                                {
+                                    @string.Format("----");
+                                }
+                                else
+                                {
+                                    @string.Format("{0}", fecEnt.FechaEntrega);
+                                }
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaUltModif" Title="Ultima Modificacion"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Total" Title="Importe Total">
+                            <Template Context="tot">
+                                @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", tot.Total)
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Pagado" Title="¿Pagado?">
+                            <Template Context="pagado">
+                                @if(pagado.Pagado)
+                                {
+                                    @string.Format("Si");
+                                }
+                                else
+                                {
+                                    @string.Format("No");
+                                }
+                        </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaPago" Title="Fecha de Pago">
+                            <Template Context="fecPag">
+                                @if(fecPag.FechaPago == null)
+                                {
+                                    @string.Format("----");
+                                }
+                                else
+                                {
+                                    @string.Format("{0}", fecPag.FechaPago);
+                                }
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FormaP" Title="Forma de Pago"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Observaciones" Title="Observaciones">
+                            <Template Context="obs">
+                                @if(string.IsNullOrEmpty(obs.Observaciones))
+                                {
+                                    @string.Format("----");
+                                }
+                                else
+                                {
+                                    @string.Format("{0}", obs.Observaciones);
+                                }
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="Ver Detalles">
+                            <Template Context="detalles">
+                                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="info" Click="@(() => NavigationManager.NavigateTo($"/detallesOrdenesCompra/{@detalles.IdCarro}"))"/>
+                            </Template>
+                        </RadzenGridColumn>
+                    </Columns>
+                </RadzenGrid>
+            }
+    </MudGrid>
+
+    <MudDivider Style="height:15px;"/>
+
+    <MudGrid Justify="Justify.Center">
+            @if(ordenesAprobadas == null)
+            {
+                <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+            }
+            else
+            {
+                <RadzenGrid Data="@ordenesAprobadas" TItem="OrdenesCompraListado" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:30px;" AllowColumnResize="true">
+                    <Columns>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="N° Orden"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Estado" Title="Estado">
+                            <Template Context="est">
+                                <div style="color:#00FF00;">@est.Estado</div>
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="UsuarioCrea" Title="Solicitado por"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaOrden" Title="Fecha de Orden"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaEntrega" Title="Fecha de Entrega">
+                            <Template Context="fecEnt">
+                                @if(fecEnt.FechaEntrega == null)
+                                {
+                                    @string.Format("----");
+                                }
+                                else
+                                {
+                                    @string.Format("{0}", fecEnt.FechaEntrega);
+                                }
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaUltModif" Title="Ultima Modificacion"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Total" Title="Importe Total">
+                            <Template Context="tot">
+                                @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", tot.Total)
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Pagado" Title="¿Pagado?">
+                            <Template Context="pagado">
+                                @if(pagado.Pagado)
+                                {
+                                    @string.Format("Si");
+                                }
+                                else
+                                {
+                                    @string.Format("No");
+                                }
+                        </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaPago" Title="Fecha de Pago">
+                            <Template Context="fecPag">
+                                @if(fecPag.FechaPago == null)
+                                {
+                                    @string.Format("----");
+                                }
+                                else
+                                {
+                                    @string.Format("{0}", fecPag.FechaPago);
+                                }
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FormaP" Title="Forma de Pago"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Observaciones" Title="Observaciones">
+                            <Template Context="obs">
+                                @if(string.IsNullOrEmpty(obs.Observaciones))
+                                {
+                                    @string.Format("----");
+                                }
+                                else
+                                {
+                                    @string.Format("{0}", obs.Observaciones);
+                                }
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="Ver Detalles">
+                            <Template Context="detalles">
+                                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="info" Click="@(() => NavigationManager.NavigateTo($"/detallesOrdenesCompra/{@detalles.IdCarro}"))"/>
+                            </Template>
+                        </RadzenGridColumn>
+                    </Columns>
+                </RadzenGrid>
+            }
+    </MudGrid>
+
+    <MudDivider Style="height:15px;"/>
+
+    <MudGrid Justify="Justify.Center">
+            @if(ordenesCanceladas == null)
+            {
+                <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+            }
+            else
+            {
+                <RadzenGrid Data="@ordenesCanceladas" TItem="OrdenesCompraListado" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:30px;" AllowColumnResize="true">
+                    <Columns>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="N° Orden"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Estado" Title="Estado">
+                            <Template Context="est">
+                                <div style="color:red;">@est.Estado</div>
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="UsuarioCrea" Title="Solicitado por"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaOrden" Title="Fecha de Orden"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaEntrega" Title="Fecha de Entrega">
+                            <Template Context="fecEnt">
+                                @if(fecEnt.FechaEntrega == null)
+                                {
+                                    @string.Format("----");
+                                }
+                                else
+                                {
+                                    @string.Format("{0}", fecEnt.FechaEntrega);
+                                }
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaUltModif" Title="Ultima Modificacion"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Total" Title="Importe Total">
+                            <Template Context="tot">
+                                @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", tot.Total)
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Pagado" Title="¿Pagado?">
+                            <Template Context="pagado">
+                                @if(pagado.Pagado)
+                                {
+                                    @string.Format("Si");
+                                }
+                                else
+                                {
+                                    @string.Format("No");
+                                }
+                        </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaPago" Title="Fecha de Pago">
+                            <Template Context="fecPag">
+                                @if(fecPag.FechaPago == null)
+                                {
+                                    @string.Format("----");
+                                }
+                                else
+                                {
+                                    @string.Format("{0}", fecPag.FechaPago);
+                                }
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FormaP" Title="Forma de Pago"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Observaciones" Title="Observaciones">
+                            <Template Context="obs">
+                                @if(string.IsNullOrEmpty(obs.Observaciones))
+                                {
+                                    @string.Format("----");
+                                }
+                                else
+                                {
+                                    @string.Format("{0}", obs.Observaciones);
+                                }
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="Ver Detalles">
+                            <Template Context="detalles">
+                                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="info" Click="@(() => NavigationManager.NavigateTo($"/detallesOrdenesCompra/{@detalles.IdCarro}"))"/>
+                            </Template>
+                        </RadzenGridColumn>
+                    </Columns>
+                </RadzenGrid>
+            }
+    </MudGrid>
+
+    <MudDivider Style="height:15px;"/>
+
+    <MudGrid Justify="Justify.Center">
+            @if(ordenesFinalizadas == null)
+            {
+                <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+            }
+            else
+            {
+                <RadzenGrid Data="@ordenesFinalizadas" TItem="OrdenesCompraListado" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom: 30px;" AllowColumnResize="true">
+                    <Columns>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="N° Orden"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Estado" Title="Estado">
+                            <Template Context="est">
+                                <div style="color: blue;">@est.Estado</div>
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="UsuarioCrea" Title="Solicitado por"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaOrden" Title="Fecha de Orden"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaEntrega" Title="Fecha de Entrega">
+                            <Template Context="fecEnt">
+                                @if(fecEnt.FechaEntrega == null)
+                                {
+                                    @string.Format("----");
+                                }
+                                else
+                                {
+                                    @string.Format("{0}", fecEnt.FechaEntrega);
+                                }
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaUltModif" Title="Ultima Modificacion"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Total" Title="Importe Total">
+                            <Template Context="tot">
+                                @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", tot.Total)
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Pagado" Title="¿Pagado?">
+                            <Template Context="pagado">
+                                @if(pagado.Pagado)
+                                {
+                                    @string.Format("Si");
+                                }
+                                else
+                                {
+                                    @string.Format("No");
+                                }
+                        </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaPago" Title="Fecha de Pago">
+                            <Template Context="fecPag">
+                                @if(fecPag.FechaPago == null)
+                                {
+                                    @string.Format("----");
+                                }
+                                else
+                                {
+                                    @string.Format("{0}", fecPag.FechaPago);
+                                }
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FormaP" Title="Forma de Pago"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Observaciones" Title="Observaciones">
+                            <Template Context="obs">
+                                @if(string.IsNullOrEmpty(obs.Observaciones))
+                                {
+                                    @string.Format("----");
+                                }
+                                else
+                                {
+                                    @string.Format("{0}", obs.Observaciones);
+                                }
+                            </Template>
+                        </RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="Ver Detalles">
+                            <Template Context="detalles">
+                                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="info" Click="@(() => NavigationManager.NavigateTo($"/detallesOrdenesCompra/{@detalles.IdCarro}"))"/>
+                            </Template>
+                        </RadzenGridColumn>
+                    </Columns>
+                </RadzenGrid>
+            }
+    </MudGrid>
+}
+
+@code {
+    //Objetos para mostrar en las tablas
+    IEnumerable<OrdenesCompraListado> fullOrders;
+    IEnumerable<OrdenesCompraListado> ordenesPendientes;
+    IEnumerable<OrdenesCompraListado> ordenesAprobadas;
+    IEnumerable<OrdenesCompraListado> ordenesCanceladas;
+    IEnumerable<OrdenesCompraListado> ordenesFinalizadas;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        fullOrders = await ServCarro.ObtenerOrdenesCompra();
+        ordenesPendientes = fullOrders.Where(p => p.Estado == "Pendiente");
+        ordenesAprobadas = fullOrders.Where(a => a.Estado == "Aprobado");
+        ordenesCanceladas = fullOrders.Where(c => c.Estado == "Cancelado");
+        ordenesFinalizadas = fullOrders.Where(f => f.Estado == "Finalizado");
+    } 
+}

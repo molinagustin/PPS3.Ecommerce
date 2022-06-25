@@ -32,7 +32,7 @@ namespace PPS3.Client.Services.ServCarroCompra
             if (carro.IdCarro > 0)
             {
                 //Creo una solicitud Http de tipo PUT
-                var request = new HttpRequestMessage(HttpMethod.Put, $"api/CarrosCompras");
+                var request = new HttpRequestMessage(HttpMethod.Put, $"api/CarrosCompras/ActualizarCarroCompra");
                 //Agrego el token al Encabezado Http
                 request.Headers.Add("Authorization", "Bearer " + token);
                 //Agrego el JSON al BODY
@@ -43,7 +43,7 @@ namespace PPS3.Client.Services.ServCarroCompra
             else
             {
                 //Creo una solicitud Http de tipo POST
-                var request = new HttpRequestMessage(HttpMethod.Post, $"api/CarrosCompras");
+                var request = new HttpRequestMessage(HttpMethod.Post, $"api/CarrosCompras/CrearCarroCompra");
                 //Agrego el token al Encabezado Http
                 request.Headers.Add("Authorization", "Bearer " + token);
                 //Agrego el JSON al BODY
@@ -68,7 +68,7 @@ namespace PPS3.Client.Services.ServCarroCompra
                 return null;
 
             //Creo una solicitud Http de tipo GET
-            var request = new HttpRequestMessage(HttpMethod.Get, $"api/CarrosCompras/{id}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/CarrosCompras/ObtenerCarroCompra/{id}");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 
@@ -98,7 +98,7 @@ namespace PPS3.Client.Services.ServCarroCompra
                 return null;
 
             //Creo una solicitud Http de tipo GET
-            var request = new HttpRequestMessage(HttpMethod.Get, $"api/CarrosCompras");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/CarrosCompras/ObtenerCarrosCompras");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 
@@ -113,6 +113,36 @@ namespace PPS3.Client.Services.ServCarroCompra
                 var carros = await JsonSerializer.DeserializeAsync<IEnumerable<CarroCompra>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                 return carros;
+            }
+            else
+                return null;
+        }
+
+        public async Task<IEnumerable<OrdenesCompraListado>> ObtenerOrdenesCompra()
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
+
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/CarrosCompras/ObtenerOrdenesCompra");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bits) y lo deserializo en un objeto apropiado
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var ordenes = await JsonSerializer.DeserializeAsync<IEnumerable<OrdenesCompraListado>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return ordenes;
             }
             else
                 return null;

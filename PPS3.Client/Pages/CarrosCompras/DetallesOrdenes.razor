@@ -1,0 +1,24 @@
+﻿@page "/detallesOrdenesCompra/{id:int}"
+@using Radzen.Blazor
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
+@attribute [Authorize(Roles = "1, 2")]
+
+<AuthorizeView Context="usCont">
+    <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+</AuthorizeView>
+
+<MudText Align="Align.Center" Typo="Typo.h5">Detalles de la Orden de Compra</MudText>
+
+@code {
+    //Parametro que se recibe por URL para una consulta del objeto
+    [Parameter]
+    public int id { get; set; }
+
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
+    //Guardo el ID del usuario actual
+    protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId")); 
+}

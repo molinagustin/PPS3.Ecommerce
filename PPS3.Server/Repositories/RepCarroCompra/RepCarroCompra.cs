@@ -119,5 +119,22 @@
             var result = await db.ExecuteScalarAsync<int>(sql, new { UsuarioCarro = idUsuario });
             return result;
         }
+
+        public async Task<IEnumerable<OrdenesCompraListado>> ObtenerOrdenesCompra()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT cc.IdCarro, cce.Estado, u.NombreUs as UsuarioCrea, cc.FechaCrea, cc.FechaOrden, cc.FechaEntrega, cc.FechaUltModif, 
+                        cc.Total, cc.Pagado, cc.FechaPago, fp.FormaP, cc.Observaciones
+                        FROM carros_compras as cc
+                        INNER JOIN carros_compras_estados as cce ON cc.Estado = cce.IdEstado
+                        INNER JOIN usuarios as u ON cc.UsuarioCarro = u.IdUsuarioAct
+                        INNER JOIN formas_pago as fp ON cc.MetodoPago = fp.IdFormaP
+                        WHERE cc.Estado > 1
+                        ";
+            var result = await db.QueryAsync<OrdenesCompraListado>(sql, new { });
+            return result;
+        }
     }
 }
