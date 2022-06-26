@@ -118,6 +118,80 @@ namespace PPS3.Client.Services.ServCarroCompra
                 return null;
         }
 
+        public async Task<OrdenesCompraListado> ObtenerOCDetalle(int NumOrden)
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
+
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/CarrosCompras/ObtenerOCDetalle/{NumOrden}");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bits) y lo deserializo en un objeto apropiado
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var orden = await JsonSerializer.DeserializeAsync<OrdenesCompraListado>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                if (orden != null)
+                {
+                    var detalles = await ObtenerOCDetalles(orden.IdCarro);
+
+                    if (detalles != null)
+                    {
+                        orden.DetallesCarro = detalles.ToList();
+                        
+                        return orden;
+                    }
+                    else
+                        return null;
+                }
+                else
+                    return null;
+            }
+            else
+                return null;
+        }
+
+        public async Task<IEnumerable<DetalleCarroCompra>> ObtenerOCDetalles(int NumOrden)
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
+
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/CarrosCompras/ObtenerOCDetalles/{NumOrden}");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bits) y lo deserializo en un objeto apropiado
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var detalles = await JsonSerializer.DeserializeAsync<IEnumerable<DetalleCarroCompra>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return detalles;
+            }
+            else
+                return null;
+        }
+
         public async Task<IEnumerable<OrdenesCompraListado>> ObtenerOrdenesCompra()
         {
             //Obtengo el token de sesion del usuario

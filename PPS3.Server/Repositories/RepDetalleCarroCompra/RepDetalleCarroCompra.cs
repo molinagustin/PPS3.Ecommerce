@@ -19,12 +19,20 @@
                         UPDATE carros_compras_detalles
                         SET
                             Producto = @Producto,
-                            Cantidad = @Cantidad
+                            Cantidad = @Cantidad,
+                            PrecioUnit = @PrecioUnit,
+                            Bonificacion = @Bonificacion,
+|                           BonificacionTotal = @BonificacionTotal,
+                            SubTotal = @SubTotal
                         WHERE IdDetalle = @IdDetalle
                         ";
             var result = await db.ExecuteAsync(sql, new {
                                                         detalleCarroCompra.Producto,
                                                         detalleCarroCompra.Cantidad,
+                                                        detalleCarroCompra.PrecioUnit,
+                                                        detalleCarroCompra.Bonificacion,
+                                                        detalleCarroCompra.BonificacionTotal,
+                                                        detalleCarroCompra.SubTotal,
                                                         detalleCarroCompra.IdDetalle
                                                         });
             return result > 0;
@@ -53,18 +61,30 @@
                         INSERT INTO carros_compras_detalles (
                                                             Carro,
                                                             Producto,
-                                                            Cantidad
+                                                            Cantidad,
+                                                            PrecioUnit,
+                                                            Bonificacion,
+                                                            BonificacionTotal,
+                                                            SubTotal
                                                             )
                         VALUES (
                                 @Carro,
                                 @Producto,
-                                @Cantidad
+                                @Cantidad,
+                                @PrecioUnit,
+                                @Bonificacion,
+                                @BonificacionTotal,
+                                @SubTotal
                                 )
                         ";
             var result = await db.ExecuteAsync(sql, new { 
                                                         detalleCarroCompra.Carro,
                                                         detalleCarroCompra.Producto,
-                                                        detalleCarroCompra.Cantidad
+                                                        detalleCarroCompra.Cantidad,
+                                                        detalleCarroCompra.PrecioUnit,
+                                                        detalleCarroCompra.Bonificacion,
+                                                        detalleCarroCompra.BonificacionTotal,
+                                                        detalleCarroCompra.SubTotal
                                                         });
             return result > 0;
         }

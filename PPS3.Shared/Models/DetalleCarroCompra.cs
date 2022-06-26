@@ -13,5 +13,17 @@ namespace PPS3.Shared.Models
         public decimal Cantidad { get; set; }
         [Column(TypeName = "decimal(10,2)")]
         public DateTime FechaCrea { get; set; }
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal PrecioUnit { get; set; }
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal Bonificacion { get; set; }
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal BonificacionTotal { get; set; }
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal SubTotal { get; set; }
+
+        //Propiedad interna solo para traer el nombre del producto
+        public string? NombreProducto { get; set; }
+        public string? DescripcionUnidad { get; set; }
     }
 }

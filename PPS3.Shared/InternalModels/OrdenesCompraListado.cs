@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using PPS3.Shared.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PPS3.Shared.InternalModels
 {
@@ -17,5 +18,8 @@ namespace PPS3.Shared.InternalModels
         public DateTime? FechaPago { get; set; }
         public string? FormaP { get; set; }
         public string? Observaciones { get; set; }
+
+        //Para guardar los detalles del carro
+        public ICollection<DetalleCarroCompra>? DetallesCarro { get; set; }
     }
 }

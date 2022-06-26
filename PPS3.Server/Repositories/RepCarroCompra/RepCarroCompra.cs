@@ -35,7 +35,12 @@
                         WHERE IdCarro = @IdCarro
                         ";
 
-            var result = await db.ExecuteAsync(sql, new { 
+            var result = 0;
+            try
+            {
+
+            
+            result = await db.ExecuteAsync(sql, new { 
                                                         carroCompra.Estado,
                                                         carroCompra.FechaOrden,
                                                         carroCompra.FechaEntrega,
@@ -47,6 +52,18 @@
                                                         carroCompra.Observaciones,
                                                         carroCompra.IdCarro
                                                         });
+            
+
+            }
+            catch (SqlException sq)
+            {
+                Console.WriteLine(sq.ToString());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
             return result > 0;
         }
 
@@ -134,6 +151,39 @@
                         WHERE cc.Estado > 1
                         ";
             var result = await db.QueryAsync<OrdenesCompraListado>(sql, new { });
+            return result;
+        }
+
+        public async Task<OrdenesCompraListado> ObtenerOCDetalle(int NumOrden)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT cc.IdCarro, cce.Estado, u.NombreUs as UsuarioCrea, cc.FechaCrea, cc.FechaOrden, cc.FechaEntrega, cc.FechaUltModif, 
+                        cc.Total, cc.Pagado, cc.FechaPago, fp.FormaP, cc.Observaciones
+                        FROM carros_compras as cc
+                        INNER JOIN carros_compras_estados as cce ON cc.Estado = cce.IdEstado
+                        INNER JOIN usuarios as u ON cc.UsuarioCarro = u.IdUsuarioAct
+                        INNER JOIN formas_pago as fp ON cc.MetodoPago = fp.IdFormaP
+                        WHERE cc.IdCarro = @IdCarro
+                        ";
+            var result = await db.QueryFirstOrDefaultAsync<OrdenesCompraListado>(sql, new { IdCarro = NumOrden });
+            return result;
+        }
+
+        public async Task<IEnumerable<DetalleCarroCompra>> ObtenerOCDetalles(int NumOrden)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT ccd.Cantidad, ccd.PrecioUnit, ccd.Bonificacion, ccd.BonificacionTotal, ccd.SubTotal, 
+                        p.NombreProd as NombreProducto, um.DescripcionUnidad
+                        FROM carros_compras_detalles as ccd
+                        INNER JOIN productos as p ON p.IdProducto = ccd.Producto
+                        INNER JOIN unidades_medida as um ON p.UnidadMedida = um.IdUnidad
+                        WHERE ccd.Carro = @Carro
+                        ";
+            var result = await db.QueryAsync<DetalleCarroCompra>(sql, new { Carro = NumOrden });
             return result;
         }
     }

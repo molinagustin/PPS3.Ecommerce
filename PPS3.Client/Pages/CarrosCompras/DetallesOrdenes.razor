@@ -1,6 +1,9 @@
 ﻿@page "/detallesOrdenesCompra/{id:int}"
 @using Radzen.Blazor
 @inject NavigationManager NavigationManager
+@inject IServCarroCompra ServCarro
+@inject IServEstadoCarroCompra ServEstadoCarro
+@inject IServFormaPago ServFormaPago
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @inject IJSRuntime JS /*JS Interop*/
 @attribute [Authorize(Roles = "1, 2")]
@@ -9,7 +12,166 @@
     <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
 </AuthorizeView>
 
-<MudText Align="Align.Center" Typo="Typo.h5">Detalles de la Orden de Compra</MudText>
+@if(ordenListado == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{
+    <MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:15px;">Detalles de la Orden de Compra N° <b>@ordenListado.IdCarro</b></MudText>
+
+    <MudGrid Justify="Justify.Center" Style="margin-bottom:30px;">
+        <MudItem lg="12">
+            <MudSimpleTable Striped="true">
+                <thead>
+                    <tr>
+                        <td>Nombre Producto</td>
+                        <td>Cantidad</td>
+                        <td>Unidad Medida</td>
+                        <td>Precio Venta</td>
+                        <td>% Bonificacion</td>
+                        <td>Bonificacion Total</td>
+                        <td>Sub Total</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var od in ordenListado.DetallesCarro)
+                    {
+                        <tr>
+                            <td>@od.NombreProducto</td>
+                            <td>@od.Cantidad</td>
+                            <td>@od.DescripcionUnidad</td>
+                            <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", od.PrecioUnit)</td>
+                            <td>@od.Bonificacion %</td>
+                            <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", od.BonificacionTotal)</td>
+                            <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", od.SubTotal)</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>TOTAL:</td>
+                        <td><b>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", ordenListado.Total)</b></td>
+                    </tr>
+                </tbody>
+            </MudSimpleTable>
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Justify="Justify.Center" Style="margin-bottom:30px;">
+        <MudItem xs="4">
+            <MudStack>
+                <MudText Align="Align.Left" Typo="Typo.body1">Solicitado por: <b>@ordenListado.UsuarioCrea</b></MudText>
+            </MudStack>
+            <MudStack>
+                <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Orden: <b>@ordenListado.FechaOrden</b></MudText>
+            </MudStack>
+            <MudStack>
+                <MudText Align="Align.Left" Typo="Typo.body1">Ultima Modificacion: <b>@ordenListado.FechaUltModif</b></MudText>
+            </MudStack>
+        </MudItem>
+
+        <MudItem xs="4">
+            <MudStack>
+                <MudDatePicker Label="Fecha de Entrega" Editable="true" @bind-Date="ordenListado.FechaEntrega" Placeholder="Seleccionar Fecha" />
+            </MudStack>
+            <MudStack>
+                @if(ordenListado.Pagado)
+                {
+                    <MudDatePicker Label="Fecha de Pago" @bind-Date="ordenListado.FechaPago" Placeholder="Seleccionar Fecha" ReadOnly="true"/>
+                }
+                else
+                {
+                    <MudDatePicker Label="Fecha de Pago" Editable="true" @bind-Date="ordenListado.FechaPago" Placeholder="Seleccionar Fecha" />
+                }
+            </MudStack>
+        </MudItem>
+
+        <MudItem xs="4">
+            @if(ordenListado.Pagado)
+            {
+                <MudStack>
+                    <MudSwitch @bind-Checked="pgdo" Label="Pagado" Color="Color.Success" ReadOnly="true"/>
+                </MudStack>
+                <MudStack>
+                    <MudSelect T="int" @bind-Value="@formaP" Label="Forma de Pago" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
+                        @foreach(var fp in formaPago)
+                        {
+                            <MudSelectItem Value="@fp.IdFormaP">@fp.FormaP</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudStack>
+            }
+            else
+            {
+                <MudStack>
+                    <MudSwitch @bind-Checked="pgdo" Label="Pagado" Color="Color.Success"/>
+                </MudStack>
+                <MudStack>
+                    <MudSelect T="int" @bind-Value="@formaP" Label="Forma de Pago" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        @foreach(var fp in formaPago)
+                        {
+                            <MudSelectItem Value="@fp.IdFormaP">@fp.FormaP</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudStack>
+            }
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Justify="Justify.Center" Style="margin-bottom:30px;">
+        <MudItem xs="6">
+            <MudTextField T="string" Label="Observaciones" Variant="Variant.Outlined" @bind-Value="ordenListado.Observaciones" Lines="5" />
+        </MudItem>
+
+        <MudItem xs="2">
+            @if(estados == null)
+            {
+                <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+            }
+            else
+            {
+                @if(ordenListado.Estado == "Cancelado" || ordenListado.Estado == "Finalizado")
+                {
+                    <MudSelect T="int" @bind-Value="@estado" Label="Estado Orden" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
+                        @foreach(var es in estados)
+                        {
+                            <MudSelectItem Value="@es.IdEstado">@es.Estado</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
+                else
+                {
+                    <MudSelect T="int" @bind-Value="@estado" Label="Estado Orden" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        @foreach(var es in estados)
+                        {
+                            <MudSelectItem Value="@es.IdEstado">@es.Estado</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
+            }
+        </MudItem>
+
+        <MudItem xs="4">
+            <MudStack Style="margin-bottom:10px;">
+                @if(ordenListado.Estado == "Cancelado" || ordenListado.Estado == "Finalizado")
+                {
+                    <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success" Variant="Variant.Outlined" OnClick="GuardarOrden" Disabled="true">Guardar</MudButton>
+                }
+                else
+                {
+                    <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success" Variant="Variant.Outlined" OnClick="GuardarOrden">Guardar</MudButton>
+                }
+            </MudStack>
+            <MudStack>
+                <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Default" Variant="Variant.Outlined" OnClick="Cancelar">Cancelar</MudButton>
+            </MudStack>
+        </MudItem>
+    </MudGrid>
+}
 
 @code {
     //Parametro que se recibe por URL para una consulta del objeto
@@ -18,7 +180,64 @@
 
     //Para almacenar el ID del usuario actual
     private int idUsAct;
+    private int formaP;
+    private int estado;
+    private bool pgdo;
+
+    //Para guardar la orden solicitada
+    OrdenesCompraListado ordenListado;
+    CarroCompra carro;
+
+    IEnumerable<FormaPago> formaPago;
+    IEnumerable<EstadoCarroCompra> estados;
 
     //Guardo el ID del usuario actual
     protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId")); 
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Busco la orden de compra, ademas de los elementos para los selectores de Forma Pago y Estado Carro
+        ordenListado = await ServCarro.ObtenerOCDetalle(id);
+        formaPago = await ServFormaPago.ObtenerFormasPago();
+        estados = await ServEstadoCarro.ObtenerEstados();
+        estados = estados.Where(e => e.IdEstado > 1);
+
+        //Obtengo el carro por si necesito actualizar datos
+        carro = await ServCarro.ObtenerCarro(id);
+
+        //Asigno las formas de pago y estado de la orden
+        estado = estados.FirstOrDefault(e => e.Estado == ordenListado.Estado).IdEstado;
+        formaP = formaPago.FirstOrDefault(f => f.FormaP == ordenListado.FormaP).IdFormaP;
+        pgdo = ordenListado.Pagado;
+    }
+
+    private async Task GuardarOrden()
+    {
+        //Asigno los valores cambiados la carro
+        carro.Estado = estado;
+        carro.MetodoPago = formaP;
+        if (ordenListado.FechaEntrega != null)
+            carro.FechaEntrega = Convert.ToDateTime(ordenListado.FechaEntrega);
+        else
+            carro.FechaEntrega = null;
+        if (ordenListado.FechaPago != null)
+            carro.FechaPago = Convert.ToDateTime(ordenListado.FechaPago);
+        else
+            carro.FechaPago = null;
+        carro.Pagado = pgdo;
+        if(!string.IsNullOrEmpty(ordenListado.Observaciones))
+            carro.Observaciones = ordenListado.Observaciones;
+
+        //Procedo a guardar los cambios
+        var result = await ServCarro.GuardarCarro(carro);
+        if(result)
+        {
+            NavigationManager.NavigateTo("/listaOrdenesCompra");
+            Snackbar.Add($"Orden de compra modificada exitosamente", Severity.Success);
+        }
+        else
+            Snackbar.Add($"No se pudo modificar la Orden de Compra", Severity.Error);
+    }
+
+    private void Cancelar() => NavigationManager.NavigateTo("/listaOrdenesCompra");
 }
