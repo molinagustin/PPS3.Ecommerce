@@ -51,7 +51,7 @@ namespace PPS3.Server.Repositories.RepEncabezadoRecibo
                                                         encRecibo.NumTarjeta,
                                                         encRecibo.ImporteTotal,
                                                         encRecibo.Observaciones,
-                                                        UsuarioCrea = 1
+                                                        encRecibo.UsuarioCrea
                                                         });
             if (result > 0)
             {
@@ -102,6 +102,24 @@ namespace PPS3.Server.Repositories.RepEncabezadoRecibo
                         WHERE IdCliente = @IdCliente
                         ";
             var result = await db.ExecuteScalarAsync<int>(sql, new { IdCliente = idCliente });
+            return result;
+        }
+
+        public async Task<IEnumerable<Recibo>> ObtenerRecibosListPorCliente(int idCliente)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT re.IdRecibo, rd.IdDetalle, rd.IdComprobante, rd.Importe, re.FechaRecibo, fp.FormaP, tj.NombreTarj, re.NumTarjeta,
+                        re.ImporteTotal, re.Observaciones, u.NombreUs as UsuarioCrea, re.FechaCrea
+                        FROM recibos_encabezado as re
+                        INNER JOIN recibos_detalles as rd ON re.IdRecibo = rd.IdRecibo
+                        INNER JOIN formas_pago as fp ON re.FormaPago = fp.IdFormaP
+                        INNER JOIN tarjetas as tj ON re.Tarjeta = tj.IdTarjeta
+                        INNER JOIN usuarios as u ON re.UsuarioCrea = u.IdUsuarioAct
+                        WHERE re.IdCliente = @IdCliente
+                        ";
+            var result = await db.QueryAsync<Recibo>(sql, new { IdCliente = idCliente });
             return result;
         }
     }

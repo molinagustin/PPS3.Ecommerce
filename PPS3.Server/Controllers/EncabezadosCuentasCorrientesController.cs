@@ -19,6 +19,13 @@ namespace PPS3.Server.Controllers
         }
 
         [HttpGet]
+        public async Task<ActionResult<IEnumerable<CuentasCorrientesListado>>> ObtenerCCListado()
+        {
+            var response = await _repEncabCC.ObtenerCCListado();
+            return Ok(response);
+        }
+
+        [HttpGet]
         public async Task<ActionResult<EncabezadoCuentaCorriente>> ObtenerCuentaCorriente(int numCC)
         {
             var response = await _repEncabCC.ObtenerCuentaCorriente(numCC);

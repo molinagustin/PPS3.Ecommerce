@@ -1,0 +1,86 @@
+﻿@page "/detallesCuentaCorriente/{id:int}"
+@inject IServEncabezadoCuentaCorriente ServCuentaCorriente
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
+@using Radzen.Blazor
+@*Con el atributo Authorize se procede a regular el acceso a toda la pagina por usuarios autorizados solamente*@
+@attribute [Authorize(Roles = "1, 2")]
+
+<AuthorizeView Context="usCont">
+    <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+</AuthorizeView>
+
+<MudText Align="Align.Center" Typo="Typo.h5">Detalles de Cuenta Corriente</MudText>
+
+@if(cuenta == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{
+    <EditForm Model="@cuenta" OnValidSubmit="GuardarCuenta">
+    <DataAnnotationsValidator/>
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="6">
+            <MudCard Elevation="1" >
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos A Modificar</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTextField Label="Limite de Saldo" HelperText="Formato 999,99 ó 999" @bind-Value="cuenta.LimiteSaldo" For="@(() => cuenta.LimiteSaldo)" Required="true"/>                  
+
+                    <MudSwitch @bind-Checked="active" Label="Cuenta Activa" Color="Color.Success"/>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Save" Color="Color.Success" ButtonType="ButtonType.Submit">Guardar</MudButton>
+                    <MudDivider/>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.ExitToApp" Color="Color.Error" OnClick="Cancelar">Cancelar</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+}
+
+@code {
+    //Parametro que se recibe por URL para una consulta del objeto
+    [Parameter]
+    public int id { get; set; }
+
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
+    private bool active;
+
+    EncabezadoCuentaCorriente cuenta;
+
+    //Guardo el ID del usuario actual
+    protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+
+    protected override async Task OnInitializedAsync()
+    {
+        cuenta = await ServCuentaCorriente.ObtenerCuentaCorriente(id);
+        active = cuenta.Activo;
+    }
+
+    protected async Task GuardarCuenta()
+    {
+        cuenta.Activo = active;
+        cuenta.UsuarioModif = idUsAct;
+
+        var result = await ServCuentaCorriente.GuardarEncabCC(cuenta);
+
+        if(result)
+        {
+            NavigationManager.NavigateTo("/listaCuentasCorrientes");
+            Snackbar.Add($"Cuenta modificada de forma exitosa", Severity.Success); 
+        }
+        else
+            Snackbar.Add($"No se pudo actualizar la cuenta", Severity.Error);
+    }
+
+    protected void Cancelar() => NavigationManager.NavigateTo("/listaCuentasCorrientes");
+}

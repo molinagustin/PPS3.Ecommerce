@@ -3,7 +3,7 @@
 namespace PPS3.Server.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class EncabezadosComprobantesController : ControllerBase
     {
@@ -26,6 +26,23 @@ namespace PPS3.Server.Controllers
                 return Ok(response);
             else
                 return BadRequest();
+        }
+
+        [HttpGet("{idCliente}")]
+        public async Task<ActionResult<IEnumerable<Comprobante>>> ObtenerComprobantesListCliente(int idCliente)
+        {
+            var response = await _repEncabComp.ObtenerComprobantesListCliente(idCliente);
+            if (response != null)
+                return Ok(response);
+            else
+                return BadRequest();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<DetalleComprobante>>> ObtenerDetallesComprobantesList()
+        {
+            var response = await _repEncabComp.ObtenerDetallesComprobantesList();
+            return Ok(response);
         }
 
         [HttpPost]

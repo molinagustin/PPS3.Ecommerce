@@ -20,6 +20,7 @@
                         SET
                             SaldoCCC = @SaldoCCC,
                             LimiteSaldo = @LimiteSaldo,
+                            Activo = @Activo,
                             UsuarioModif = @UsuarioModif,
                             FechaUltModif = @FechaUltModif
                         WHERE NumCC = @NumCC
@@ -28,7 +29,8 @@
                             { 
                             encabezadoCC.SaldoCCC,
                             encabezadoCC.LimiteSaldo,
-                            UsuarioModif = 1,
+                            encabezadoCC.Activo,
+                            encabezadoCC.UsuarioModif,
                             FechaUltModif = DateTime.Now,
                             encabezadoCC.NumCC
                             });
@@ -80,8 +82,8 @@
                                     encabezadoCC.ClienteCC,
                                     encabezadoCC.SaldoCCC,
                                     encabezadoCC.LimiteSaldo,
-                                    UsuarioCrea = 1,
-                                    UsuarioModif = 1
+                                    encabezadoCC.UsuarioCrea,
+                                    encabezadoCC.UsuarioModif
                                     });
             return result > 0;
         }
@@ -121,6 +123,20 @@
                         FROM cuentas_corrientes
                         ";
             var result = await db.QueryAsync<EncabezadoCuentaCorriente>(sql, new { });
+            return result;
+        }
+
+        public async Task<IEnumerable<CuentasCorrientesListado>> ObtenerCCListado()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT cc.NumCC, cl.NombreCompleto, cl.NumDocumento, cc.SaldoCCC, cc.LimiteSaldo, cc.Activo
+                        FROM cuentas_corrientes as cc
+                        INNER JOIN clientes as cl ON cc.ClienteCC = cl.IdCliente
+                        ORDER BY cc.Activo DESC, cl.NombreCompleto
+                        ";
+            var result = await db.QueryAsync<CuentasCorrientesListado>(sql, new { });
             return result;
         }
     }

@@ -1,0 +1,57 @@
+﻿@page "/listaCuentasCorrientes"
+@inject IServEncabezadoCuentaCorriente ServCuentaCorriente
+@inject NavigationManager NavigationManager
+@using Radzen.Blazor
+@*Con el atributo Authorize se procede a regular el acceso a toda la pagina por usuarios autorizados solamente*@
+@attribute [Authorize(Roles = "1, 2")]
+
+<MudText Align="Align.Center" Typo="Typo.h5">Listado de Cuentas Corrientes</MudText>
+
+@if(cuentas == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{
+    <RadzenGrid Data="@cuentas" TItem="CuentasCorrientesListado" AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive">
+        <Columns>
+            <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NumCC" Title="N° Cuenta"></RadzenGridColumn>
+            <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NombreCompleto" Title="Nombre Cliente"></RadzenGridColumn>
+            <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NumDocumento" Title="N° Documento"></RadzenGridColumn>
+            <RadzenGridColumn TItem="CuentasCorrientesListado" Property="SaldoCCC" Title="Saldo de Compra Disponible">
+                <Template Context="saldo">
+                    @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", saldo.SaldoCCC)
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="CuentasCorrientesListado" Property="LimiteSaldo" Title="Limite de Saldo">
+                <Template Context="limite">
+                    @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", limite.LimiteSaldo)
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="CuentasCorrientesListado" Property="Activo" Title="Cuenta Activa">
+                <Template Context="act">
+                    @if(act.Activo)
+                    {
+                        @string.Format("Si");
+                    }
+                    else
+                    {
+                        @string.Format("No");
+                    }
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NumCC">
+                <Template Context="movimientos">
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="info" Click="@(() => NavigationManager.NavigateTo($"/movimientosCuentaCorriente/{movimientos.NumCC}"))" Size="Radzen.ButtonSize.Small" Text="Mov."/>
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Warning" Icon="open_in_new" Click="@(() => NavigationManager.NavigateTo($"/detallesCuentaCorriente/{movimientos.NumCC}"))" Size="Radzen.ButtonSize.Small" Text="Editar"/>
+                </Template>
+            </RadzenGridColumn>
+        </Columns>
+    </RadzenGrid>
+}
+
+@code {
+    IEnumerable<CuentasCorrientesListado> cuentas;
+
+    protected override async Task OnInitializedAsync() => cuentas = await ServCuentaCorriente.ObtenerCCListado();
+}

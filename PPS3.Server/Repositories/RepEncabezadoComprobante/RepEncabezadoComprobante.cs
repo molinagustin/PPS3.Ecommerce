@@ -1,4 +1,6 @@
-﻿namespace PPS3.Server.Repositories.RepEncabezadoComprobante
+﻿using PPS3.Shared.Models;
+
+namespace PPS3.Server.Repositories.RepEncabezadoComprobante
 {
     public class RepEncabezadoComprobante : IRepEncabezadoComprobante
     {
@@ -58,7 +60,7 @@
                             encabezadoComp.ImporteFinal,
                             encabezadoComp.SaldoRestante,
                             encabezadoComp.Observaciones,
-                            UsuarioCrea = 1
+                            encabezadoComp.UsuarioCrea
                             });
 
             //Si el resultado de la insecion es exitoso, busco el ID del comprobante ingresado
@@ -105,6 +107,41 @@
                         WHERE ClienteComp = @ClienteComp
                         ";
             var result = await db.ExecuteScalarAsync<int>(sql, new { ClienteComp = idCliente });
+            return result;
+        }
+
+        public async Task<IEnumerable<Comprobante>> ObtenerComprobantesListCliente(int idCliente)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT ce.IdEncab, ce.Periodo, ce.NumComp, tc.TipoComp, ce.FechaComp, cl.NombreCompleto as Cliente, fp.FormaP, ce.ImporteFinal, 
+                        ce.SaldoRestante, ce.Pagado, ce.Observaciones, us.NombreUs as UsuarioCrea, ce.FechaCrea
+                        FROM comprobantes_encabezados as ce
+                        INNER JOIN tipos_comprobantes as tc ON ce.TipoComprobante = tc.IdTipoC
+                        INNER JOIN clientes as cl ON cl.IdCliente = ce.ClienteComp
+                        INNER JOIN formas_pago as fp ON ce.FormaPago = fp.IdFormaP
+                        INNER JOIN usuarios as us ON ce.UsuarioCrea = us.IdUsuarioAct
+                        WHERE ce.ClienteComp = @ClienteComp AND ce.TipoVta = 1
+                        ORDER BY ce.FechaComp
+                        ";
+            var result = await db.QueryAsync<Comprobante>(sql, new { ClienteComp = idCliente });
+            return result;
+        }
+
+        public async Task<IEnumerable<DetalleComprobante>> ObtenerDetallesComprobantesList()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT cc.IdCuerpo, cc.IdEncab, cc.ProductoCuerpo, pr.NombreProd, um.DescripcionUnidad, cc.CantidadProdC, cc.PrecioUnitario, 
+                        cc.Bonificacion, cc.BonificacionTotal, cc.Total
+                        FROM comprobantes_cuerpos as cc
+                        INNER JOIN productos as pr ON cc.ProductoCuerpo = pr.IdProducto
+						INNER JOIN unidades_medida as um ON pr.UnidadMedida = um.IdUnidad
+                        "
+;
+            var result = await db.QueryAsync<DetalleComprobante>(sql, new {  });
             return result;
         }
     }
