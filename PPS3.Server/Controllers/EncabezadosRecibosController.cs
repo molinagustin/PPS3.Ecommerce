@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PPS3.Shared.Models;
 
 namespace PPS3.Server.Controllers
 {
@@ -38,6 +39,13 @@ namespace PPS3.Server.Controllers
                 return BadRequest();
 
             var response = await _repEncabRec.ObtenerRecibosListPorCliente(idCliente);
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Recibo>>> ObtenerRecibosList()
+        {
+            var response = await _repEncabRec.ObtenerRecibosList();
             return Ok(response);
         }
 

@@ -39,6 +39,13 @@ namespace PPS3.Server.Controllers
         }
 
         [HttpGet]
+        public async Task<ActionResult<IEnumerable<Comprobante>>> ObtenerComprobantesList()
+        {
+            var response = await _repEncabComp.ObtenerComprobantesList();
+            return Ok(response);
+        }
+
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<DetalleComprobante>>> ObtenerDetallesComprobantesList()
         {
             var response = await _repEncabComp.ObtenerDetallesComprobantesList();

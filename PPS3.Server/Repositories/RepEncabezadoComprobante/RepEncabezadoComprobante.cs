@@ -144,5 +144,23 @@ namespace PPS3.Server.Repositories.RepEncabezadoComprobante
             var result = await db.QueryAsync<DetalleComprobante>(sql, new {  });
             return result;
         }
+
+        public async Task<IEnumerable<Comprobante>> ObtenerComprobantesList()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT ce.IdEncab, ce.Periodo, ce.NumComp, tc.TipoComp, ce.FechaComp, cl.NombreCompleto as Cliente, fp.FormaP, ce.ImporteFinal, 
+                        ce.SaldoRestante, ce.Pagado, ce.Observaciones, us.NombreUs as UsuarioCrea, ce.FechaCrea
+                        FROM comprobantes_encabezados as ce
+                        INNER JOIN tipos_comprobantes as tc ON ce.TipoComprobante = tc.IdTipoC
+                        INNER JOIN clientes as cl ON cl.IdCliente = ce.ClienteComp
+                        INNER JOIN formas_pago as fp ON ce.FormaPago = fp.IdFormaP
+                        INNER JOIN usuarios as us ON ce.UsuarioCrea = us.IdUsuarioAct
+                        ORDER BY ce.IdEncab DESC
+                        ";
+            var result = await db.QueryAsync<Comprobante>(sql, new {  });
+            return result;
+        }
     }
 }

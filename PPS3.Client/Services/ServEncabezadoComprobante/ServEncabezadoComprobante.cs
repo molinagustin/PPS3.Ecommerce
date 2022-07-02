@@ -44,6 +44,51 @@ namespace PPS3.Client.Services.ServEncabezadoComprobante
                 return 0;               
         }
 
+        public async Task<IEnumerable<Comprobante>> ObtenerComprobantesList()
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
+
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/EncabezadosComprobantes/ObtenerComprobantesList");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bits) y lo deserializo en un objeto apropiado
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var comps = await JsonSerializer.DeserializeAsync<IEnumerable<Comprobante>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                if (comps != null)
+                {
+                    var detalles = await ObtenerDetallesComprobantesList();
+
+                    //Creo la lista donde se guardaran los presupuestos
+                    var listaComprobantes = new List<Comprobante>();
+
+                    foreach (var comp in comps)
+                    {
+                        comp.DetallesComprobante = detalles.Where(x => x.IdEncab == comp.IdEncab).ToList();
+                        listaComprobantes.Add(comp);
+                    }
+                    return listaComprobantes;
+                }
+                else
+                    return null;
+            }
+            else
+                return null;
+        }
+
         public async Task<IEnumerable<Comprobante>> ObtenerComprobantesListCliente(int idCliente)
         {
             //Obtengo el token de sesion del usuario

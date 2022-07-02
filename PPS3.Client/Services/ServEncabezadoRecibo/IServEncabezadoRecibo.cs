@@ -4,6 +4,7 @@
     {
         Task<IEnumerable<EncabezadoRecibo>> ObtenerEncabRecCliente(int idCliente);
         Task<IEnumerable<Recibo>> ObtenerRecibosListPorCliente(int idCliente);
+        Task<IEnumerable<Recibo>> ObtenerRecibosList();
         Task<EncabezadoRecibo> ObtenerEncab(int idRecibo);
         Task<bool> CrearEncabRec(EncabezadoRecibo encabRec);
     }

@@ -122,5 +122,22 @@ namespace PPS3.Server.Repositories.RepEncabezadoRecibo
             var result = await db.QueryAsync<Recibo>(sql, new { IdCliente = idCliente });
             return result;
         }
+
+        public async Task<IEnumerable<Recibo>> ObtenerRecibosList()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT re.IdRecibo, rd.IdDetalle, rd.IdComprobante, rd.Importe, re.FechaRecibo, fp.FormaP, tj.NombreTarj, re.NumTarjeta,
+                        re.ImporteTotal, re.Observaciones, u.NombreUs as UsuarioCrea, re.FechaCrea
+                        FROM recibos_encabezado as re
+                        INNER JOIN recibos_detalles as rd ON re.IdRecibo = rd.IdRecibo
+                        INNER JOIN formas_pago as fp ON re.FormaPago = fp.IdFormaP
+                        INNER JOIN tarjetas as tj ON re.Tarjeta = tj.IdTarjeta
+                        INNER JOIN usuarios as u ON re.UsuarioCrea = u.IdUsuarioAct
+                        ";
+            var result = await db.QueryAsync<Recibo>(sql, new {  });
+            return result;
+        }
     }
 }
