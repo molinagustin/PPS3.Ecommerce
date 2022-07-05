@@ -7,6 +7,7 @@ namespace PPS3.Shared.InternalModels
         public int IdEncab { get; set; }
         public string Periodo { get; set; } = string.Empty;
         public string NumComp { get; set; } = string.Empty;
+        public int ClienteComp { get; set; }
         public string TipoComp { get; set; } = string.Empty;
         public DateTime FechaComp { get; set; }
         public string Cliente { get; set; } = string.Empty;

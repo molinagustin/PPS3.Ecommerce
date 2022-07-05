@@ -1,0 +1,250 @@
+﻿@page "/detallesRecibo"
+@inject IServEncabezadoCuentaCorriente ServCuentaCorr
+@inject IServFormaPago ServFormaPago
+@inject IServTarjeta ServTarj
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
+@using Radzen.Blazor
+@*Con el atributo Authorize se procede a regular el acceso a toda la pagina por usuarios autorizados solamente*@
+@attribute [Authorize(Roles = "1, 2")]
+
+<AuthorizeView Context="usCont">
+    <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+</AuthorizeView>
+
+<MudText Align="Align.Center" Typo="Typo.h4">Detalles del Recibo</MudText>
+
+<MudButton StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Primary" Variant="Variant.Outlined" Href="/listaRecibos" Size="Size.Small">Volver</MudButton>
+
+@if(cuentasComp == null || formasPago == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{
+    <MudGrid Justify="Justify.Center">
+        @*CUENTAS CORRIENTES*@
+        <MudItem xs="2">
+            <MudText Align="Align.Center" Typo="Typo.body1">Cuentas Corrientes</MudText>
+            <RadzenGrid Data="@cuentasComp" TItem="CuentasCorrientesListado" RowSelect="@(args => cuentaSelect = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
+                <Columns>
+                    <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NumCC" Title="N° CC"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NombreCompleto" Title="Cliente"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NumDocumento" Title="N° Doc."></RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+        </MudItem>
+        @*COMPROBANTES*@
+        <MudItem lg="8">
+            <MudText Align="Align.Center" Typo="Typo.body1">Comprobantes Sin Pagar</MudText>
+            <RadzenGrid Data="@cuentaSelect.Comprobantes" TItem="Comprobante" RowSelect="@(args => compSelect = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
+                <Columns>
+                    <RadzenGridColumn TItem="Comprobante" Property="IdEncab" Title="N° Comp."></RadzenGridColumn>
+                    <RadzenGridColumn TItem="Comprobante" Property="TipoComp" Title="Tipo Comp."></RadzenGridColumn>
+                    <RadzenGridColumn TItem="Comprobante" Property="FechaComp" Title="Fecha Comp."></RadzenGridColumn>
+                    <RadzenGridColumn TItem="Comprobante" Property="FormaP" Title="Forma Pago"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="Comprobante" Property="Observaciones" Title="Observaciones"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="Comprobante" Property="UsuarioCrea" Title="Emitido Por"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="Comprobante" Property="ImporteFinal" Title="Importe Final">
+                        <Template Context="impFin">
+                            @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", impFin.ImporteFinal)
+                        </Template>
+                        <FooterTemplate>
+                            @if(cuentaSelect.Comprobantes != null)
+                            {
+                                @string.Format("TOTAL RESTANTE:");
+                            }                            
+                        </FooterTemplate>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="Comprobante" Property="SaldoRestante" Title="Saldo Restante">
+                        <Template Context="saldo">
+                            @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", saldo.SaldoRestante)
+                        </Template>
+                        <FooterTemplate>                            
+                            @if(cuentaSelect.Comprobantes != null)
+                            {
+                                    <b>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", cuentaSelect.Comprobantes.Sum(s => s.SaldoRestante))</b>
+                            }
+                        </FooterTemplate>
+                    </RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+        </MudItem>
+        @*FORMULARIO*@
+        <MudItem xs="2">
+            <MudText Align="Align.Center" Typo="Typo.body1"><br /></MudText>
+            <MudButton StartIcon="@Icons.Material.Filled.AddCircle" Color="Color.Primary" Variant="Variant.Outlined" OnClick="AgregarCompr">Agregar Comprobante</MudButton>
+        </MudItem>
+    </MudGrid>
+}
+
+<MudText Align="Align.Center" Typo="Typo.h5">Detalles del Recibo</MudText>
+
+@if(comprobantesAgregados != null && comprobantesAgregados.Count() > 0)
+{
+    <MudGrid Justify="Justify.Center">
+        @*COMPROBANTES AGREGADOS*@
+        <MudItem lg="6">
+            <MudSimpleTable Striped="true">
+                <thead>
+                    <tr>
+                        <td>N° Comp.</td>
+                        <td>Fecha Comp.</td>
+                        <td>Observaciones</td>
+                        <td>Importe Final</td>
+                        <td>Saldo Restante</td>
+                        <td></td>
+                    </tr>
+                </thead>                
+                <tbody>
+                    @foreach (var compAg in comprobantesAgregados)
+                    {
+                        <tr>
+                            <td>@compAg.IdEncab</td>
+                            <td>@compAg.FechaComp</td>
+                            <td>@compAg.Observaciones</td>
+                            <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", compAg.ImporteFinal)</td>
+                            <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", compAg.SaldoRestante)</td>
+                            <td><MudIconButton Icon="@Icons.Material.Filled.RemoveCircle" OnClick="@(e => RemoverCompr(compAg.IdEncab))" Color="Color.Error"/></td>
+                        </tr>
+                    }
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>TOTAL:</td>
+                        <td><b>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", comprobantesAgregados.Sum(s => s.SaldoRestante))</b></td>
+                    </tr>
+                </tbody>
+            </MudSimpleTable>
+        </MudItem>
+        @*FECHA Y FORMA PAGO*@
+        <MudItem xs="2">
+            <MudDatePicker Label="Fecha del Recibo" Editable="true" @bind-Date="fechaRecibo" Placeholder="Seleccionar Fecha" Required="true"/>
+
+            <MudSelect T="int" @bind-Value="@formaPag" Label="Forma Pago" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                @foreach(var fp in formasPago)
+                {
+                    <MudSelectItem Value="@fp.IdFormaP">@fp.FormaP</MudSelectItem>
+                }
+            </MudSelect>
+            @if(formaPag == 2 || formaPag == 3)
+            {
+                <MudTextField Label="N° Tarjeta" HelperText="4 ultimos digitos" @bind-Value="numTarj" MaxLength="4"/>
+            }
+            else
+            {
+                tarjeta = 8;
+                numTarj = "";
+            }
+        </MudItem>
+        @*IMPORTE A PAGAR Y OBSERVACIONES*@
+        <MudItem xs="2">
+            <MudStack Justify="Justify.Center">
+                <MudStack>
+                    <MudTextField Label="Importe A Abonar" HelperText="Formato 999,99 ó 999" @bind-Value="recibo.ImporteTotal" For="@(() => recibo.ImporteTotal)" Required="true" AdornmentIcon="@Icons.Material.Filled.Money"/>
+                </MudStack>
+                <MudStack>
+                    <MudTextField T="string" Label="Observaciones" Variant="Variant.Outlined" @bind-Value="observ" Lines="5" />
+                </MudStack>
+            </MudStack>
+        </MudItem>
+        @*BOTON*@
+        <MudItem xs="2">
+            <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success" Variant="Variant.Outlined" OnClick="GenerarRecibo">Generar Recibo</MudButton>
+        </MudItem>
+    </MudGrid>
+}
+else
+{
+    <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Error">NINGUN COMPROBANTE AGREGADO</MudText>
+}
+
+@code {
+    IEnumerable<CuentasCorrientesListado> cuentasComp;
+    CuentasCorrientesListado cuentaSelect = new CuentasCorrientesListado();
+    List<Comprobante> comprobantesAgregados;
+    Comprobante? compSelect;
+    IEnumerable<FormaPago> formasPago;
+    IEnumerable<Tarjeta> tarjetas;
+    EncabezadoRecibo recibo = new EncabezadoRecibo();
+
+    private int formaPag = 1;
+    private int tarjeta = 8;   
+    private string observ = "";
+    private string numTarj = "";
+    private DateTime? fechaRecibo;
+
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
+    //Guardo el ID del usuario actual
+    protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId")); 
+
+    protected override async Task OnInitializedAsync()
+    {
+        cuentasComp = await ServCuentaCorr.ObtenerListadoCCCompr();
+        formasPago = await ServFormaPago.ObtenerFormasPago();
+        tarjetas = await ServTarj.ObtenerTarjetas();
+        comprobantesAgregados = new List<Comprobante>();
+        fechaRecibo = DateTime.Today;
+    }
+
+    protected void AgregarCompr()
+    {
+        if(compSelect != null)
+        {
+            //Verifico si el comprobante ya se encuentra en el listado
+            var compYaAgregado = comprobantesAgregados.Exists(a => a.IdEncab == compSelect.IdEncab);
+            if(!compYaAgregado)
+            {
+                comprobantesAgregados.Add(compSelect);
+                compSelect = null;
+            }
+            else
+                Snackbar.Add($"El comprobante ya se encuentra agregado al listado", Severity.Error);
+        }
+        else
+            Snackbar.Add($"Debe seleccionar el comprobante a agregar", Severity.Error);
+    }
+
+    protected string RemoverCompr(int id)
+    {
+        if(id > 0)
+        {
+            if (comprobantesAgregados != null && comprobantesAgregados.Count() > 1)
+            {
+                var comp = comprobantesAgregados.Find(f => f.IdEncab == id);
+                comprobantesAgregados.Remove(comp);
+                Snackbar.Add($"Comprobante Removido", Severity.Success);
+            }
+            else
+                comprobantesAgregados.Clear();
+        }
+        else
+            Snackbar.Add($"Debe seleccionar el comprobante a remover", Severity.Error);
+        return "";
+    }
+
+    private async Task GenerarRecibo()
+    {
+        if (comprobantesAgregados != null && comprobantesAgregados.Count() > 0)
+        {
+            if(recibo.ImporteTotal > 0)
+            {
+                if(fechaRecibo != null && fechaRecibo <= DateTime.Today)
+                {
+                    
+                }
+                else
+                    Snackbar.Add($"La fecha es incorrecta", Severity.Error);
+            }
+            else
+                Snackbar.Add($"El importe del recibo debe ser mayor a 0", Severity.Error);
+        }
+        else
+            Snackbar.Add($"No se puede generar el recibo porque el listado de comprobantes es incorrecto", Severity.Error);
+    }
+}

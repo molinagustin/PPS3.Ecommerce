@@ -1,0 +1,71 @@
+﻿@page "/listaRecibos"
+@inject IServEncabezadoRecibo ServRecibo
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@using Radzen.Blazor
+@*Con el atributo Authorize se procede a regular el acceso a toda la pagina por usuarios autorizados solamente*@
+@attribute [Authorize(Roles = "1, 2")]
+
+<MudText Align="Align.Center" Typo="Typo.h5">Listado de Recibos Emitidos</MudText>
+
+<MudButton StartIcon="@Icons.Material.Filled.AddCircle" Color="Color.Primary" Variant="Variant.Outlined" Href="/detallesRecibo" Size="Size.Small" Style="margin-bottom:10px;">Agregar Recibo</MudButton>
+
+@if(recibos == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{
+    <MudGrid Justify="Justify.Center">
+        <MudItem lg="10">
+            <RadzenGrid Data="@recibos" TItem="ReciboListado" RowSelect="@(args => recibo = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
+                <Columns>
+                    <RadzenGridColumn TItem="ReciboListado" Property="IdRecibo" Title="N° Recibo"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ReciboListado" Property="Cliente" Title="Cliente"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ReciboListado" Property="FechaRecibo" Title="Fecha Recibo"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ReciboListado" Property="FormaP" Title="Forma Pago"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ReciboListado" Property="NombreTarj" Title="Tarjeta"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ReciboListado" Property="NumTarjeta" Title="N° Tarj.">
+                        <Template Context="numT">
+                            @if(string.IsNullOrEmpty(numT.NumTarjeta))
+                            {
+                                @string.Format("------");
+                            }
+                            else
+                            {
+                                @string.Format($"...{0}", numT.NumTarjeta);
+                            }
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="ReciboListado" Property="ImporteTotal" Title="Importe Total">
+                        <Template Context="imp">
+                            @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", imp.ImporteTotal)
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="ReciboListado" Property="Observaciones" Title="Observaciones"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ReciboListado" Property="UsuarioCrea" Title="Emitido Por"></RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+        </MudItem>
+        <MudItem xs="2">
+            <RadzenGrid Data="@recibo.DetallesRecibo" TItem="DetalleRecibo" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
+                <Columns>
+                    <RadzenGridColumn TItem="DetalleRecibo" Property="IdDetalle" Title="N° Detalle"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="DetalleRecibo" Property="IdComprobante" Title="N° Comp."></RadzenGridColumn>
+                    <RadzenGridColumn TItem="DetalleRecibo" Property="Importe" Title="Importe">
+                        <Template Context="imp">
+                            @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", imp.Importe)
+                        </Template>
+                    </RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    IEnumerable<ReciboListado> recibos;
+    ReciboListado recibo = new ReciboListado();
+
+    protected override async Task OnInitializedAsync() => recibos = await ServRecibo.ObtenerRecibosListado();
+}

@@ -49,6 +49,13 @@ namespace PPS3.Server.Controllers
             return Ok(response);
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ReciboListado>>> ObtenerRecibosListado()
+        {
+            var response = await _repEncabRec.ObtenerRecibosListado();
+            return Ok(response);
+        }
+
         [HttpPost]
         public async Task<ActionResult<int>> CrearNuevoRecibo([FromBody] EncabezadoRecibo encabRec)
         {

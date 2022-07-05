@@ -1,4 +1,6 @@
-﻿namespace PPS3.Server.Repositories.RepDetalleRecibo
+﻿using PPS3.Shared.InternalModels;
+
+namespace PPS3.Server.Repositories.RepDetalleRecibo
 {
     public class RepDetalleRecibo : IRepDetalleRecibo
     {
@@ -58,6 +60,19 @@
                         WHERE IdRecibo = @IdRecibo
                         ";
             var result = await db.QueryAsync<DetalleRecibo>(sql, new { IdRecibo = idRecibo });
+            return result;
+        }
+
+        public async Task<IEnumerable<DetalleRecibo>> ObtenerDetallesRecibos()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT *
+                        FROM recibos_detalles
+                        "
+;
+            var result = await db.QueryAsync<DetalleRecibo>(sql, new {  });
             return result;
         }
     }

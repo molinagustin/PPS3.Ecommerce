@@ -6,11 +6,13 @@ namespace PPS3.Client.Services.ServEncabezadoCuentaCorriente
     {
         private readonly HttpClient _httpClient;
         private readonly ISessionStorageService _sessionStorage;
+        private readonly IServEncabezadoComprobante _servEncComp;
 
-        public ServEncabezadoCuentaCorriente(HttpClient httpClient, ISessionStorageService sessionStorage)
+        public ServEncabezadoCuentaCorriente(HttpClient httpClient, ISessionStorageService sessionStorage, IServEncabezadoComprobante servEncComp)
         {
             _httpClient = httpClient;
             _sessionStorage = sessionStorage;
+            _servEncComp = servEncComp;
         }
 
         public async Task<bool> BorrarEncabCC(int id)
@@ -197,6 +199,51 @@ namespace PPS3.Client.Services.ServEncabezadoCuentaCorriente
                 var encabs = await JsonSerializer.DeserializeAsync<IEnumerable<EncabezadoCuentaCorriente>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                 return encabs;
+            }
+            else
+                return null;
+        }
+
+        public async Task<IEnumerable<CuentasCorrientesListado>> ObtenerListadoCCCompr()
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
+
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/EncabezadosCuentasCorrientes/ObtenerCCListado");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bits) y lo deserializo en un objeto apropiado
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var encabs = await JsonSerializer.DeserializeAsync<IEnumerable<CuentasCorrientesListado>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                if (encabs != null)
+                {
+                    var comprobs = await _servEncComp.ObtenerComprobantesList();
+
+                    //Creo la lista donde se guardaran los presupuestos
+                    var listaCuentas = new List<CuentasCorrientesListado>();
+
+                    foreach (var enc in encabs)
+                    {
+                        enc.Comprobantes = comprobs.Where(x => x.ClienteComp == enc.ClienteCC && x.Pagado == false).ToList();
+                        listaCuentas.Add(enc);
+                    }
+                    return listaCuentas;
+                }
+                else
+                    return null;
             }
             else
                 return null;

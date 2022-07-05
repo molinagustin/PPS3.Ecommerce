@@ -115,7 +115,7 @@ namespace PPS3.Server.Repositories.RepEncabezadoComprobante
             var db = dbConnection();
 
             var sql = @"
-                        SELECT ce.IdEncab, ce.Periodo, ce.NumComp, tc.TipoComp, ce.FechaComp, cl.NombreCompleto as Cliente, fp.FormaP, ce.ImporteFinal, 
+                        SELECT ce.IdEncab, ce.Periodo, ce.NumComp, ce.ClienteComp, tc.TipoComp, ce.FechaComp, cl.NombreCompleto as Cliente, fp.FormaP, ce.ImporteFinal, 
                         ce.SaldoRestante, ce.Pagado, ce.Observaciones, us.NombreUs as UsuarioCrea, ce.FechaCrea
                         FROM comprobantes_encabezados as ce
                         INNER JOIN tipos_comprobantes as tc ON ce.TipoComprobante = tc.IdTipoC
@@ -150,7 +150,7 @@ namespace PPS3.Server.Repositories.RepEncabezadoComprobante
             var db = dbConnection();
 
             var sql = @"
-                        SELECT ce.IdEncab, ce.Periodo, ce.NumComp, tc.TipoComp, ce.FechaComp, cl.NombreCompleto as Cliente, fp.FormaP, ce.ImporteFinal, 
+                        SELECT ce.IdEncab, ce.Periodo, ce.NumComp, ce.ClienteComp, tc.TipoComp, ce.FechaComp, cl.NombreCompleto as Cliente, fp.FormaP, ce.ImporteFinal, 
                         ce.SaldoRestante, ce.Pagado, ce.Observaciones, us.NombreUs as UsuarioCrea, ce.FechaCrea
                         FROM comprobantes_encabezados as ce
                         INNER JOIN tipos_comprobantes as tc ON ce.TipoComprobante = tc.IdTipoC

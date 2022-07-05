@@ -2,6 +2,7 @@
 {
     public interface IRepDetalleRecibo
     {
+        Task<IEnumerable<DetalleRecibo>> ObtenerDetallesRecibos();
         Task<IEnumerable<DetalleRecibo>> ObtenerDetallesRecibo(int idRecibo);
         Task<IEnumerable<DetalleRecibo>> ObtenerDetallesPorComprobante(int idComprobante);
         Task<bool> InsertarDetalle(DetalleRecibo detalleRec);

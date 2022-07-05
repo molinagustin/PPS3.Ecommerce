@@ -131,7 +131,7 @@
             var db = dbConnection();
 
             var sql = @"
-                        SELECT cc.NumCC, cl.NombreCompleto, cl.NumDocumento, cc.SaldoCCC, cc.LimiteSaldo, cc.Activo
+                        SELECT cc.NumCC, cc.ClienteCC, cl.NombreCompleto, cl.NumDocumento, cc.SaldoCCC, cc.LimiteSaldo, cc.Activo
                         FROM cuentas_corrientes as cc
                         INNER JOIN clientes as cl ON cc.ClienteCC = cl.IdCliente
                         ORDER BY cc.Activo DESC, cl.NombreCompleto

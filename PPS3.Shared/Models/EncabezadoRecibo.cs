@@ -15,6 +15,7 @@ namespace PPS3.Shared.Models
         public int FormaPago { get; set; }
         public int Tarjeta { get; set; }
         public string NumTarjeta { get; set; } = string.Empty;
+        [RegularExpression(@"^\d+(?:[,]\d{0,2})?$", ErrorMessage = "El importe no es correcto")]
         [Required(ErrorMessage = "El importe del Recibo debe indicarse")]
         [Column(TypeName = "decimal(10, 2)")]
         public decimal ImporteTotal { get; set; }
