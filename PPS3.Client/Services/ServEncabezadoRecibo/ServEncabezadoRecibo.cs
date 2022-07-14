@@ -15,14 +15,14 @@ namespace PPS3.Client.Services.ServEncabezadoRecibo
             _servDetRec = servDetRec;
         }
 
-        public async Task<bool> CrearEncabRec(EncabezadoRecibo encabRec)
+        public async Task<int> CrearEncabRec(EncabezadoRecibo encabRec)
         {
             //Obtengo el token de sesion del usuario
             var token = await _sessionStorage.GetItemAsync<string>("token");
 
             //Verifico que exista un token
             if (String.IsNullOrEmpty(token))
-                return false;
+                return 0;
 
             //Se procede a Serializar el contenido del producto por parametro
             var encabJson = new StringContent(JsonSerializer.Serialize(encabRec), Encoding.UTF8, "application/json");
@@ -40,9 +40,9 @@ namespace PPS3.Client.Services.ServEncabezadoRecibo
             response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
 
             if (response.IsSuccessStatusCode)
-                return true;
+                return await response.Content.ReadFromJsonAsync<int>();
             else
-                return false;
+                return 0;
         }
 
         public async Task<EncabezadoRecibo> ObtenerEncab(int idRecibo)

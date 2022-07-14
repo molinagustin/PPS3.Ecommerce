@@ -18,13 +18,13 @@ namespace PPS3.Server.Repositories.RepDetalleRecibo
             var db = dbConnection();
 
             var sql = @"
-                        INSERT INTO recibos_detalles(
-                                                    IdRecibo,
-                                                    IdComprobante,
-                                                    Importe
-                                                    )
+                        INSERT INTO recibos_detalles (
+                                                     IdRecibo,
+                                                     IdComprobante,
+                                                     Importe
+                                                     )
                         VALUES  (
-    |                           @IdRecibo,
+                                @IdRecibo,
                                 @IdComprobante,
                                 @Importe
                                 )

@@ -10,5 +10,6 @@ namespace PPS3.Client.Services.ServEncabezadoComprobante
         Task<IEnumerable<DetalleComprobante>> ObtenerDetallesComprobantesList();
         Task<EncabezadoComprobante> ObtenerEncabezado(int id);
         Task<int> CrearEncabezado(EncabezadoComprobante encabezadoComp);
+        Task<bool> ActualizarComprobante(Comprobante comprobante);
     }
 }

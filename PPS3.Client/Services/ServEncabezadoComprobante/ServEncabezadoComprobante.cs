@@ -13,6 +13,36 @@ namespace PPS3.Client.Services.ServEncabezadoComprobante
             _sessionStorage = sessionStorage;
         }
 
+        public async Task<bool> ActualizarComprobante(Comprobante comprobante)
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return false;
+
+            //Se procede a Serializar el contenido del producto por parametro
+            var encabJson = new StringContent(JsonSerializer.Serialize(comprobante), Encoding.UTF8, "application/json");
+
+            //Creo el objeto donde se guardara el mensaje devuelto
+            var response = new HttpResponseMessage();
+
+            //Creo una solicitud Http de tipo PUT
+            var request = new HttpRequestMessage(HttpMethod.Put, $"api/EncabezadosComprobantes/ActualizarComprobante");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+            //Agrego el JSON al BODY
+            request.Content = encabJson;
+            //Envio la solicitud HTTP
+            response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            if (response.IsSuccessStatusCode)
+                return true;
+            else
+                return false;
+        }
+
         public async Task<int> CrearEncabezado(EncabezadoComprobante encabezadoComp)
         {
             //Obtengo el token de sesion del usuario
@@ -37,7 +67,6 @@ namespace PPS3.Client.Services.ServEncabezadoComprobante
             //Envio la solicitud HTTP
             response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
 
-            //PROBAR SI CON ESE METODO DEVUELVE EL NUMERO DE ENCABEZADO CREADO
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<int>();
             else

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PPS3.Shared.Models;
 
 namespace PPS3.Server.Controllers
 {
@@ -64,6 +65,24 @@ namespace PPS3.Server.Controllers
                 //Devuelvo el ID del comprobante ingresado
                 if (response > 0)
                     return Ok(response);
+                else
+                    return BadRequest();
+            }
+            else
+                return Problem();
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> ActualizarComprobante([FromBody]Comprobante comprobante)
+{
+            if (comprobante == null)
+                return BadRequest();
+
+            if (ModelState.IsValid)
+{
+                var response = await _repEncabComp.ActualizarComprobante(comprobante);
+                if (response != false)
+                    return Ok();
                 else
                     return BadRequest();
             }

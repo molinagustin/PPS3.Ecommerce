@@ -7,6 +7,6 @@
         Task<IEnumerable<Recibo>> ObtenerRecibosList();
         Task<IEnumerable<ReciboListado>> ObtenerRecibosListado();
         Task<EncabezadoRecibo> ObtenerEncab(int idRecibo);
-        Task<bool> CrearEncabRec(EncabezadoRecibo encabRec);
+        Task<int> CrearEncabRec(EncabezadoRecibo encabRec);
     }
 }

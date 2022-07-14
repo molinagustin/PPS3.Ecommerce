@@ -162,5 +162,27 @@ namespace PPS3.Server.Repositories.RepEncabezadoComprobante
             var result = await db.QueryAsync<Comprobante>(sql, new {  });
             return result;
         }
+
+        public async Task<bool> ActualizarComprobante(Comprobante comprobante)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        UPDATE comprobantes_encabezados
+                        SET
+                            SaldoRestante = @SaldoRestante,
+                            Pagado = @Pagado
+                        WHERE IdEncab = @IdEncab
+                        ";
+
+            var result = await db.ExecuteAsync(sql, new
+                                                    {
+                                                        comprobante.SaldoRestante,
+                                                        comprobante.Pagado,
+                                                        comprobante.IdEncab
+                                                    });            
+
+            return result > 0;
+        }
     }
 }

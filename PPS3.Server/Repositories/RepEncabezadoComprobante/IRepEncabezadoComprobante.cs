@@ -8,5 +8,6 @@
         Task<IEnumerable<DetalleComprobante>> ObtenerDetallesComprobantesList();
         Task<EncabezadoComprobante> ObtenerEncabezadoComp(int id);
         Task<int> InsertarEncabezadoComp(EncabezadoComprobante encabezadoComp);
+        Task<bool> ActualizarComprobante(Comprobante comprobante);
     }
 }

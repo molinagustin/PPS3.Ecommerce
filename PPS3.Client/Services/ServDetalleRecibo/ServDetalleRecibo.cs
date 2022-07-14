@@ -12,7 +12,7 @@ namespace PPS3.Client.Services.ServDetalleRecibo
         {
             _httpClient = httpClient;
             _sessionStorage = sessionStorage;
-        }
+        }               
 
         public async Task<bool> CrearDetalleRecibo(DetalleRecibo detalleRec)
         {
