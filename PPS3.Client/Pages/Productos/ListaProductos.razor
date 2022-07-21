@@ -1,5 +1,7 @@
 ﻿@page "/listaProductos"
 @inject IServProducto ServProducto
+@inject NavigationManager NavigationManager
+@using Radzen.Blazor
 @*Con el atributo Authorize se procede a regular el acceso a toda la pagina por usuarios autorizados solamente*@
 @attribute [Authorize(Roles = "1, 2")]
 
@@ -11,71 +13,89 @@
 }
 else
 {    
-    <MudTable Items="@productos" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<ProductoListado, bool>(FilterFunc)">
-        <ToolBarContent>
-            <MudText Typo="Typo.h6">Productos</MudText>
-            <MudSpacer/>
-            <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Outlined" Href="/detallesProducto">Agregar Nuevo</MudButton>
-            <MudSpacer/>
-            <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
-        </ToolBarContent>
-        <HeaderContent>
-            <MudTh>Nombre</MudTh>
-            <MudTh>Descripcion</MudTh>
-            <MudTh>Rubro</MudTh>
-            <MudTh>Tipo Producto</MudTh>
-            <MudTh>Precio Costo</MudTh>
-            <MudTh>Precio Final</MudTh>
-            <MudTh>Proveedor</MudTh>
-            <MudTh>Medido en</MudTh>
-            <MudTh>Alerta de Cantidad</MudTh>
-            <MudTh>Stock Existencia</MudTh>
-            <MudTh>Creado por</MudTh>
-            <MudTh>Modificado por</MudTh>
-            <MudTh>Fecha Creacion</MudTh>
-            <MudTh>Fecha Ult. Modif.</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Nombre">@context.NombreProd</MudTd>
-            <MudTd DataLabel="Descripcion">@context.Descripcion</MudTd>
-            <MudTd DataLabel="Rubro">@context.DescRubro</MudTd>
-            <MudTd DataLabel="Tipo Producto">@context.DescripcionTipo</MudTd>
-            <MudTd DataLabel="Precio Costo">@context.PrecioCosto</MudTd>
-            <MudTd DataLabel="Precio Final">@context.PrecioFinal</MudTd>
-            <MudTd DataLabel="Proveedor">@context.NombreProv</MudTd>
-            <MudTd DataLabel="Medido en">@context.DescripcionUnidad</MudTd>
-            <MudTd DataLabel="Alerta de Cantidad">@context.CantMinAlerta</MudTd>
-            <MudTd DataLabel="Stock Existencia">@context.StockExistencia</MudTd>
-            <MudTd DataLabel="Creado por">@context.UsuarioCrea</MudTd>
-            <MudTd DataLabel="Modificado por">@context.UsuarioModif</MudTd>
-            <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
-            <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>                    
-            <MudTd><a href="/detallesProducto/@context.IdProducto" class="btn-sm btn-warning">Editar</a></MudTd>
-            <MudTd><a href="/detallesProducto/imagenes/@context.IdProducto" class="btn-sm btn-info">Imagenes</a></MudTd>
-            <MudTd><a href="/borrarProducto/@context.IdProducto" class="btn-sm btn-danger">Eliminar</a></MudTd>
-        </RowTemplate>
-        <PagerContent>
-            <MudTablePager/>
-        </PagerContent>
-    </MudTable>
+    <RadzenGrid Data="@productos" TItem="ProductoListado" AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowColumnResize=true>
+        <Columns>
+            <RadzenGridColumn TItem="ProductoListado" Property="NombreProd" Title="Nombre"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripcion"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="DescRubro" Title="Rubro"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="DescripcionTipo" Title="Tipo Producto"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="PrecioCosto" Title="Precio de Costo">
+                <Template Context="pcosto">
+                    @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pcosto.PrecioCosto)
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="PrecioFinal" Title="Precio Final">
+                <Template Context="pfinal">
+                    @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pfinal.PrecioFinal)
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="NombreProv" Title="Proveedor"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="DescripcionUnidad" Title="Medido en"></RadzenGridColumn>
+            @*<RadzenGridColumn TItem="ProductoListado" Property="CantMinAlerta" Title="Alerta de Cantidad"></RadzenGridColumn>*@
+            <RadzenGridColumn TItem="ProductoListado" Property="StockExistencia" Title="Stock Existencia"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="UsuarioCrea" Title="Creado por"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="UsuarioModif" Title="Modificado por"></RadzenGridColumn>
+            @*<RadzenGridColumn TItem="ProductoListado" Property="FechaCrea" Title="Fecha Creacion"></RadzenGridColumn>*@
+            <RadzenGridColumn TItem="ProductoListado" Property="FechaUltModif" Title="Fecha Ult. Modif."></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="IdProducto">
+                <Template Context="acciones">
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="info" Click="@(() => NavigationManager.NavigateTo($"/detallesProducto/{acciones.IdProducto}"))" Size="Radzen.ButtonSize.Small" Text="Edit"/>
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Warning" Icon="open_in_new" Click="@(() => NavigationManager.NavigateTo($"/detallesProducto/imagenes/{acciones.IdProducto}"))" Size="Radzen.ButtonSize.Small" Text="Img"/>
+                </Template>
+            </RadzenGridColumn>
+        </Columns>
+    </RadzenGrid>
+}
+
+<MudText Align="Align.Center" Typo="Typo.h6">Listado de Productos Inactivos</MudText>
+
+@if(productos == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{    
+    <RadzenGrid Data="@productosInactivos" TItem="ProductoListado" AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowColumnResize=true>
+        <Columns>
+            <RadzenGridColumn TItem="ProductoListado" Property="NombreProd" Title="Nombre"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripcion"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="DescRubro" Title="Rubro"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="DescripcionTipo" Title="Tipo Producto"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="PrecioCosto" Title="Precio de Costo">
+                <Template Context="pcosto">
+                    @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pcosto.PrecioCosto)
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="PrecioFinal" Title="Precio Final">
+                <Template Context="pfinal">
+                    @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pfinal.PrecioFinal)
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="NombreProv" Title="Proveedor"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="DescripcionUnidad" Title="Medido en"></RadzenGridColumn>
+            @*<RadzenGridColumn TItem="ProductoListado" Property="CantMinAlerta" Title="Alerta de Cantidad"></RadzenGridColumn>*@
+            <RadzenGridColumn TItem="ProductoListado" Property="StockExistencia" Title="Stock Existencia"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="UsuarioCrea" Title="Creado por"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="UsuarioModif" Title="Modificado por"></RadzenGridColumn>
+            @*<RadzenGridColumn TItem="ProductoListado" Property="FechaCrea" Title="Fecha Creacion"></RadzenGridColumn>*@
+            <RadzenGridColumn TItem="ProductoListado" Property="FechaUltModif" Title="Fecha Ult. Modif."></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="IdProducto">
+                <Template Context="acciones">
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="info" Click="@(() => NavigationManager.NavigateTo($"/detallesProducto/{acciones.IdProducto}"))" Size="Radzen.ButtonSize.Small" Text="Edit"/>
+                    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Warning" Icon="open_in_new" Click="@(() => NavigationManager.NavigateTo($"/detallesProducto/imagenes/{acciones.IdProducto}"))" Size="Radzen.ButtonSize.Small" Text="Img"/>
+                </Template>
+            </RadzenGridColumn>
+        </Columns>
+    </RadzenGrid>
 }
 
 @code {
     IEnumerable<ProductoListado> productos;
-    private string nombreBuscar = "";
+    IEnumerable<ProductoListado> productosInactivos;
 
-    protected override async Task OnInitializedAsync() => productos = await ServProducto.ObtenerProductos();
-
-    private bool FilterFunc(ProductoListado prodList)
+    protected override async Task OnInitializedAsync()
     {
-        if (string.IsNullOrWhiteSpace(nombreBuscar))
-            return true;
-        if (prodList.NombreProd.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (prodList.NombreProv.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (prodList.DescripcionTipo.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
-            return true;
-        return false;
+        productos = await ServProducto.ObtenerProductos();
+        productosInactivos = await ServProducto.ObtenerProductosInactivos();
     }
 }

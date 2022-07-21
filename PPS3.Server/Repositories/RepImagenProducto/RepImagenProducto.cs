@@ -127,7 +127,8 @@ namespace PPS3.Server.Repositories.RepImagenProducto
         public async Task<bool> ImagenFavorita(ImagenProducto imagenFav)
         {
             var db = dbConnection();
-
+            
+            //Primero quito cualquier imagen favorita que haya
             var sql = @"
                         UPDATE productos_imagenes
                         SET
@@ -136,6 +137,7 @@ namespace PPS3.Server.Repositories.RepImagenProducto
                         ";
             var result = await db.ExecuteAsync(sql, new{ imagenFav.IdProducto });
 
+            //Si es exitoso, actualizo la imagen que quiero que sea favorita
             if (result > 0)
             {
                 var sqlFav = @"
@@ -151,7 +153,25 @@ namespace PPS3.Server.Repositories.RepImagenProducto
                                                                 FechaUltModif = DateTime.Now,
                                                                 imagenFav.IdImg
                                                                 });
-                return resultFav > 0;
+                //Si se actualiza correctamente, añado dicha imagen al producto en cuestion para mostrarla en el inicio
+                if (resultFav > 0)
+                {
+                    var sqlImgProd = @"
+                                        UPDATE productos
+                                        SET
+                                            ImagenDestacada = @Contenido
+                                        WHERE IdProducto = @IdProducto
+                                        ";
+                    var resultImgProd = await db.ExecuteAsync(sqlImgProd, new 
+                    {
+                        imagenFav.Contenido,
+                        imagenFav.IdProducto
+                    });
+
+                    return resultImgProd > 0;
+                }
+                else
+                    return false;
             }
 
             return false;

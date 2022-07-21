@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PPS3.Shared.InternalModels
 {
@@ -25,6 +26,7 @@ namespace PPS3.Shared.InternalModels
         public DateTime FechaUltModif { get; set; }
 
         //Propiedades para los presupuestos
+        [RegularExpression(@"^\d+(?:[,]\d{0,2})?$", ErrorMessage = "La cantidad no es correcta")]
         [Column(TypeName = "decimal(10,2)")]
         public decimal Cantidad { get; set; }
         [Column(TypeName = "decimal(10,2)")]
@@ -33,5 +35,9 @@ namespace PPS3.Shared.InternalModels
         public decimal BonificacionTotal { get; set; }
         [Column(TypeName = "decimal(10,2)")]
         public decimal SubTotal { get; set; }
+
+        //Para guardar una imagen del producto
+        public byte[]? ImagenDestacada { get; set; }
+        public string UrlImagen { get; set; } = string.Empty;
     }
 }

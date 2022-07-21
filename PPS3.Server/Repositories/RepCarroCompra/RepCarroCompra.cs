@@ -186,5 +186,18 @@
             var result = await db.QueryAsync<DetalleCarroCompra>(sql, new { Carro = NumOrden });
             return result;
         }
+
+        public async Task<CarroCompra> ObtenerCarroActivoUsuario(int idUsuario)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT *
+                        FROM carros_compras
+                        WHERE Estado = 1 AND UsuarioCarro = @idUsuario
+                        ";
+            var result = await db.QueryFirstOrDefaultAsync<CarroCompra>(sql, new { idUsuario });
+            return result;
+        }
     }
 }

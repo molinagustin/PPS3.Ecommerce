@@ -23,6 +23,14 @@ namespace PPS3.Server.Controllers
             return Ok(response);
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ProductoListado>>> ObtenerProductosInactivos()
+        {
+            var response = await _repProducto.ObtenerProductosInactivos();
+            return Ok(response);
+        }
+
         //Similar al metodo anterior, solo que en la solicitud HTTP va a ir un parametro, que sera el ID del producto que solicitamos
         [AllowAnonymous]
         [HttpGet("{id:int}")]
@@ -44,6 +52,35 @@ namespace PPS3.Server.Controllers
 
             if (response != null)
                 return Ok(response);
+            else
+                return BadRequest();
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ProductoListado>>> ObtenerUltimos5Productos()
+        {
+            var response = await _repProducto.ObtenerUltimos5Productos();
+
+            if (response != null)
+                return Ok(response);
+            else
+                return BadRequest();
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ProductoListado>> ObtenerProductoListado(int id)
+        {
+            if(id > 0)
+            {
+                var response = await _repProducto.ObtenerProductoListado(id);
+
+                if (response != null)
+                    return Ok(response);
+                else
+                    return BadRequest();
+            }
             else
                 return BadRequest();
         }

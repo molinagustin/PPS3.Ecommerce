@@ -1,0 +1,160 @@
+﻿@page "/verProducto/{id:int}"
+@inject IServProducto ServProducto
+@inject IServImagenProducto ServImagen
+@inject IServCarroCompra ServCarro
+@inject IServDetalleCarroCompra ServDetalleCarro
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
+
+@*Con ese modo de ver la autorizacion, se obtiene el Id del usuario si esta logueado o no*@
+<AuthorizeView Context="usCont">
+    <Authorized>
+        <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+    </Authorized>    
+    <NotAuthorized>
+        <input type="hidden" id="UsAct" value="0" />
+    </NotAuthorized>
+</AuthorizeView>
+
+@if(producto == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+}
+else
+{
+    <MudText Align="Align.Center" Typo="Typo.h4"><b>@producto.NombreProd</b></MudText>
+    <br />
+
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="4">
+            <MudCarousel ItemsSource="imagenesProducto" Style="height:400px; width:400px;" ShowArrows=true ShowBullets=true AutoCycle=false SelectedIndex="0">
+                <ItemTemplate Context="img">
+		            <div class="d-flex flex-column flex-column justify-center" style="height:100%">
+                        <MudImage Class="mx-auto" Elevation="2" ObjectFit="ObjectFit.Fill" Src="@img.UrlImagen" Style="width:250px; height:250px; margin:5px;"/>
+		            </div>
+	            </ItemTemplate>
+            </MudCarousel>
+        </MudItem>
+        <MudItem xs="6">
+            <MudCard Elevation="1">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Informacion</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Align="Align.Left" Typo="Typo.body1"><b>Descripcion: </b>@producto.Descripcion</MudText>
+                    <MudText Align="Align.Left" Typo="Typo.body1"><b>Proveedor: </b>@producto.NombreProv</MudText>
+                    <MudText Align="Align.Left" Typo="Typo.body1"><b>Rubro: </b>@producto.DescRubro</MudText>
+                    <MudText Align="Align.Left" Typo="Typo.body1"><b>Medido En: </b>@producto.DescripcionUnidad</MudText>
+                    @if(stock > 0)
+                    {
+                        <MudText Align="Align.Left" Typo="Typo.body1"><b>Stock Disponible: </b>@producto.StockExistencia</MudText>
+                    }
+                    else
+                    {
+                        <MudText Align="Align.Left" Typo="Typo.body1" Color="Color.Error"><b>Sin Stock Disponible</b></MudText>
+                    }
+                    <MudText Align="Align.Left" Typo="Typo.body1"><b>Precio: </b>$@producto.PrecioFinal</MudText>
+                </MudCardContent>
+            </MudCard>            
+        </MudItem>
+        <MudItem xs="2">
+            <AuthorizeView Context="usCont">
+                <Authorized>
+                    <EditForm Model="producto" OnValidSubmit="AgregarProducto">
+                        <MudTextField Label="Cantidad" HelperText="Formato 999,99 ó 999" @bind-Value="cantidad" For="@(() => producto.Cantidad)" Required="true" OnBlur="CalculoSubTotal"/>
+                        <MudText @bind-Value="subTotal" ReadOnly=true>
+                            Sub Total:
+                            <b>
+                                @if(subTotal > 0)
+                                {
+                                @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", subTotal)
+                                }
+                                else
+                                {
+                                @string.Format("---")
+                                }
+                            </b>
+                        </MudText>
+                        <br>
+                        <MudButton StartIcon="@Icons.Material.Filled.AddCircle" Color="Color.Success" Variant="Variant.Filled" ButtonType="ButtonType.Submit">Agregar al Carro</MudButton>
+                    </EditForm>                    
+                </Authorized>    
+                <NotAuthorized>
+                    <MudText Align="Align.Center" Typo="Typo.h6">Para agregar el producto al carro, debe loguearse o registrarse si todavia no tiene una cuenta.</MudText>
+                    <MudTextField Label="Cantidad" HelperText="Formato 999,99 ó 999" @bind-Value="cantidad" Required="true" Disabled=true/>
+                    <MudButton StartIcon="@Icons.Material.Filled.AddCircle" Color="Color.Success" Variant="Variant.Filled" Disabled=true>Agregar al Carro</MudButton>
+                </NotAuthorized>
+            </AuthorizeView>
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    //Parametro que se recibe por URL para una consulta del objeto
+    [Parameter]
+    public int id { get; set; }
+
+    ProductoListado producto = new ProductoListado();
+    IEnumerable<ImagenProducto> imagenesProducto;
+
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
+    private decimal cantidad = 1;
+    private decimal stock = 0;
+    private decimal subTotal = 0;
+
+    //Guardo el ID del usuario actual
+    protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+
+    protected override async Task OnInitializedAsync()
+    {
+        producto = await ServProducto.ObtenerProductoListado(id);
+        imagenesProducto = await ServImagen.ObtenerImagenes(id);
+        stock = producto.StockExistencia;
+    }
+
+    private async Task AgregarProducto()
+    {
+        //Verifico que la cantidad del producto sea mayor a cero y no mayor que el stock disponible
+        if(cantidad > 0 && cantidad <= stock)
+        {
+            CarroCompra carro = new CarroCompra();
+            carro = await ServCarro.ObtenerCarroActivoUsuario(idUsAct);
+
+            if(carro != null)
+            {
+                //Creo un detalle del carro donde se guardara el producto
+                DetalleCarroCompra detalle = new DetalleCarroCompra();
+                detalle.Carro = carro.IdCarro;
+                detalle.Producto = producto.IdProducto;
+                detalle.Cantidad = cantidad;
+                detalle.PrecioUnit = producto.PrecioFinal;
+                detalle.SubTotal = subTotal;
+
+                var nuevoDetalle = await ServDetalleCarro.GuardarDetalle(detalle);
+
+                //Si se guarda correctamente el detalle, procedo a mostrar una alerta y llevar al usuario al carro de compra para ver los detalles
+                if(nuevoDetalle)
+                {
+                    NavigationManager.NavigateTo($"/verCarro/{carro.IdCarro}");
+                    Snackbar.Add($"El detalle fue añadido correctamente.", Severity.Success);
+                }
+                else
+                    Snackbar.Add($"El detalle del carro no pudo ser agregado correctamente.", Severity.Error);
+            }
+            else
+                Snackbar.Add($"No se pudo obtener el carro del usuario", Severity.Error);
+        }
+        else
+            Snackbar.Add($"La cantidad a agregar es incorrecta", Severity.Error);
+    }
+
+    private void CalculoSubTotal()
+    {
+        subTotal = producto.PrecioFinal * cantidad;
+    }
+}

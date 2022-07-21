@@ -24,7 +24,7 @@ else
                     <RadzenGridColumn TItem="ReciboListado" Property="Cliente" Title="Cliente"></RadzenGridColumn>
                     <RadzenGridColumn TItem="ReciboListado" Property="FechaRecibo" Title="Fecha Recibo"></RadzenGridColumn>
                     <RadzenGridColumn TItem="ReciboListado" Property="FormaP" Title="Forma Pago"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ReciboListado" Property="NombreTarj" Title="Tarjeta"></RadzenGridColumn>
+                    @*<RadzenGridColumn TItem="ReciboListado" Property="NombreTarj" Title="Tarjeta"></RadzenGridColumn>*@
                     <RadzenGridColumn TItem="ReciboListado" Property="NumTarjeta" Title="N° Tarj.">
                         <Template Context="numT">
                             @if(string.IsNullOrEmpty(numT.NumTarjeta))

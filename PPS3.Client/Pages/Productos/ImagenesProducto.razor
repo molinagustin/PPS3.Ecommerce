@@ -9,22 +9,22 @@
     <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
 </AuthorizeView>
 
-<MudText Align="Align.Center" Typo="Typo.h3">Imagenes del Producto</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5">Imagenes</MudText>
 
 <MudItem xs="4">
-        <MudText Align="Align.Center" Typo="Typo.h5" Color="Color.Primary">Las imagenes seleccionadas se guardan automaticamente</MudText>
-        <InputFile OnChange="OnInputFileChanged" multiple/>
+        <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Primary" Variant="Variant.Outlined" OnClick="Volver" Size="Size.Small">Volver</MudButton>
 </MudItem>
 
 <MudItem xs="4">
-        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Default" OnClick="Volver">VOLVER </MudIconButton>
+        <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Primary">Las imagenes seleccionadas se guardan automaticamente</MudText>
+        <InputFile OnChange="OnInputFileChanged" multiple/>
 </MudItem>
 
 <MudText Align="Align.Center" Typo="Typo.h5">Imagenes Guardadas</MudText>
 
 <MudGrid>
-    <MudItem xs="12">
-        <MudStack Row="true" Style="max-width:max-content;">
+    <MudItem xs="12" md="9">
+        <MudStack Row="true" Style="max-width:max-content;">            
             @if(imagenes != null && imagenes.Count() > 0)
             {
                 @foreach(var image in imagenes)
@@ -48,7 +48,7 @@
                         </MudCard>
                     </MudItem>
                 }
-            }
+            }            
             else
             {
                 <MudText Align="Align.Center" Typo="Typo.h5" Color="Color.Error">El producto no posee imagenes todavia</MudText>

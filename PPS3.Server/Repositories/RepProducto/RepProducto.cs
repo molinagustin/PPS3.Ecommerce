@@ -30,6 +30,7 @@
                             UnidadMedida=@UnidadMedida, 
                             CantMinAlerta=@CantMinAlerta, 
                             StockExistencia=@StockExistencia,
+                            Activo=@Activo,
                             UsuarioModif=@UsuarioModif, 
                             FechaUltModif=@FechaUltModif
                             
@@ -47,6 +48,7 @@
                                                         producto.UnidadMedida, 
                                                         producto.CantMinAlerta, 
                                                         producto.StockExistencia,
+                                                        producto.Activo,
                                                         producto.UsuarioModif, 
                                                         FechaUltModif = DateTime.Now, 
                                                         producto.IdProducto 
@@ -186,6 +188,66 @@
                         WHERE UsuarioCrea = @UsuarioCrea
                         ";
             var result = await db.ExecuteScalarAsync<int>(sql, new { UsuarioCrea = idUsuario });
+            return result;
+        }
+
+        public async Task<IEnumerable<ProductoListado>> ObtenerProductosInactivos()
+        {
+            var db = dbConnection();
+            //Se coloca el @ para que se pueda usar multiples lineas en la misma cadena, sino habria que concatenarla con +
+            var sql = @"
+                        SELECT  prod.IdProducto, prod.NombreProd, prod.Descripcion, r.DescRubro,                    tp.DescripcionTipo, prod.PrecioCosto, 
+                                prod.PrecioFinal, prov.NombreProv, um.DescripcionUnidad, prod.CantMinAlerta,      prod.StockExistencia, u.NombreUs as UsuarioCrea, u2.NombreUs as UsuarioModif, 
+                                prod.FechaCrea, prod.FechaUltModif
+                        FROM productos as prod
+                        INNER JOIN rubros as r ON prod.Rubro = r.IdRubro
+                        INNER JOIN productos_tipos as tp ON prod.TipoProd = tp.IdTipo
+                        INNER JOIN proveedores as prov ON prod.Proveedor = prov.IdProveedor
+                        INNER JOIN unidades_medida as um ON prod.UnidadMedida = um.IdUnidad
+                        INNER JOIN usuarios as u ON prod.UsuarioCrea = u.IdUsuarioAct
+                        INNER JOIN usuarios as u2 ON prod.UsuarioModif = u2.IdUsuarioAct
+                        WHERE prod.Activo = 0
+                        ORDER BY prod.NombreProd
+                        ";
+
+            //El metodo QueryAsync va a devolver un IEnumerable con los datos del modelo que pasamos por parametro
+            var result = await db.QueryAsync<ProductoListado>(sql, new { });
+            return result;
+        }
+
+        public async Task<IEnumerable<ProductoListado>> ObtenerUltimos5Productos()
+        {
+            var db = dbConnection();
+            //Se coloca el @ para que se pueda usar multiples lineas en la misma cadena, sino habria que concatenarla con +
+            var sql = @"
+                        SELECT TOP 5 prod.IdProducto, prod.NombreProd, prod.PrecioFinal, prod.FechaUltModif, prod.ImagenDestacada
+                        FROM productos as prod
+                        WHERE prod.Activo = 1
+                        ORDER BY prod.FechaUltModif DESC
+                        ";
+
+            //El metodo QueryAsync va a devolver un IEnumerable con los datos del modelo que pasamos por parametro
+            var result = await db.QueryAsync<ProductoListado>(sql, new { });
+            return result;
+        }
+
+        public async Task<ProductoListado> ObtenerProductoListado(int id)
+        {
+            var db = dbConnection();
+            //Se coloca el @ para que se pueda usar multiples lineas en la misma cadena, sino habria que concatenarla con +
+            var sql = @"
+                        SELECT  prod.IdProducto, prod.NombreProd, prod.Descripcion, r.DescRubro,                    tp.DescripcionTipo, prod.PrecioCosto, 
+                                prod.PrecioFinal, prov.NombreProv, um.DescripcionUnidad, prod.StockExistencia
+                        FROM productos as prod
+                        INNER JOIN rubros as r ON prod.Rubro = r.IdRubro
+                        INNER JOIN productos_tipos as tp ON prod.TipoProd = tp.IdTipo
+                        INNER JOIN proveedores as prov ON prod.Proveedor = prov.IdProveedor
+                        INNER JOIN unidades_medida as um ON prod.UnidadMedida = um.IdUnidad
+                        WHERE prod.IdProducto = @IdProducto
+                        ";
+
+            //El metodo QueryAsync va a devolver un IEnumerable con los datos del modelo que pasamos por parametro
+            var result = await db.QueryFirstOrDefaultAsync<ProductoListado>(sql, new { IdProducto = id });
             return result;
         }
     }

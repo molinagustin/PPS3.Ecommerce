@@ -1,10 +1,13 @@
-﻿namespace PPS3.Client.Services.ServProducto
+﻿using static Org.BouncyCastle.Bcpg.Attr.ImageAttrib;
+
+namespace PPS3.Client.Services.ServProducto
 {
     public class ServProducto : IServProducto
     {
         //Se comienza por crear el campo que se utilizara para los HTTP request, el cual ya trae configurado .NET CORE
         private readonly HttpClient _httpClient;
         private readonly ISessionStorageService _sessionStorage;
+        private readonly string format = "image/png";
 
         public ServProducto(HttpClient httpClient, ISessionStorageService sessionStorage)
         {
@@ -114,6 +117,15 @@
             return producto;
         }
 
+        public async Task<ProductoListado> ObtenerProductoListado(int id)
+        {
+            var response = await _httpClient.GetStreamAsync($"api/Productos/ObtenerProductoListado/{id}");
+
+            var producto = await JsonSerializer.DeserializeAsync<ProductoListado>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            return producto;
+        }
+
         public async Task<IEnumerable<ProductoListado>> ObtenerProductos()
         {
             //Se obtiene el resultado de los productos solicitados a la ruta de la API, el cual viene como cadena y deber ser deserializado
@@ -123,6 +135,36 @@
             var productos = await JsonSerializer.DeserializeAsync<IEnumerable<ProductoListado>>(response, new JsonSerializerOptions () { PropertyNameCaseInsensitive = true });
 
             return productos;
+        }
+
+        public async Task<IEnumerable<ProductoListado>> ObtenerProductosInactivos()
+        {
+            //Se obtiene el resultado de los productos solicitados a la ruta de la API, el cual viene como cadena y deber ser deserializado
+            var response = await _httpClient.GetStreamAsync($"api/Productos/ObtenerProductosInactivos");
+
+            //Deserializo el objeto JSON a un Enumerable y se usa CASE INSENSITIVE dado que el frontend podria tener un modelo que no este respetando esta condicion, entonces es buena practica colocarlo (en este caso no haria falta porque es el mismo modelo para BACK y FRONT)
+            var productos = await JsonSerializer.DeserializeAsync<IEnumerable<ProductoListado>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            return productos;
+        }
+
+        public async Task<IEnumerable<ProductoListado>> ObtenerUltimos5Productos()
+        {
+            var response = await _httpClient.GetStreamAsync($"api/Productos/ObtenerUltimos5Productos");
+
+            var productos = await JsonSerializer.DeserializeAsync<IEnumerable<ProductoListado>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            if (productos != null)
+            {
+                foreach (var prod in productos)
+                {
+                    if(prod.ImagenDestacada != null)
+                        prod.UrlImagen = $"data:{format};base64,{Convert.ToBase64String(prod.ImagenDestacada)}";
+                }
+                return productos;
+            }
+            else
+                return null;
         }
 
         public async Task<int> UltimoProductoCreado(int idUsuario)

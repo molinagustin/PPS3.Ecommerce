@@ -33,5 +33,6 @@ namespace PPS3.Shared.Models
         public DateTime FechaCrea { get; set; }
         public int UsuarioModif { get; set; }
         public DateTime FechaUltModif { get; set; }
+        public byte[]? ImagenDestacada { get; set; }
     }
 }

@@ -1,0 +1,37 @@
+﻿@page "/"
+@inject IServProducto ServProducto
+@inject NavigationManager NavigationManager
+
+<PageTitle>Ecommerce Shop</PageTitle>
+
+<MudText Align="Align.Center" Typo="Typo.h6">¡Revisa Nuestros Ultimos Productos!</MudText>
+<br />
+
+@if(ultimosProductos == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+}
+else
+{
+    <MudGrid Justify="Justify.Center">
+        <MudCarousel ItemsSource="ultimosProductos" Style="height:400px; width:600px;" ShowArrows=true ShowBullets=true AutoCycle=false SelectedIndex="0">
+            <ItemTemplate Context="img">
+		        <div class="d-flex flex-column flex-column justify-center" style="height:100%">
+                    <MudImage Class="mx-auto" Elevation="2" ObjectFit="ObjectFit.Fill" Src="@img.UrlImagen" Style="width:250px; height:250px; margin:5px;"/>
+			        <MudText Align="@Align.Center" Class="mx-auto"><b>@img.NombreProd</b></MudText>
+                    <MudText Align="@Align.Center" Class="mx-auto">$ @img.PrecioFinal</MudText>
+                    <MudButton OnClick="@(() => VerProducto(img.IdProducto))" Style="margin-bottom:10px;">¡VER!</MudButton>
+		        </div>
+	        </ItemTemplate>
+        </MudCarousel>
+    </MudGrid>
+}
+
+@code {
+    //Traigo los ultimos 5 productos modificados o creados recientemente
+    IEnumerable<ProductoListado> ultimosProductos;
+
+    protected override async Task OnInitializedAsync() => ultimosProductos = await ServProducto.ObtenerUltimos5Productos();
+
+    protected void VerProducto(int id) => NavigationManager.NavigateTo($"/verProducto/{id}");
+}

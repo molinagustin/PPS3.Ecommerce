@@ -55,6 +55,16 @@ namespace PPS3.Server.Controllers
                 return BadRequest();
         }
 
+        [HttpGet("{idUsuario}")]
+        public async Task<ActionResult<CarroCompra>> ObtenerCarroActivoUsuario(int idUsuario)
+        {
+            var response = await _repCarroCompra.ObtenerCarroActivoUsuario(idUsuario);
+            if (response != null)
+                return Ok(response);
+            else
+                return BadRequest();
+        }
+
         [HttpPost]
         public async Task<ActionResult<int>> CrearCarroCompra([FromBody] int idUsuario)
         {

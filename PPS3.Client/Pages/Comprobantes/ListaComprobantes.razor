@@ -119,7 +119,7 @@ else
                                 </Template>
                             </RadzenGridColumn>  
                             <RadzenGridColumn TItem="Recibo" Property="FormaP" Title="Forma Pago"></RadzenGridColumn>  
-                            <RadzenGridColumn TItem="Recibo" Property="NombreTarj" Title="Tarjeta"></RadzenGridColumn>  
+                            @*<RadzenGridColumn TItem="Recibo" Property="NombreTarj" Title="Tarjeta"></RadzenGridColumn>  *@
                             <RadzenGridColumn TItem="Recibo" Property="NumTarjeta" Title="N° Tarj.">
                                 <Template Context="numT">
                                     @if(string.IsNullOrEmpty(numT.NumTarjeta))
@@ -128,7 +128,7 @@ else
                                     }
                                     else
                                     {
-                                        @string.Format($"...{0}", numT.NumTarjeta);
+                                        @string.Format("...{0}", numT.NumTarjeta);
                                     }
                                 </Template>
                             </RadzenGridColumn>  

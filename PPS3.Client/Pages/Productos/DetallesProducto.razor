@@ -19,7 +19,7 @@
 @if(id>0)
 {
     @*Si es un producto ya creado, recien ahi muestro sus imagenes*@
-    <MudButton OnClick="VerImagenes">Imagenes</MudButton>
+    <MudButton StartIcon="@Icons.Material.Filled.Image" Color="Color.Primary" Variant="Variant.Outlined" OnClick="VerImagenes" Size="Size.Small">IMAGENES</MudButton>
 }
 
 <EditForm Model="@producto" OnValidSubmit="GuardarProducto" Context="conForm">
@@ -101,6 +101,11 @@
 
                     <MudTextField Label="Stock en Existencia" HelperText="Productos que quedan. Formato 999,99 ó 999" @bind-Value="producto.StockExistencia" For="@(() => producto.StockExistencia)"/>
 
+                    @if(id > 0)
+                    {
+                        <MudSwitch @bind-Checked="producto.Activo" Label="Producto Activo" Color="Color.Success"/>
+                    }          
+                    
                 </MudCardContent>
                 <MudCardActions>
                     <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Save" Color="Color.Success" ButtonType="ButtonType.Submit">Guardar</MudButton>
