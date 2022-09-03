@@ -2,7 +2,7 @@
 @inject IServTipoVenta ServTipoVta
 @attribute [Authorize(Roles = "1")]
 
-<MudText Align="Align.Center" Typo="Typo.h5">Listado de Tipos Ventas</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Listado de Tipos Ventas</MudText>
 
 @if(tiposVta == null)
 {
@@ -17,7 +17,7 @@ else
             <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>Id Tipo Venta</MudTh>
+            <MudTh Style="width:120px;">Id Tipo Venta</MudTh>
             <MudTh>Tipo de Venta</MudTh>
         </HeaderContent>
         <RowTemplate>

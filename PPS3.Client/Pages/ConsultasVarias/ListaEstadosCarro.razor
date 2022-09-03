@@ -2,7 +2,7 @@
 @inject IServEstadoCarroCompra ServEstadoCarro
 @attribute [Authorize(Roles = "1")]
 
-<MudText Align="Align.Center" Typo="Typo.h5">Listado de Estados Carros Compras</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Listado de Estados Carros Compras</MudText>
 
 @if(estados == null)
 {
@@ -17,7 +17,7 @@ else
             <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>Id Estado</MudTh>
+            <MudTh Style="width:100px;">Id Estado</MudTh>
             <MudTh>Estado</MudTh>
         </HeaderContent>
         <RowTemplate>

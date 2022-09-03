@@ -64,15 +64,11 @@
                         INSERT INTO cuentas_corrientes
                                     (
                                     ClienteCC,
-                                    SaldoCCC,
-                                    LimiteSaldo,
                                     UsuarioCrea,
                                     UsuarioModif
                                     )
                         VALUES      (
                                     @ClienteCC,
-                                    @SaldoCCC,
-                                    @LimiteSaldo,
                                     @UsuarioCrea,
                                     @UsuarioModif
                                     )
@@ -80,8 +76,6 @@
             var result = await db.ExecuteAsync(sql, new 
                                     {
                                     encabezadoCC.ClienteCC,
-                                    encabezadoCC.SaldoCCC,
-                                    encabezadoCC.LimiteSaldo,
                                     encabezadoCC.UsuarioCrea,
                                     encabezadoCC.UsuarioModif
                                     });

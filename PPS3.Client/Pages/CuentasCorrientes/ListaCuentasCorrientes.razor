@@ -5,7 +5,7 @@
 @*Con el atributo Authorize se procede a regular el acceso a toda la pagina por usuarios autorizados solamente*@
 @attribute [Authorize(Roles = "1, 2")]
 
-<MudText Align="Align.Center" Typo="Typo.h5">Listado de Cuentas Corrientes</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Listado de Cuentas Corrientes</MudText>
 
 @if(cuentas == null)
 {
@@ -13,9 +13,9 @@
 }
 else
 {
-    <RadzenGrid Data="@cuentas" TItem="CuentasCorrientesListado" AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive">
+    <RadzenGrid Data="@cuentas" TItem="CuentasCorrientesListado" AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" PageSize="20">
         <Columns>
-            <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NumCC" Title="N° Cuenta"></RadzenGridColumn>
+            <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NumCC" Title="N° Cuenta" Width="100px"></RadzenGridColumn>
             <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NombreCompleto" Title="Nombre Cliente"></RadzenGridColumn>
             <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NumDocumento" Title="N° Documento"></RadzenGridColumn>
             <RadzenGridColumn TItem="CuentasCorrientesListado" Property="SaldoCCC" Title="Saldo de Compra Disponible">
@@ -28,19 +28,19 @@ else
                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", limite.LimiteSaldo)
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="CuentasCorrientesListado" Property="Activo" Title="Cuenta Activa">
+            <RadzenGridColumn TItem="CuentasCorrientesListado" Property="Activo" Title="Cuenta Activa" Width="120px">
                 <Template Context="act">
                     @if(act.Activo)
                     {
-                        @string.Format("Si");
+                        <MudIcon Icon="@Icons.Filled.Check" Color="Color.Success"></MudIcon>
                     }
                     else
                     {
-                        @string.Format("No");
+                        <MudIcon Icon="@Icons.Filled.Dangerous" Color="Color.Error"></MudIcon>
                     }
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NumCC">
+            <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NumCC" Width="150px">
                 <Template Context="movimientos">
                     <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="info" Click="@(() => NavigationManager.NavigateTo($"/movimientosCuentaCorriente/{movimientos.NumCC}"))" Size="Radzen.ButtonSize.Small" Text="Mov."/>
                     <RadzenButton ButtonStyle="Radzen.ButtonStyle.Warning" Icon="open_in_new" Click="@(() => NavigationManager.NavigateTo($"/detallesCuentaCorriente/{movimientos.NumCC}"))" Size="Radzen.ButtonSize.Small" Text="Editar"/>

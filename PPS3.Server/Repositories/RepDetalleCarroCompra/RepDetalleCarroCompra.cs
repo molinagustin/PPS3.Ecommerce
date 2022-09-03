@@ -112,8 +112,11 @@
             var db = dbConnection();
 
             var sql = @"
-                        SELECT *
-                        FROM carros_compras_detalles
+                        SELECT ccd.IdDetalle, ccd.Carro, ccd.Producto, ccd.Cantidad, ccd.PrecioUnit, ccd.Bonificacion, ccd.BonificacionTotal, ccd.SubTotal,
+                        p.NombreProd as NombreProducto, p.Descripcion, p.ImagenDestacada, um.DescripcionUnidad
+                        FROM carros_compras_detalles as ccd
+                        INNER JOIN productos as p ON ccd.Producto = p.IdProducto
+                        INNER JOIN unidades_medida as um ON p.UnidadMedida = um.IdUnidad
                         WHERE Carro = @Carro
                         ";
             var result = await db.QueryAsync<DetalleCarroCompra>(sql, new { Carro = idCarro });

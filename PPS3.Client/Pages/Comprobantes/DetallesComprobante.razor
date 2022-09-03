@@ -16,9 +16,9 @@
     <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
 </AuthorizeView>
 
-<MudText Align="Align.Center" Typo="Typo.h4">Detalles del Comprobante</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom: 30px;">Nuevo Comprobante</MudText>
 
-<MudButton StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Primary" Variant="Variant.Outlined" Href="/listaComprobantes" Size="Size.Small">Volver</MudButton>
+<MudButton StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Primary" Variant="Variant.Outlined" Href="/listaComprobantes" Size="Size.Small" Style="margin-bottom:10px;">Volver</MudButton>
 
 @if (productosDisponibles == null || clientes == null || tiposComp == null || formasPago == null)
 {
@@ -29,37 +29,37 @@ else
     <MudGrid Justify="Justify.Center">
         @*CLIENTES*@
         <MudItem xs="2">
-            <MudText Align="Align.Center" Typo="Typo.body1">Clientes</MudText>
+            <MudText Align="Align.Center" Typo="Typo.h6">Clientes</MudText>
             <RadzenGrid Data="@clientes" TItem="Cliente" RowSelect="@(args => cliente = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
                 <Columns>
                     <RadzenGridColumn TItem="Cliente" Property="NombreCompleto" Title="Nombre"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="Cliente" Property="NumDocumento" Title="N° Doc."></RadzenGridColumn>
+                    <RadzenGridColumn TItem="Cliente" Property="NumDocumento" Title="N° Doc." Width="90px"></RadzenGridColumn>
                 </Columns>
             </RadzenGrid>
         </MudItem>
         @*LISTADO PRODUCTOS*@
         <MudItem lg="8">
-            <MudText Align="Align.Center" Typo="Typo.body1">Lista de Productos</MudText>
+            <MudText Align="Align.Center" Typo="Typo.h6">Lista de Productos</MudText>
             <RadzenGrid Data="@productosDisponibles" TItem="ProductoListado" RowSelect="@(args => prodSelect = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
                 <Columns>
                     <RadzenGridColumn TItem="ProductoListado" Property="NombreProd" Title="Nombre Producto"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripcion"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductoListado" Property="DescRubro" Title="Rubro"></RadzenGridColumn>
+                    @*<RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripcion"></RadzenGridColumn>*@
+                    <RadzenGridColumn TItem="ProductoListado" Property="DescRubro" Title="Rubro" Width="120px"></RadzenGridColumn>
                     <RadzenGridColumn TItem="ProductoListado" Property="DescripcionTipo" Title="Tipo Producto"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductoListado" Property="PrecioFinal" Title="Precio Venta">
+                    <RadzenGridColumn TItem="ProductoListado" Property="PrecioFinal" Title="Precio Venta" Width="100px">
                         <Template Context="pVta">
                             @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pVta.PrecioFinal)
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductoListado" Property="DescripcionUnidad" Title="Unidad Medida"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductoListado" Property="NombreProv" Title="Proveedor"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductoListado" Property="StockExistencia" Title="Stock Existente"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ProductoListado" Property="DescripcionUnidad" Title="Unidad Medida" Width="120px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ProductoListado" Property="NombreProv" Title="Proveedor" Width="135px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ProductoListado" Property="StockExistencia" Title="Stock" Width="85px"></RadzenGridColumn>
                 </Columns>
             </RadzenGrid>
         </MudItem>
         @*AGREGAR EL PRODUCTO*@
         <MudItem xs="2">
-            <MudText Align="Align.Center" Typo="Typo.body1">Acciones</MudText>
+            <MudText Align="Align.Center" Typo="Typo.h6"><br /></MudText>
             <MudStack Row="true" Justify="Justify.Center">
                 <MudStack Style="width:50%">
                     <MudTextField Label="Cantidad" HelperText="Formato 9,99 ó 9" @bind-Value="cant"/>
@@ -75,7 +75,7 @@ else
     </MudGrid>
 }
 
-<MudText Align="Align.Center" Typo="Typo.h5">Detalles del Comprobante</MudText>
+<MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:15px; margin-bottom:10px;">Detalles del Comprobante</MudText>
 
 @if(productosAgregados != null && productosAgregados.Count() > 0)
 {    
@@ -86,7 +86,7 @@ else
                 <thead>
                     <tr>
                         <td>Nombre Producto</td>
-                        <td>Descripcion</td>
+                        @*<td>Descripcion</td>*@
                         <td>Unidad Medida</td>
                         <td>Precio Venta</td>
                         <td>Cantidad</td>
@@ -101,7 +101,7 @@ else
                     {
                         <tr>
                             <td>@pr.NombreProd</td>
-                            <td>@pr.Descripcion</td>
+                            @*<td>@pr.Descripcion</td>*@
                             <td>@pr.DescripcionUnidad</td>
                             <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pr.PrecioFinal)</td>
                             <td>@pr.Cantidad</td>
@@ -113,7 +113,7 @@ else
                     }
                     <tr>
                         <td></td>
-                        <td></td>
+                        @*<td></td>*@
                         <td></td>
                         <td></td>
                         <td></td>
@@ -130,18 +130,18 @@ else
             <MudSelect T="int" @bind-Value="@tipoComp" Label="Tipo Comp." Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                 @foreach(var tp in tiposComp)
                 {
-                    <MudSelectItem Value="@tp.IdTipoC">@tp.TipoComp</MudSelectItem>
+                    <MudSelectItem Value="@tp.IdTipoC">@(tiposComp.ToList().IndexOf(tp) + 1) - @tp.TipoComp</MudSelectItem>
                 }
             </MudSelect>
             <MudSelect T="int" @bind-Value="@formaPago" Label="Forma Pago" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                 @foreach(var fp in formasPago)
                 {
-                    <MudSelectItem Value="@fp.IdFormaP">@fp.FormaP</MudSelectItem>
+                    <MudSelectItem Value="@fp.IdFormaP">@(formasPago.ToList().IndexOf(fp) + 1) - @fp.FormaP</MudSelectItem>
                 }
             </MudSelect>
             <MudSelect T="int" @bind-Value="@tipoVta" Label="Tipo Venta" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                <MudSelectItem Value="1">Con Cuenta Corriente</MudSelectItem>
-                <MudSelectItem Value="2">Sin Cuenta Corriente</MudSelectItem>
+                <MudSelectItem Value="1">1 - Con Cuenta Corriente</MudSelectItem>
+                <MudSelectItem Value="2">2 - Sin Cuenta Corriente</MudSelectItem>
             </MudSelect>
         </MudItem>
         @*GENERAR COMPROBANTE*@
@@ -162,7 +162,7 @@ else
 }
 else
 {
-    <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Error">NINGUN PRODUCTO AGREGADO</MudText>
+    <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Error">Todavía no se agregó ningún producto</MudText>
 }
 
 @code {
@@ -191,7 +191,7 @@ else
     private int cant = 1;
     private decimal bonif = 0;
     private string observ = "";
-    private int tipoComp = 1;
+    private int tipoComp = 3;
     private int formaPago = 7;
     private DateTime? fecha;
 
@@ -295,27 +295,36 @@ else
     {
         if (prodSelect != null)
         {
-            //Verifico que el producto no se encuentre en la lista agregada
-            var prodYaAgregado = productosAgregados.Exists(a => a.IdProducto == prodSelect.IdProducto);
-            if(!prodYaAgregado)
+            if(cant > 0)
             {
-                //Realizo los calculos y asignaciones correspondientes
-                prodSelect.Cantidad = cant;
-                prodSelect.Bonificacion = bonif;
-                var precioTotCant = prodSelect.Cantidad * prodSelect.PrecioFinal;
-                var bonifUnit = (prodSelect.Bonificacion * prodSelect.PrecioFinal) / 100;
-                prodSelect.BonificacionTotal = bonifUnit * cant;
-                prodSelect.SubTotal = precioTotCant - prodSelect.BonificacionTotal;
+                if(bonif >= 0 && bonif <= 100)
+                {
+                    //Verifico que el producto no se encuentre en la lista agregada
+                    var prodYaAgregado = productosAgregados.Exists(a => a.IdProducto == prodSelect.IdProducto);
+                    if (!prodYaAgregado)
+                    {
+                        //Realizo los calculos y asignaciones correspondientes
+                        prodSelect.Cantidad = cant;
+                        prodSelect.Bonificacion = bonif;
+                        var precioTotCant = prodSelect.Cantidad * prodSelect.PrecioFinal;
+                        var bonifUnit = (prodSelect.Bonificacion * prodSelect.PrecioFinal) / 100;
+                        prodSelect.BonificacionTotal = bonifUnit * cant;
+                        prodSelect.SubTotal = precioTotCant - prodSelect.BonificacionTotal;
 
-                //Agrego el producto al listado y reestablezco los controles
-                productosAgregados.Add(prodSelect);
-                prodSelect = null;
-                cant = 1;
-                bonif = 0;
+                        //Agrego el producto al listado y reestablezco los controles
+                        productosAgregados.Add(prodSelect);
+                        prodSelect = null;
+                        cant = 1;
+                        bonif = 0;
+                    }
+                    else
+                        Snackbar.Add($"El producto que intenta agregar, ya se encuentra en el comprobante, debe seleccionar otro o bien remover el existente del comprobante", Severity.Error);
+                }
+                else
+                    Snackbar.Add($"La bonificacion no puede ser menor a 0 ó mayor que 100", Severity.Error);
             }
             else
-                Snackbar.Add($"El producto que intenta agregar, ya se encuentra en el comprobante, debe seleccionar otro o bien remover el existente del comprobante", Severity.Error);
-
+                Snackbar.Add($"La cantidad debe ser mayor a 0", Severity.Error);
         }
         else
             Snackbar.Add($"Debe seleccionar el producto a agregar", Severity.Error);

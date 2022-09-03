@@ -176,8 +176,8 @@
             var db = dbConnection();
 
             var sql = @"
-                        SELECT ccd.Cantidad, ccd.PrecioUnit, ccd.Bonificacion, ccd.BonificacionTotal, ccd.SubTotal, 
-                        p.NombreProd as NombreProducto, um.DescripcionUnidad
+                        SELECT ccd.Producto, ccd.Cantidad, ccd.PrecioUnit, ccd.Bonificacion, ccd.BonificacionTotal, ccd.SubTotal, 
+                        p.NombreProd as NombreProducto, um.DescripcionUnidad, p.ImagenDestacada
                         FROM carros_compras_detalles as ccd
                         INNER JOIN productos as p ON p.IdProducto = ccd.Producto
                         INNER JOIN unidades_medida as um ON p.UnidadMedida = um.IdUnidad
@@ -197,6 +197,23 @@
                         WHERE Estado = 1 AND UsuarioCarro = @idUsuario
                         ";
             var result = await db.QueryFirstOrDefaultAsync<CarroCompra>(sql, new { idUsuario });
+            return result;
+        }
+
+        public async Task<IEnumerable<OrdenesCompraListado>> ObtenerOrdenesCompraUsuario(int idUsuario)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT cc.IdCarro, cce.Estado, cc.FechaOrden, cc.FechaEntrega, cc.FechaUltModif, 
+                        cc.Total, cc.Pagado, cc.FechaPago, fp.FormaP, cc.Observaciones
+                        FROM carros_compras as cc
+                        INNER JOIN carros_compras_estados as cce ON cc.Estado = cce.IdEstado
+                        INNER JOIN formas_pago as fp ON cc.MetodoPago = fp.IdFormaP
+                        WHERE cc.Estado > 1 AND cc.UsuarioCarro = @UsuarioCarro
+                        ORDER BY cc.IdCarro DESC
+                        ";
+            var result = await db.QueryAsync<OrdenesCompraListado>(sql, new { UsuarioCarro = idUsuario});
             return result;
         }
     }

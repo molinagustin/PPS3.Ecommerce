@@ -7,6 +7,7 @@ namespace PPS3.Shared.Models
         public int IdTipo { get; set; }
         [Required(ErrorMessage = "El nombre del Tipo de Producto es obligatorio.")]
         public string DescripcionTipo { get; set; } = string.Empty;
+        public int Rubro { get; set; }
         public bool Activo { get; set; }
         public int UsuarioCrea { get; set; }
         public DateTime FechaCrea { get; set; }

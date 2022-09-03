@@ -27,7 +27,7 @@
                         <MudSelect T="int" @bind-value="@priv" Label="Privilegio" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                             @foreach(var priv in privilegios)
                             {
-                                <MudSelectItem Value="@priv.IdPrivi">@priv.DescPrivilegio</MudSelectItem>
+                                <MudSelectItem Value="@priv.IdPrivi">@(privilegios.ToList().IndexOf(priv) + 1) - @priv.DescPrivilegio</MudSelectItem>
                             }
                         </MudSelect>
                     }

@@ -2,7 +2,7 @@
 @inject IServCondicionIVA ServCondIva
 @attribute [Authorize(Roles = "1")]
 
-<MudText Align="Align.Center" Typo="Typo.h5">Listado de Condiciones IVA</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Listado de Condiciones IVA</MudText>
 
 @if(condiciones == null)
 {
@@ -17,21 +17,21 @@ else
             <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>Id Condicion</MudTh>
+            <MudTh Style="width:25px;">Id Condicion</MudTh>
             <MudTh>Descripcion</MudTh>
             <MudTh>Activo</MudTh>
-            <MudTh>Usuario Creacion</MudTh>
+            @*<MudTh>Usuario Creacion</MudTh>*@
             <MudTh>Fecha Creacion</MudTh>
-            <MudTh>Usuario Ult. Modif.</MudTh>
+            @*<MudTh>Usuario Ult. Modif.</MudTh>*@
             <MudTh>Fecha Ult. Modif.</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Id Condicion">@context.IdCondicion</MudTd>
             <MudTd DataLabel="Descripcion">@context.DescripcionCond</MudTd>
             <MudTd DataLabel="Activo">@context.Activo</MudTd>
-            <MudTd DataLabel="Usuario Creacion">@context.UsuarioCrea</MudTd>
+            @*<MudTd DataLabel="Usuario Creacion">@context.UsuarioCrea</MudTd>*@
             <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
-            <MudTd DataLabel="Usuario Ult. Modif.">@context.UsuarioModif</MudTd>
+            @*<MudTd DataLabel="Usuario Ult. Modif.">@context.UsuarioModif</MudTd>*@
             <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>
         </RowTemplate>
         <PagerContent>

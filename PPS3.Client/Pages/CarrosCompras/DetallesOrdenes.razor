@@ -18,13 +18,14 @@
 }
 else
 {
-    <MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:15px;">Detalles de la Orden de Compra N° <b>@ordenListado.IdCarro</b></MudText>
+    <MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Detalles de la Orden de Compra N° <b>@ordenListado.IdCarro</b></MudText>
 
     <MudGrid Justify="Justify.Center" Style="margin-bottom:30px;">
         <MudItem lg="12">
             <MudSimpleTable Striped="true">
                 <thead>
                     <tr>
+                        <td>#</td>
                         <td>Nombre Producto</td>
                         <td>Cantidad</td>
                         <td>Unidad Medida</td>
@@ -38,7 +39,13 @@ else
                     @foreach(var od in ordenListado.DetallesCarro)
                     {
                         <tr>
-                            <td>@od.NombreProducto</td>
+                            <td>@(ordenListado.DetallesCarro.ToList().IndexOf(od) + 1)</td>
+                            <td>
+                                <RadzenImage Path="@od.UrlImagen" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px; float: left;" />
+                                <div style="margin-top:10px;">
+                                    <a href="/verProducto/@od.Producto">@od.NombreProducto</a>
+                                </div>                                
+                            </td>
                             <td>@od.Cantidad</td>
                             <td>@od.DescripcionUnidad</td>
                             <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", od.PrecioUnit)</td>
@@ -53,8 +60,9 @@ else
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td>TOTAL:</td>
-                        <td><b>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", ordenListado.Total)</b></td>
+                        <td></td>
+                        <td></td>
+                        <td>TOTAL: <b>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", ordenListado.Total)</b></td>
                     </tr>
                 </tbody>
             </MudSimpleTable>
@@ -76,22 +84,30 @@ else
 
         <MudItem xs="4">
             <MudStack>
-                <MudDatePicker Label="Fecha de Entrega" Editable="true" @bind-Date="ordenListado.FechaEntrega" Placeholder="Seleccionar Fecha" />
+                @if(ordenListado.Estado == "Cancelado" || ordenListado.Estado == "Finalizado")
+                {
+                    <MudDatePicker Label="Fecha de Entrega" @bind-Date="ordenListado.FechaEntrega" Placeholder="Seleccionar Fecha" ReadOnly="true"/>
+                }
+                else
+                {
+                    <MudDatePicker Label="Fecha de Entrega" Editable="true" @bind-Date="ordenListado.FechaEntrega" Placeholder="Seleccionar Fecha" />
+                }                
             </MudStack>
+
             <MudStack>
-                @if(ordenListado.Pagado)
+                @if(ordenListado.Pagado || ordenListado.Estado == "Cancelado" || ordenListado.Estado == "Finalizado")
                 {
                     <MudDatePicker Label="Fecha de Pago" @bind-Date="ordenListado.FechaPago" Placeholder="Seleccionar Fecha" ReadOnly="true"/>
                 }
                 else
                 {
-                    <MudDatePicker Label="Fecha de Pago" Editable="true" @bind-Date="ordenListado.FechaPago" Placeholder="Seleccionar Fecha" />
+                    <MudDatePicker Label="Fecha de Pago" Editable="true" @bind-Date="ordenListado.FechaPago" Placeholder="Seleccionar Fecha"/>
                 }
             </MudStack>
         </MudItem>
 
         <MudItem xs="4">
-            @if(ordenListado.Pagado)
+            @if (ordenListado.Pagado || ordenListado.Estado == "Cancelado" || ordenListado.Estado == "Finalizado")
             {
                 <MudStack>
                     <MudSwitch @bind-Checked="pgdo" Label="Pagado" Color="Color.Success" ReadOnly="true"/>
@@ -100,7 +116,7 @@ else
                     <MudSelect T="int" @bind-Value="@formaP" Label="Forma de Pago" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
                         @foreach(var fp in formaPago)
                         {
-                            <MudSelectItem Value="@fp.IdFormaP">@fp.FormaP</MudSelectItem>
+                            <MudSelectItem Value="@fp.IdFormaP">@(formaPago.ToList().IndexOf(fp) + 1) - @fp.FormaP</MudSelectItem>
                         }
                     </MudSelect>
                 </MudStack>
@@ -114,7 +130,7 @@ else
                     <MudSelect T="int" @bind-Value="@formaP" Label="Forma de Pago" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                         @foreach(var fp in formaPago)
                         {
-                            <MudSelectItem Value="@fp.IdFormaP">@fp.FormaP</MudSelectItem>
+                            <MudSelectItem Value="@fp.IdFormaP">@(formaPago.ToList().IndexOf(fp) + 1) - @fp.FormaP</MudSelectItem>
                         }
                     </MudSelect>
                 </MudStack>
@@ -124,7 +140,14 @@ else
 
     <MudGrid Justify="Justify.Center" Style="margin-bottom:30px;">
         <MudItem xs="6">
-            <MudTextField T="string" Label="Observaciones" Variant="Variant.Outlined" @bind-Value="ordenListado.Observaciones" Lines="5" />
+            @if (ordenListado.Estado == "Cancelado" || ordenListado.Estado == "Finalizado")
+            {
+                <MudTextField T="string" Label="Observaciones" Variant="Variant.Outlined" @bind-Value="ordenListado.Observaciones" Lines="5" ReadOnly=true/>
+            }
+            else
+            {
+                <MudTextField T="string" Label="Observaciones" Variant="Variant.Outlined" @bind-Value="ordenListado.Observaciones" Lines="5" />
+            }            
         </MudItem>
 
         <MudItem xs="2">
@@ -139,7 +162,7 @@ else
                     <MudSelect T="int" @bind-Value="@estado" Label="Estado Orden" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
                         @foreach(var es in estados)
                         {
-                            <MudSelectItem Value="@es.IdEstado">@es.Estado</MudSelectItem>
+                            <MudSelectItem Value="@es.IdEstado">@(estados.ToList().IndexOf(es) + 1) - @es.Estado</MudSelectItem>
                         }
                     </MudSelect>
                 }
@@ -148,7 +171,7 @@ else
                     <MudSelect T="int" @bind-Value="@estado" Label="Estado Orden" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                         @foreach(var es in estados)
                         {
-                            <MudSelectItem Value="@es.IdEstado">@es.Estado</MudSelectItem>
+                            <MudSelectItem Value="@es.IdEstado">@(estados.ToList().IndexOf(es) + 1) - @es.Estado</MudSelectItem>
                         }
                     </MudSelect>
                 }

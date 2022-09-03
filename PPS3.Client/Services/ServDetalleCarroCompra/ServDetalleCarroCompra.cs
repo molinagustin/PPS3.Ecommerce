@@ -1,11 +1,10 @@
-﻿using PPS3.Shared.Models;
-
-namespace PPS3.Client.Services.ServDetalleCarroCompra
+﻿namespace PPS3.Client.Services.ServDetalleCarroCompra
 {
     public class ServDetalleCarroCompra : IServDetalleCarroCompra
     {
         private readonly HttpClient _httpClient;
         private readonly ISessionStorageService _sessionStorage;
+        private readonly string format = "image/png";
 
         public ServDetalleCarroCompra(HttpClient httpClient, ISessionStorageService sessionStorage)
         {
@@ -136,7 +135,17 @@ namespace PPS3.Client.Services.ServDetalleCarroCompra
 
                 var detalles = await JsonSerializer.DeserializeAsync<IEnumerable<DetalleCarroCompra>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
-                return detalles;
+                if (detalles != null)
+                {
+                    foreach (var det in detalles)
+                    {
+                        if (det.ImagenDestacada != null)
+                            det.UrlImagen = $"data:{format};base64,{Convert.ToBase64String(det.ImagenDestacada)}";
+                    }
+                    return detalles;
+                }
+                else
+                    return null;
             }
             else
                 return null;

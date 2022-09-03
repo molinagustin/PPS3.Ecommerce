@@ -1,5 +1,7 @@
-﻿using PPS3.Shared.Models;
+﻿using Org.BouncyCastle.Crypto;
+using PPS3.Shared.Models;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
+using static Org.BouncyCastle.Bcpg.Attr.ImageAttrib;
 
 namespace PPS3.Client.Services.ServCarroCompra
 {
@@ -7,6 +9,7 @@ namespace PPS3.Client.Services.ServCarroCompra
     {
         private readonly HttpClient _httpClient;
         private readonly ISessionStorageService _sessionStorage;
+        private readonly string format = "image/png";
 
         public ServCarroCompra(HttpClient httpClient, ISessionStorageService sessionStorage)
         {
@@ -44,7 +47,7 @@ namespace PPS3.Client.Services.ServCarroCompra
             else
             {
                 //Creo una solicitud Http de tipo POST
-                var request = new HttpRequestMessage(HttpMethod.Post, $"api/CarrosCompras/CrearCarroCompra");
+                var request = new HttpRequestMessage(HttpMethod.Post, $"api/CarrosCompras/CrearCarroCompra?idUsuario={carro.UsuarioCarro}");
                 //Agrego el token al Encabezado Http
                 request.Headers.Add("Authorization", "Bearer " + token);
                 //Agrego el JSON al BODY
@@ -217,7 +220,18 @@ namespace PPS3.Client.Services.ServCarroCompra
 
                 var detalles = await JsonSerializer.DeserializeAsync<IEnumerable<DetalleCarroCompra>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
-                return detalles;
+                if (detalles != null)
+                {
+                    foreach (var det in detalles)
+                    {
+                        if (det.ImagenDestacada != null)
+                            det.UrlImagen = $"data:{format};base64,{Convert.ToBase64String(det.ImagenDestacada)}";
+                    }
+
+                    return detalles;
+                }
+                else
+                    return null;                
             }
             else
                 return null;
@@ -234,6 +248,36 @@ namespace PPS3.Client.Services.ServCarroCompra
 
             //Creo una solicitud Http de tipo GET
             var request = new HttpRequestMessage(HttpMethod.Get, $"api/CarrosCompras/ObtenerOrdenesCompra");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bits) y lo deserializo en un objeto apropiado
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var ordenes = await JsonSerializer.DeserializeAsync<IEnumerable<OrdenesCompraListado>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return ordenes;
+            }
+            else
+                return null;
+        }
+
+        public async Task<IEnumerable<OrdenesCompraListado>> ObtenerOrdenesCompraUsuario(int idUsuario)
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
+
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/CarrosCompras/ObtenerOrdenesCompraUsuario/{idUsuario}");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 

@@ -220,7 +220,7 @@
             var db = dbConnection();
             //Se coloca el @ para que se pueda usar multiples lineas en la misma cadena, sino habria que concatenarla con +
             var sql = @"
-                        SELECT TOP 5 prod.IdProducto, prod.NombreProd, prod.PrecioFinal, prod.FechaUltModif, prod.ImagenDestacada
+                        SELECT TOP 8 prod.IdProducto, prod.NombreProd, prod.PrecioFinal, prod.FechaUltModif, prod.ImagenDestacada
                         FROM productos as prod
                         WHERE prod.Activo = 1
                         ORDER BY prod.FechaUltModif DESC
@@ -248,6 +248,53 @@
 
             //El metodo QueryAsync va a devolver un IEnumerable con los datos del modelo que pasamos por parametro
             var result = await db.QueryFirstOrDefaultAsync<ProductoListado>(sql, new { IdProducto = id });
+            return result;
+        }
+
+        public async Task<IEnumerable<ProductoListado>> ObtenerProductosCarro(int idCarro)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT  prod.IdProducto, prod.NombreProd, prod.Descripcion, prod.PrecioFinal, um.DescripcionUnidad, prod.ImagenDestacada
+                        FROM productos as prod
+                        INNER JOIN unidades_medida as um ON prod.UnidadMedida = um.IdUnidad
+                        INNER JOIN carros_compras_detalles as ccd ON ccd.Producto = prod.IdProducto
+                        WHERE ccd.Carro = @idCarro
+                        ";
+
+            //El metodo QueryAsync va a devolver un IEnumerable con los datos del modelo que pasamos por parametro
+            var result = await db.QueryAsync<ProductoListado>(sql, new { idCarro });
+            return result;
+        }
+
+        public async Task<IEnumerable<ProductoListado>> ObtenerProductosPorTipoProducto(int idTipoProd)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT prod.IdProducto, prod.NombreProd, prod.Descripcion, prod.PrecioFinal, prod.ImagenDestacada
+                        FROM productos as prod
+                        WHERE prod.Activo = 1 AND prod.TipoProd = @idTipoProd
+                        ORDER BY prod.NombreProd
+                        ";
+
+            //El metodo QueryAsync va a devolver un IEnumerable con los datos del modelo que pasamos por parametro
+            var result = await db.QueryAsync<ProductoListado>(sql, new { idTipoProd });
+            return result;
+        }
+
+        public async Task<IEnumerable<ProductoListado>> ObtenerProductosPorBusqueda(string busqueda)
+        {
+            var db = dbConnection();
+
+            var sql = @"SELECT prod.IdProducto, prod.NombreProd, prod.Descripcion, prod.PrecioFinal,            prod.ImagenDestacada 
+                        FROM productos as prod 
+                        WHERE prod.Activo = 1 AND prod.NombreProd LIKE '%" + busqueda + @"%' 
+                        ORDER BY prod.NombreProd";
+
+            //El metodo QueryAsync va a devolver un IEnumerable con los datos del modelo que pasamos por parametro
+            var result = await db.QueryAsync<ProductoListado>(sql, new { });
             return result;
         }
     }

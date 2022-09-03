@@ -1,6 +1,4 @@
-﻿using static Org.BouncyCastle.Bcpg.Attr.ImageAttrib;
-
-namespace PPS3.Client.Services.ServProducto
+﻿namespace PPS3.Client.Services.ServProducto
 {
     public class ServProducto : IServProducto
     {
@@ -137,6 +135,46 @@ namespace PPS3.Client.Services.ServProducto
             return productos;
         }
 
+        public async Task<IEnumerable<ProductoListado>> ObtenerProductosCarro(int idCarro)
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
+
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/Productos/ObtenerProductosCarro/{idCarro}");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bits) y lo deserializo en un objeto apropiado
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var productos = await JsonSerializer.DeserializeAsync<IEnumerable<ProductoListado>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                if (productos != null)
+                {
+                    foreach (var prod in productos)
+                    {
+                        if (prod.ImagenDestacada != null)
+                            prod.UrlImagen = $"data:{format};base64,{Convert.ToBase64String(prod.ImagenDestacada)}";
+                    }
+                    return productos;
+                }
+                else
+                    return null;
+            }
+            else
+                return null;
+        }
+
         public async Task<IEnumerable<ProductoListado>> ObtenerProductosInactivos()
         {
             //Se obtiene el resultado de los productos solicitados a la ruta de la API, el cual viene como cadena y deber ser deserializado
@@ -146,6 +184,44 @@ namespace PPS3.Client.Services.ServProducto
             var productos = await JsonSerializer.DeserializeAsync<IEnumerable<ProductoListado>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
             return productos;
+        }
+
+        public async Task<IEnumerable<ProductoListado>> ObtenerProductosPorBusqueda(string busqueda)
+        {
+            var response = await _httpClient.GetStreamAsync($"api/Productos/ObtenerProductosPorBusqueda/{busqueda}");
+
+            var productos = await JsonSerializer.DeserializeAsync<IEnumerable<ProductoListado>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            if (productos != null)
+            {
+                foreach (var prod in productos)
+                {
+                    if (prod.ImagenDestacada != null)
+                        prod.UrlImagen = $"data:{format};base64,{Convert.ToBase64String(prod.ImagenDestacada)}";
+                }
+                return productos;
+            }
+            else
+                return null;
+        }
+
+        public async Task<IEnumerable<ProductoListado>> ObtenerProductosPorTipoProducto(int idTipoProd)
+        {
+            var response = await _httpClient.GetStreamAsync($"api/Productos/ObtenerProductosPorTipoProducto/{idTipoProd}");
+
+            var productos = await JsonSerializer.DeserializeAsync<IEnumerable<ProductoListado>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            if (productos != null)
+            {
+                foreach (var prod in productos)
+                {
+                    if (prod.ImagenDestacada != null)
+                        prod.UrlImagen = $"data:{format};base64,{Convert.ToBase64String(prod.ImagenDestacada)}";
+                }
+                return productos;
+            }
+            else
+                return null;
         }
 
         public async Task<IEnumerable<ProductoListado>> ObtenerUltimos5Productos()

@@ -36,5 +36,18 @@
             var result = await db.QueryAsync<Tarjeta>(sql, new { });
             return result;
         }
+
+        public async Task<IEnumerable<ListaTarjeta>> ObtenerListaTarjetas()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT t.IdTarjeta, t.NombreTarj, tt.Descripcion as TipoTarj, t.Activo, t.UsuarioCrea, t.FechaCrea, t.UsuarioModif, t.FechaUltModif
+                        FROM tarjetas as t
+                        INNER JOIN tarjetas_tipos as tt ON t.TipoTarj = tt.IdTipoTarj
+                        ";
+            var result = await db.QueryAsync<ListaTarjeta>(sql, new { });
+            return result;
+        }
     }
 }

@@ -10,7 +10,7 @@
     <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
 </AuthorizeView>
 
-<MudText Align="Align.Center" Typo="Typo.h5">Detalles del Rubro</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Detalles del Rubro</MudText>
 
 <EditForm Model="@rubro" OnValidSubmit="GuardarRubro" Context="conForm">
     <DataAnnotationsValidator/>
@@ -71,9 +71,18 @@
 
         if (result)
         {              
-            //Se redirige hacia el listado de productos
-            NavigationManager.NavigateTo("/listaRubros");
-            Snackbar.Add($"Rubro agregado/modificado de forma exitosa", Severity.Success);
+            if(id > 0)
+            {
+                //Se redirige hacia el listado de productos
+                NavigationManager.NavigateTo("/listaRubros", true);
+                Snackbar.Add($"Rubro modificado de forma exitosa", Severity.Success);
+            }
+            else
+            {
+                //Se redirige hacia agregar un nuevo tipo de producto
+                NavigationManager.NavigateTo("/detallesTiposProd", true);
+                Snackbar.Add($"Rubro agregado de forma exitosa", Severity.Success);
+            }            
         }        
         else
             Snackbar.Add($"No se pudo crear/modificar el Rubro", Severity.Error);

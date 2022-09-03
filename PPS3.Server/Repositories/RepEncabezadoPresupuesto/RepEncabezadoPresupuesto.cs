@@ -17,15 +17,18 @@
 
             var sql = @"
                         INSERT INTO presupuestos_encabezados(
+                                                            Cliente,
                                                             Observaciones,
                                                             UsuarioCrea
                                                             )
                         VALUES  (
+                                @Cliente,
                                 @Observaciones,
                                 @UsuarioCrea
                                 )                        
                         ";
             var result = await db.ExecuteAsync(sql, new { 
+                                                        encabezadoPresupuesto.Cliente,
                                                         encabezadoPresupuesto.Observaciones,
                                                         encabezadoPresupuesto.UsuarioCrea
                                                         });
@@ -91,10 +94,10 @@
             var db = dbConnection();
 
             var sql = @"
-                        SELECT pe.NumPresu, pe.Observaciones, u.NombreUs as UsuarioCrea, pe.FechaCrea
+                        SELECT pe.NumPresu, pe.Cliente, pe.Observaciones, u.NombreUs as UsuarioCrea, pe.FechaCrea
                         FROM presupuestos_encabezados as pe
                         INNER JOIN usuarios as u ON pe.UsuarioCrea = u.IdUsuarioAct
-                        ORDER BY pe.NumPresu
+                        ORDER BY pe.NumPresu DESC
                         ";
             var result = await db.QueryAsync<Presupuesto>(sql, new { });
             return result;

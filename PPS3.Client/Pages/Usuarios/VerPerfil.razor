@@ -1,0 +1,322 @@
+﻿@page "/verPerfil"
+@inject IServUsuario ServUsuario
+@inject IServCliente ServCliente
+@inject IServCondicionIVA ServCondIVA
+@inject IServTipoDocumento ServTipoDoc
+@inject IServLocalidad ServLocalidad
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
+@using Radzen.Blazor
+@attribute [Authorize]
+
+<AuthorizeView Context="usCont">
+    <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+</AuthorizeView>
+
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Datos de Usuarios - Cliente</MudText>
+
+@if(usuarioCliente == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+}
+else
+{
+    <EditForm Model="@usuarioCliente" OnValidSubmit="GuardarPerfil">
+        <DataAnnotationsValidator/>
+        <MudGrid Justify="Justify.Center">
+            <MudItem xs="6">
+                <MudCard>
+                <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos de Usuario</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudTextField Label="Nombre Completo" HelperText="Apellido-Nombre" @bind-Value="usuarioCliente.NombreCompleto" For="@(() => usuarioCliente.NombreCompleto)" AutoFocus="true" />
+                        <MudTextField Label="Nombre de Usuario" @bind-Value="usuarioCliente.NombreUs" ReadOnly=true />
+                        @if (usuario.EmailVerificado)
+                        {
+                                <MudTextField Label="Email" HelperText="Correo electronico" @bind-Value="usuarioCliente.Email" ReadOnly=true/>
+                        }
+                        else
+                        {
+                                <MudTextField Label="Email" HelperText="Correo electronico" @bind-Value="usuarioCliente.Email" For="@(() => usuarioCliente.Email)"/>
+                        }
+
+                        <MudTextField Label="Contraseña Actual" HelperText="Minimo 4 caracteres" Class="mt-3" @bind-Value="usuarioCliente.Password" For="@(() => usuarioCliente.Password)" InputType="InputType.Password" />
+
+                        <MudTextField Label="Nueva Contraseña" HelperText="Minimo 4 caracteres" Class="mt-3" @bind-Value="passNuevo" For="@(() => usuarioCliente.CambioPassword)" InputType="InputType.Password" />
+
+                        <MudTextField Label="Repetir Nueva Contraseña" HelperText="Minimo 4 caracteres" Class="mt-3" @bind-Value="passNuevo2" For="@(() => usuarioCliente.CambioPassword)" InputType="InputType.Password" />
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="6">
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos de Cliente</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudStack Row="true">
+                            <MudStack Style="width:50%">
+                                <MudSelect T="string" @bind-Value="@tipoCl" Label="Tipo de Cliente/Persona" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                    <MudSelectItem Value="@("Fisica")">@string.Format("1- Fisica")</MudSelectItem>
+                                    <MudSelectItem Value="@("Juridica")">@string.Format("2- Juridica")</MudSelectItem>
+                                </MudSelect>
+                            </MudStack>
+                            <MudStack Style="width:50%">
+                                @if (condIva != null)
+                                {
+                                    <MudSelect T="int" @bind-Value="@cond" Label="Condicion IVA" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                        @foreach(var condicion in condIva)
+                                        {
+                                            <MudSelectItem Value="@condicion.IdCondicion">@(condIva.ToList().IndexOf(condicion) + 1) - @condicion.DescripcionCond</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                }
+                                else
+                                {
+                                    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                                }
+                            </MudStack>
+                        </MudStack>
+                    
+                        @if(tipoCl == "Fisica")
+                        {
+                            <MudSelect T="string" @bind-Value="@genero" Label="Genero" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                <MudSelectItem Value="@("Masculino")">@string.Format("1- Masculino")</MudSelectItem>
+                                <MudSelectItem Value="@("Femenino")">@string.Format("2- Femenino")</MudSelectItem>
+                                <MudSelectItem Value="@("Otro")">@string.Format("3- Otro")</MudSelectItem>
+                            </MudSelect>
+                        }
+                    
+                        <MudStack Row="true">
+                            <MudStack Style="width:50%">
+                                @if (tipoDoc != null)
+                                {
+                                    <MudSelect T="int" @bind-Value="@tipoDocu" Label="Tipo de Documento" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                        @foreach(var tipos in tipoDoc)
+                                        {
+                                            <MudSelectItem Value="@tipos.IdTipoDoc">@(tipoDoc.ToList().IndexOf(tipos) + 1) - @tipos.Sigla</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                }
+                                else
+                                {
+                                    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                                }
+                            </MudStack>
+                            <MudStack Style="width:50%">
+                                <MudTextField Label="Numero de Documento" HelperText="Solo numeros."
+                                          @bind-Value="usuarioCliente.NumDocumento" For="@(() => usuarioCliente.NumDocumento)"/>
+                            </MudStack>
+                        </MudStack>
+
+                        <MudStack Row="true" Justify="Justify.Center">
+                            <MudStack Style="width:50%">
+                                @if (loc != null)
+                                {
+                                    <MudSelect T="int" @bind-Value="@loca" Label="Localidad" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                        @foreach(var local in loc)
+                                        {
+                                            <MudSelectItem Value="@local.IdLocalidad">@(loc.ToList().IndexOf(local) + 1) - @local.NombreLoc</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                }
+                                else
+                                {
+                                    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                                } 
+                            </MudStack>
+                            <MudStack Style="width:50%">
+                                <MudTextField Label="Numero de Telefono" HelperText="Sin 15, 0 ni espacios o caracteres especiales."
+                                          @bind-Value="usuarioCliente.Telefono" For="@(() => usuarioCliente.Telefono)"/>
+                            </MudStack>
+                        </MudStack>
+
+                        <MudTextField Label="Domicilio" HelperText="Mas detalle, mejor servicio."
+                                      @bind-Value="usuarioCliente.DomicilioC" For="@(() => usuarioCliente.DomicilioC)"/>
+
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Save" Color="Color.Success" ButtonType="ButtonType.Submit" Style="margin-bottom:15%;">Guardar Cambios</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </EditForm>
+}
+
+@code {
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
+    //Objeto para almacenar datos del registro
+    private UsuarioCliente usuarioCliente = new UsuarioCliente();
+    private Usuario usuario = new Usuario();
+    private Cliente cliente = new Cliente();
+
+    //Objetos para CBO
+    private IEnumerable<CondicionIVA> condIva;
+    private IEnumerable<TipoDocumento> tipoDoc;
+    private IEnumerable<Localidad> loc;
+
+    private string tipoCl = "Fisica";
+    private string genero = "Masculino";
+    private int cond = 3;
+    private int tipoDocu = 3;
+    private int loca = 1;
+
+    private string passActual = "";
+    private string passNuevo = "";
+    private string passNuevo2 = "";
+
+    private bool actualizado = false;
+
+    //Guardo el ID del usuario actual
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+
+        if(idUsAct > 0)
+        {
+            //Obtengo el usuario
+            usuario = await ServUsuario.ObtenerUsuario(idUsAct);
+
+            if (usuario != null)
+            {
+                //Obtengo el cliente
+                cliente = await ServCliente.ObtenerCliente(usuario.IdCliente);
+
+                if(cliente != null)
+                {       
+                    ActualizarPagina();
+                }
+                else
+                    Snackbar.Add($"No se pudo obtener el registro del cliente", Severity.Error);
+            }
+            else
+                Snackbar.Add($"No se pudo obtener el registro del usuario", Severity.Error);
+        }
+        else
+            Snackbar.Add($"No se pudo obtener el ID usuario", Severity.Error);
+    } 
+
+    protected override async Task OnInitializedAsync()
+    {
+        condIva = await ServCondIVA.ObtenerCondiciones();
+        tipoDoc = await ServTipoDoc.ObtenerTiposDocs();
+        loc = await ServLocalidad.ObtenerLocalidades();
+    }
+
+    protected async Task GuardarPerfil()
+    {
+        if(!string.IsNullOrEmpty(usuarioCliente.Password))
+        {
+            //Asigno los valores para proceder a actualizarlos
+            usuarioCliente.SaltCont = usuario.SaltCont;
+            usuarioCliente.HashCont = usuario.HashCont;
+            usuarioCliente.TipoCliente = Convert.ToChar(tipoCl.Substring(0, 1));
+            usuarioCliente.Genero = Convert.ToChar(genero.Substring(0, 1));
+            usuarioCliente.TipoDocumento = tipoDocu;
+            usuarioCliente.CondIva = cond;
+            usuarioCliente.LocalidadC = loca;
+
+            var actualizacion = await ServUsuario.ActualizarPerfilUsuario(usuarioCliente);
+
+            //Compruebo que se hayan actualizado correctamente
+            if(actualizacion)
+            {
+                //Veo si hace falta actualizar la contraseña, sino finalizo la operacion
+                if(!string.IsNullOrEmpty(passNuevo) && !string.IsNullOrEmpty(passNuevo2))
+                {
+                    //Compruebo que ambas contraseñas sean iguales
+                    if(passNuevo == passNuevo2)
+                    {
+                        //Asigno los valores
+                        usuarioCliente.CambioPassword = passNuevo;
+
+                        //Actualizo los datos
+                        var passActualizado = await ServUsuario.CambiarPassword(usuarioCliente);
+
+                        if(passActualizado)
+                        {
+                            NavigationManager.NavigateTo("/");
+                            Snackbar.Add($"Los datos del perfil se actualizaron correctamente", Severity.Success);
+                        }
+                        else
+                        {
+                            NavigationManager.NavigateTo("/verPerfil", forceLoad: true);
+                            Snackbar.Add($"No se pudo actualizar la contraseña", Severity.Error);
+                        }
+                    }
+                    else
+                    {
+                        NavigationManager.NavigateTo("/verPerfil", forceLoad:true);
+                        Snackbar.Add($"Los datos del perfil se actualizaron correctamente", Severity.Success);
+                        Snackbar.Add($"Las contraseñas no coinciden por lo que no se pudieron actualizar", Severity.Error);
+                    }                        
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/");
+                    Snackbar.Add($"Los datos del perfil se actualizaron correctamente", Severity.Success);
+                }
+            }
+            else
+                Snackbar.Add($"Los datos del perfil no se actualizaron correctamente. Compruebe la contraseña o los datos suministrados.", Severity.Error);
+        }
+        else
+            Snackbar.Add($"La contraseña actual no puede estar vacia", Severity.Error);
+    }
+
+    protected void Volver() => NavigationManager.NavigateTo("/");
+
+    protected void ActualizarPagina()
+    {
+        if (!actualizado)
+        {
+            //Comienzo a asignar los valores a los objetos apropiados
+            usuarioCliente.NombreCompleto = usuario.NombreCompleto;
+            usuarioCliente.NombreUs = usuario.NombreUs;
+            usuarioCliente.Email = usuario.Email;
+            usuarioCliente.IdUsuarioAct = idUsAct;
+
+            usuarioCliente.IdCliente = usuario.IdCliente;
+            usuarioCliente.TipoCliente = cliente.TipoCliente;
+            usuarioCliente.Genero = cliente.Genero;
+            usuarioCliente.TipoDocumento = cliente.TipoDocumento;
+            usuarioCliente.NumDocumento = cliente.NumDocumento;
+            usuarioCliente.CondIva = cliente.CondIva;
+            usuarioCliente.DomicilioC = cliente.DomicilioC;
+            usuarioCliente.Telefono = cliente.Telefono;
+            usuarioCliente.LocalidadC = cliente.LocalidadC;
+
+            cond = usuarioCliente.CondIva;
+            tipoDocu = usuarioCliente.TipoDocumento;
+            loca = usuarioCliente.LocalidadC;
+
+            //Masculino - Femenino - Otro
+            if (usuarioCliente.Genero == 'M')
+                genero = "Masculino";
+            else if (usuarioCliente.Genero == 'F')
+                genero = "Femenino";
+            else
+                genero = "Otro";
+
+            //Fisica - Juridica
+            if (usuarioCliente.TipoCliente == 'F')
+                tipoCl = "Fisica";
+            else
+                tipoCl = "Juridica";
+
+            StateHasChanged();
+
+            actualizado = true;
+        }        
+    }
+}

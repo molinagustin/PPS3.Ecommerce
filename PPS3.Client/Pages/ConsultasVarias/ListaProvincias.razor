@@ -2,7 +2,7 @@
 @inject IServProvincia ServProvi
 @attribute [Authorize(Roles = "1")]
 
-<MudText Align="Align.Center" Typo="Typo.h5">Listado de Provincias</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Listado de Provincias</MudText>
 
 @if(provs == null)
 {
@@ -17,7 +17,7 @@ else
             <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>Id Provincia</MudTh>
+            <MudTh Style="width:120px;">Id Provincia</MudTh>
             <MudTh>Nombre</MudTh>
         </HeaderContent>
         <RowTemplate>

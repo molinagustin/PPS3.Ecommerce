@@ -9,6 +9,8 @@
         Task<Usuario> ObtenerUsuario(int id);
         Task<Usuario> ObtenerUsuario(string nombreUsuario);
         Task<bool> ActualizarUsuario(Usuario usuario);
+        Task<bool> ActualizarPerfilUsuario(UsuarioCliente usuarioCl);
         Task<bool> BorrarUsuario(int id);
+        Task<bool> CambiarPassword(UsuarioCliente usuarioCliente);
     }
 }

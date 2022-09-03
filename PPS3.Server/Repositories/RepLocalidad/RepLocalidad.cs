@@ -123,5 +123,19 @@
             var result = await db.QueryAsync<Localidad>(sql, new { });
             return result;
         }
+
+        public async Task<IEnumerable<ListaLocalidad>> ObtenerListaLocalidades()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT l.IdLocalidad, l.NombreLoc, p.NombreProv as Provincia, l.CP, l.Activo, l.UsuarioCrea, 
+                        l.FechaCrea, l.UsuarioModif, l.FechaUltModif
+                        FROM localidades as l
+                        INNER JOIN provincias as p ON p.IdProvincia = l.Provincia
+                        ";
+            var result = await db.QueryAsync<ListaLocalidad>(sql, new { });
+            return result;
+        }
     }
 }

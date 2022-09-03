@@ -2,7 +2,7 @@
 @inject IServTipoDocumento ServTipoDoc
 @attribute [Authorize(Roles = "1")]
 
-<MudText Align="Align.Center" Typo="Typo.h5">Listado de Tipos de Documentos</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Listado de Tipos de Documentos</MudText>
 
 @if(tiposDoc == null)
 {
@@ -17,13 +17,13 @@ else
             <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>Id Tipo Documento</MudTh>
+            <MudTh Style="width:100px;">Id Tipo Documento</MudTh>
             <MudTh>Sigla</MudTh>
             <MudTh>Descripcion</MudTh>
             <MudTh>Activo</MudTh>
-            <MudTh>Usuario Creacion</MudTh>
+            @*<MudTh>Usuario Creacion</MudTh>*@
             <MudTh>Fecha Creacion</MudTh>
-            <MudTh>Usuario Ult. Modif.</MudTh>
+            @*<MudTh>Usuario Ult. Modif.</MudTh>*@
             <MudTh>Fecha Ult. Modif.</MudTh>
         </HeaderContent>
         <RowTemplate>
@@ -31,9 +31,9 @@ else
             <MudTd DataLabel="Sigla">@context.Sigla</MudTd>
             <MudTd DataLabel="Descripcion">@context.DescripcionTD</MudTd>
             <MudTd DataLabel="Activo">@context.Activo</MudTd>
-            <MudTd DataLabel="Usuario Creacion">@context.UsuarioCrea</MudTd>
+            @*<MudTd DataLabel="Usuario Creacion">@context.UsuarioCrea</MudTd>*@
             <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
-            <MudTd DataLabel="Usuario Ult. Modif.">@context.UsuarioModif</MudTd>
+            @*<MudTd DataLabel="Usuario Ult. Modif.">@context.UsuarioModif</MudTd>*@
             <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>
         </RowTemplate>
         <PagerContent>

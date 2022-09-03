@@ -1,6 +1,7 @@
 ﻿@page "/detallesTiposProd"
 @page "/detallesTiposProd/{id:int}"
 @inject IServTipoProducto ServTipoProd
+@inject IServRubro ServRubro
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @inject IJSRuntime JS /*JS Interop*/
@@ -10,7 +11,7 @@
     <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
 </AuthorizeView>
 
-<MudText Align="Align.Center" Typo="Typo.h5">Detalles de Tipos de Productos</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Detalles de Tipos de Productos</MudText>
 
 <EditForm Model="@tipoProd" OnValidSubmit="GuardarTipoProducto" Context="conForm">
     <DataAnnotationsValidator/>
@@ -24,6 +25,19 @@
                 </MudCardHeader>
                 <MudCardContent>
                     <MudTextField Label="Nombre del Tipo de Producto" HelperText="Nombre Completo" @bind-Value="tipoProd.DescripcionTipo" For="@(() => tipoProd.DescripcionTipo)" AutoFocus = "true" Required="true"/>
+                    @if (rubros != null)
+                    {
+                        <MudSelect T="int" @bind-Value="@rubro" Label="Rubro" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                            @foreach(var rubro in rubros)
+                            {
+                                <MudSelectItem Value="@rubro.IdRubro">@(rubros.ToList().IndexOf(rubro) + 1) - @rubro.DescRubro</MudSelectItem>
+                            }
+                        </MudSelect>
+                    }
+                    else
+                    {
+                        <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                    }
 
                     <AuthorizeView Roles="1">
                         @if(id > 0)
@@ -51,15 +65,20 @@
     private int idUsAct;
 
     TipoProducto tipoProd = new TipoProducto();
+    private IEnumerable<Rubro> rubros;
 
     private bool active;
+    private int rubro = 1;
 
     protected override async Task OnInitializedAsync()
     {
+        rubros = await ServRubro.ObtenerRubros();
+
         if (id > 0)
         {
             tipoProd = await ServTipoProd.ObtenerTipoProd(id);
-            active = tipoProd.Activo;
+            rubro = tipoProd.Rubro;
+            active = tipoProd.Activo;            
         }
     }
 
@@ -70,11 +89,13 @@
     {
         if(tipoProd.IdTipo > 0)
         {
+            tipoProd.Rubro = rubro;
             tipoProd.UsuarioModif = idUsAct;
             tipoProd.Activo = active;
         }
         else
         {
+            tipoProd.Rubro = rubro;
             tipoProd.UsuarioCrea = idUsAct;
             tipoProd.UsuarioModif = idUsAct;
         }
@@ -84,7 +105,7 @@
         if (result)
         {              
             //Se redirige hacia el listado de productos
-            NavigationManager.NavigateTo("/listaTiposProd");
+            NavigationManager.NavigateTo("/listaTiposProd", true);
             Snackbar.Add($"Tipo de Producto agregado/modificado de forma exitosa", Severity.Success);
         }        
         else

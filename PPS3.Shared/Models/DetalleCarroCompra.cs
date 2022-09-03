@@ -25,5 +25,10 @@ namespace PPS3.Shared.Models
         //Propiedad interna solo para traer el nombre del producto
         public string? NombreProducto { get; set; }
         public string? DescripcionUnidad { get; set; }
+        public string? Descripcion { get; set; }
+
+        //Para guardar una imagen del producto
+        public byte[]? ImagenDestacada { get; set; }
+        public string UrlImagen { get; set; } = string.Empty;
     }
 }

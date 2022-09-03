@@ -1,8 +1,10 @@
 ﻿<MudAppBar Bottom="true" Fixed="true" Color="Color.Primary" Elevation="1" Dense="true" Class="mt-8">
         <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Inherit" Edge="Edge.Start" />
-        <MudSpacer />
+        <MudSpacer />        
+        <MudButton Class="mr-5" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Whatsapp"
+               Color="Color.Inherit" Href="https://api.whatsapp.com/send?phone=5492625663454" Target="_blank">¡Escribenos a nuestro Whatsapp!</MudButton>
         <MudButton Class="mr-5" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Email" 
-                        Color="Color.Inherit" OnClick="async ()=> await Contacto.InvokeAsync()">¡Contactanos!</MudButton>
+                        Color="Color.Inherit" OnClick="async ()=> await Contacto.InvokeAsync()">¡Contactanos via email!</MudButton>
         <MudAvatar Class="mr-2" Size="Size.Small" Color="Color.Primary">
             <MudIcon Icon="@Icons.Material.Filled.Copyright"/>
         </MudAvatar>

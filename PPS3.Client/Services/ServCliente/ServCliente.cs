@@ -20,7 +20,7 @@
                 return null;
 
             //Creo una solicitud Http de tipo GET
-            var request = new HttpRequestMessage(HttpMethod.Get, $"api/Clientes/{id}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/Clientes/ObtenerCliente/{id}");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 
@@ -50,7 +50,7 @@
                 return null;
 
             //Creo una solicitud Http de tipo GET
-            var request = new HttpRequestMessage(HttpMethod.Get, $"api/Clientes/{nombreCliente}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/Clientes/ObtenerCliente/{nombreCliente}");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 
@@ -80,7 +80,7 @@
                 return null;
 
             //Creo una solicitud Http de tipo GET
-            var request = new HttpRequestMessage(HttpMethod.Get, $"api/Clientes");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/Clientes/ObtenerClientes");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 
@@ -93,6 +93,36 @@
                 var stream = await response.Content.ReadAsStreamAsync();
 
                 var clientes = await JsonSerializer.DeserializeAsync<IEnumerable<Cliente>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return clientes;
+            }
+            else
+                return null;
+        }
+
+        public async Task<IEnumerable<ListaCliente>> ObtenerListaClientes()
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
+
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/Clientes/ObtenerListaClientes");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bits) y lo deserializo en un objeto apropiado
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var clientes = await JsonSerializer.DeserializeAsync<IEnumerable<ListaCliente>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
                 return clientes;
             }

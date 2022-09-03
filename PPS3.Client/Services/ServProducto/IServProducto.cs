@@ -5,6 +5,9 @@
         Task<IEnumerable<ProductoListado>> ObtenerProductos();
         Task<IEnumerable<ProductoListado>> ObtenerProductosInactivos();
         Task<IEnumerable<ProductoListado>> ObtenerUltimos5Productos();
+        Task<IEnumerable<ProductoListado>> ObtenerProductosPorTipoProducto(int idTipoProd);
+        Task<IEnumerable<ProductoListado>> ObtenerProductosCarro(int idCarro);
+        Task<IEnumerable<ProductoListado>> ObtenerProductosPorBusqueda(string busqueda);
         Task<Producto> ObtenerProducto(int id);
         Task<ProductoListado> ObtenerProductoListado(int id);
         Task<Producto> ObtenerProducto(string nombreProd);

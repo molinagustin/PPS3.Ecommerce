@@ -3,6 +3,7 @@
     public interface IRepCliente
     {
         Task<IEnumerable<Cliente>> ObtenerClientes();
+        Task<IEnumerable<ListaCliente>> ObtenerListaClientes();
         Task<Cliente> ObtenerCliente(int id);
         Task<Cliente> ObtenerCliente(string nombreCliente);
         Task<int> ObtenerIdCliente(string nombreCliente, string numDocumento);

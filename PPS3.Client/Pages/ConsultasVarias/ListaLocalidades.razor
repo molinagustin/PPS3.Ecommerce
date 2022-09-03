@@ -2,7 +2,7 @@
 @inject IServLocalidad ServLocal
 @attribute [Authorize(Roles = "1")]
 
-<MudText Align="Align.Center" Typo="Typo.h5">Listado de Localidades</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Listado de Localidades</MudText>
 
 @if(locals == null)
 {
@@ -10,7 +10,7 @@
 }
 else
 {
-    <MudTable Items="@locals" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<Localidad, bool>(FilterFunc)">
+    <MudTable Items="@locals" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<ListaLocalidad, bool>(FilterFunc)">
         <ToolBarContent>
             <MudText Typo="Typo.h6">Localidades</MudText>
             <MudSpacer/>
@@ -22,9 +22,9 @@ else
             <MudTh>Provincia</MudTh>
             <MudTh>Codigo Postal</MudTh>
             <MudTh>Activo</MudTh>
-            <MudTh>Usuario Creacion</MudTh>
+            @*<MudTh>Usuario Creacion</MudTh>*@
             <MudTh>Fecha Creacion</MudTh>
-            <MudTh>Usuario Ult. Modif.</MudTh>
+            @*<MudTh>Usuario Ult. Modif.</MudTh>*@
             <MudTh>Fecha Ult. Modif.</MudTh>
         </HeaderContent>
         <RowTemplate>
@@ -33,9 +33,9 @@ else
             <MudTd DataLabel="Provincia">@context.Provincia</MudTd>
             <MudTd DataLabel="Codigo Postal">@context.CP</MudTd>
             <MudTd DataLabel="Activo">@context.Activo</MudTd>
-            <MudTd DataLabel="Usuario Creacion">@context.UsuarioCrea</MudTd>
+            @*<MudTd DataLabel="Usuario Creacion">@context.UsuarioCrea</MudTd>*@
             <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
-            <MudTd DataLabel="Usuario Ult. Modif.">@context.UsuarioModif</MudTd>
+            @*<MudTd DataLabel="Usuario Ult. Modif.">@context.UsuarioModif</MudTd>*@
             <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>
         </RowTemplate>
         <PagerContent>
@@ -45,13 +45,13 @@ else
 }
 
 @code {
-    IEnumerable<Localidad>? locals;
+    IEnumerable<ListaLocalidad>? locals;
     private string nombreBuscar = "";
 
     //Obtengo la lista de localidades
-    protected override async Task OnInitializedAsync() => locals = await ServLocal.ObtenerLocalidades();
+    protected override async Task OnInitializedAsync() => locals = await ServLocal.ObtenerListaLocalidades();
 
-    private bool FilterFunc(Localidad local)
+    private bool FilterFunc(ListaLocalidad local)
     {
         if (string.IsNullOrWhiteSpace(nombreBuscar))
             return true;
@@ -59,7 +59,7 @@ else
             return true;
         if (local.NombreLoc.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (local.Provincia.ToString().Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
+        if (local.Provincia.Contains(nombreBuscar, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
     }

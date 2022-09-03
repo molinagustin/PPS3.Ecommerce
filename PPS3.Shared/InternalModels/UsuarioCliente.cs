@@ -5,6 +5,7 @@ namespace PPS3.Shared.InternalModels
     public class UsuarioCliente
     {
         //=======>>>    PROPIEDADES DE USUARIO    <<<=======
+        public int IdUsuarioAct { get; set; }
         [Required(ErrorMessage = "Se debe introducir el Nombre Completo del Usuario/Cliente a crear.")]
         [RegularExpression(@"^[a-zA-Z ]{4,}$", ErrorMessage = "El nombre de usuario debe contener letras mayusculas y/o minusculas solamente y se puede usar espaciado (Min. 4)")]
         public string NombreCompleto { get; set; } = string.Empty;
@@ -14,12 +15,7 @@ namespace PPS3.Shared.InternalModels
         public int IdCliente { get; set; }
         [Required(ErrorMessage = "Se debe introducir un Email.")]
         [EmailAddress(ErrorMessage = "El Email introducido no es valido.")]
-        public string Email { get; set; } = string.Empty;
-
-        //Propiedades internas sin almacenamiento
-        [Required(ErrorMessage = "La contraseña no puede estar vacia.")]
-        [RegularExpression(@"^.{4,}$", ErrorMessage = "La contraseña debe ser de Minimo 4 caracteres")]
-        public string Password { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;       
 
         //=======>>>    PROPIEDADES DE CLIENTE    <<<=======
         [Required(ErrorMessage = "Se debe seleccionar un Tipo de Cliente.")]
@@ -39,5 +35,15 @@ namespace PPS3.Shared.InternalModels
         public string Telefono { get; set; } = string.Empty;
         [Required(ErrorMessage = "Se debe seleccionar una Localidad.")]
         public int LocalidadC { get; set; }
+
+        //=======>>>    CAMBIO DE PASSWORD    <<<=======
+        //Propiedades internas sin almacenamiento
+        public string SaltCont { get; set; } = string.Empty;
+        public string HashCont { get; set; } = string.Empty;
+        [Required(ErrorMessage = "La contraseña no puede estar vacia.")]
+        [RegularExpression(@"^.{4,}$", ErrorMessage = "La contraseña debe ser de Minimo 4 caracteres")]
+        public string Password { get; set; } = string.Empty;
+        [RegularExpression(@"^.{4,}$", ErrorMessage = "La contraseña debe ser de Minimo 4 caracteres")]
+        public string CambioPassword { get; set; } = string.Empty;
     }
 }

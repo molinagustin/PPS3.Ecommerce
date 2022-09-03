@@ -4,6 +4,7 @@
     {
         Task<IEnumerable<CarroCompra>> ObtenerCarrosCompras();
         Task<IEnumerable<OrdenesCompraListado>> ObtenerOrdenesCompra();
+        Task<IEnumerable<OrdenesCompraListado>> ObtenerOrdenesCompraUsuario(int idUsuario);
         Task<OrdenesCompraListado> ObtenerOCDetalle(int NumOrden);
         Task<IEnumerable<DetalleCarroCompra>> ObtenerOCDetalles(int NumOrden);
         Task<CarroCompra> ObtenerCarroCompra(int id);

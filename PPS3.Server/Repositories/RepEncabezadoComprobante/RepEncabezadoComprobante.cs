@@ -123,7 +123,7 @@ namespace PPS3.Server.Repositories.RepEncabezadoComprobante
                         INNER JOIN formas_pago as fp ON ce.FormaPago = fp.IdFormaP
                         INNER JOIN usuarios as us ON ce.UsuarioCrea = us.IdUsuarioAct
                         WHERE ce.ClienteComp = @ClienteComp AND ce.TipoVta = 1
-                        ORDER BY ce.FechaComp
+                        ORDER BY ce.FechaComp DESC
                         ";
             var result = await db.QueryAsync<Comprobante>(sql, new { ClienteComp = idCliente });
             return result;
@@ -150,7 +150,7 @@ namespace PPS3.Server.Repositories.RepEncabezadoComprobante
             var db = dbConnection();
 
             var sql = @"
-                        SELECT ce.IdEncab, ce.Periodo, ce.NumComp, ce.ClienteComp, tc.TipoComp, ce.FechaComp, cl.NombreCompleto as Cliente, fp.FormaP, ce.ImporteFinal, 
+                        SELECT ce.IdEncab, ce.Periodo, ce.NumComp, ce.ClienteComp, tc.TipoComp, ce.FechaComp, cl.NombreCompleto as Cliente, fp.FormaP, ce.TipoVta, ce.ImporteFinal, 
                         ce.SaldoRestante, ce.Pagado, ce.Observaciones, us.NombreUs as UsuarioCrea, ce.FechaCrea
                         FROM comprobantes_encabezados as ce
                         INNER JOIN tipos_comprobantes as tc ON ce.TipoComprobante = tc.IdTipoC

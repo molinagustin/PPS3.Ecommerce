@@ -6,7 +6,7 @@
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 
-<MudText Typo="Typo.h3" Align="Align.Center">Registrar Nuevo Cliente</MudText>
+<MudText Typo="Typo.h4" Align="Align.Center" Style="margin-bottom:30px;">Registrar Nuevo Cliente</MudText>
 
 <EditForm Model="@usuarioCliente" OnValidSubmit="@Registrarse">
     <DataAnnotationsValidator/>
@@ -46,8 +46,8 @@
                     <MudStack Row="true">
                         <MudStack Style="width:50%">
                             <MudSelect T="string" @bind-Value="@tipoCl" Label="Tipo de Cliente/Persona" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                                <MudSelectItem Value="@("Fisica")" />
-                                <MudSelectItem Value="@("Juridica")" />
+                                <MudSelectItem Value="@("Fisica")">@string.Format("1- Fisica")</MudSelectItem>
+                                <MudSelectItem Value="@("Juridica")">@string.Format("2- Juridica")</MudSelectItem>
                             </MudSelect>
                         </MudStack>
                         <MudStack Style="width:50%">
@@ -56,7 +56,7 @@
                                 <MudSelect T="int" @bind-Value="@cond" Label="Condicion IVA" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                                     @foreach(var condicion in condIva)
                                     {
-                                        <MudSelectItem Value="@condicion.IdCondicion">@condicion.DescripcionCond</MudSelectItem>
+                                        <MudSelectItem Value="@condicion.IdCondicion">@(condIva.ToList().IndexOf(condicion) + 1) - @condicion.DescripcionCond</MudSelectItem>
                                     }
                                 </MudSelect>
                             }
@@ -70,9 +70,9 @@
                     @if(tipoCl == "Fisica")
                     {
                         <MudSelect T="string" @bind-Value="@genero" Label="Genero" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                            <MudSelectItem Value="@("Masculino")" />
-                            <MudSelectItem Value="@("Femenino")" />
-                            <MudSelectItem Value="@("Otro")" />
+                            <MudSelectItem Value="@("Masculino")">@string.Format("1- Masculino")</MudSelectItem>
+                            <MudSelectItem Value="@("Femenino")">@string.Format("2- Femenino")</MudSelectItem>
+                            <MudSelectItem Value="@("Otro")">@string.Format("3- Otro")</MudSelectItem>
                         </MudSelect>
                     }
                     
@@ -83,7 +83,7 @@
                                 <MudSelect T="int" @bind-Value="@tipoDocu" Label="Tipo de Documento" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                                     @foreach(var tipos in tipoDoc)
                                     {
-                                        <MudSelectItem Value="@tipos.IdTipoDoc">@tipos.Sigla</MudSelectItem>
+                                        <MudSelectItem Value="@tipos.IdTipoDoc">@(tipoDoc.ToList().IndexOf(tipos) + 1) - @tipos.Sigla</MudSelectItem>
                                     }
                                 </MudSelect>
                             }
@@ -105,7 +105,7 @@
                                 <MudSelect T="int" @bind-Value="@loca" Label="Localidad" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                                     @foreach(var local in loc)
                                     {
-                                        <MudSelectItem Value="@local.IdLocalidad">@local.NombreLoc</MudSelectItem>
+                                        <MudSelectItem Value="@local.IdLocalidad">@(loc.ToList().IndexOf(local) + 1) - @local.NombreLoc</MudSelectItem>
                                     }
                                 </MudSelect>
                             }
@@ -115,8 +115,7 @@
                             } 
                         </MudStack>
                         <MudStack Style="width:50%">
-                            <MudTextField Label="Numero de Telefono" HelperText="Sin 15, 0 ni espacios o caracteres especiales."
-                                      @bind-Value="usuarioCliente.Telefono" For="@(() => usuarioCliente.Telefono)"/>
+                            <MudTextField Label="Numero de Telefono" HelperText="Sin 15, 0 ni espacios o caracteres especiales." @bind-Value="usuarioCliente.Telefono" For="@(() => usuarioCliente.Telefono)"/>
                         </MudStack>
                     </MudStack>
 
@@ -173,7 +172,10 @@
                 var registrado = await ServUsuario.Registrarse(usuarioCliente);
 
                 if (registrado)
+                {
                     NavigationManager.NavigateTo("/login");
+                    Snackbar.Add($"Registro exitoso, ahora puede iniciar sesion.", Severity.Success);
+                }                    
                 else
                     Snackbar.Add($"No se pudo crear el usuario", Severity.Error); 
             }

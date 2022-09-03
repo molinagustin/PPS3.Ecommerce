@@ -2,7 +2,7 @@
 @inject IServCliente ServCliente
 @attribute [Authorize(Roles = "1")]
 
-<MudText Align="Align.Center" Typo="Typo.h5">Listado de Clientes</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Listado de Clientes</MudText>
 
 @if(clientes == null)
 {
@@ -10,14 +10,14 @@
 }
 else
 {
-    <MudTable Items="@clientes" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<Cliente, bool>(FilterFunc)">
+    <MudTable Items="@clientes" Hover="true" Striped="true" FixedHeader="true" Filter="new Func<ListaCliente, bool>(FilterFunc)">
         <ToolBarContent>
             <MudText Typo="Typo.h6">Clientes</MudText>
             <MudSpacer/>
             <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>Id Cliente</MudTh>
+            <MudTh>Id Cliente</MudTh>            
             <MudTh>Tipo de Cliente</MudTh>
             <MudTh>Genero</MudTh>
             <MudTh>Tipo de Documento</MudTh>
@@ -53,13 +53,13 @@ else
 }
 
 @code {
-    IEnumerable<Cliente>? clientes;
+    IEnumerable<ListaCliente>? clientes;
     private string nombreBuscar = "";
 
     //Obtengo la lista de clientes
-    protected override async Task OnInitializedAsync() => clientes = await ServCliente.ObtenerClientes();
+    protected override async Task OnInitializedAsync() => clientes = await ServCliente.ObtenerListaClientes();
     
-    private bool FilterFunc(Cliente cliente)
+    private bool FilterFunc(ListaCliente cliente)
     {
         if (string.IsNullOrWhiteSpace(nombreBuscar))
             return true;

@@ -19,6 +19,7 @@ namespace PPS3.Shared.Models
         public decimal PrecioCosto { get; set; }
         [Required(ErrorMessage = "El Precio Final debe ser introducido.")]
         [Column(TypeName = "decimal(8,2)")]
+        [RegularExpression(@"^\d+(?:[,]\d{0,2})?$", ErrorMessage = "El precio no es correcto")]
         public decimal PrecioFinal { get; set; }
         [Required(ErrorMessage = "Se debe introducir un Proveedor.")]
         public int Proveedor { get; set; }
@@ -26,7 +27,9 @@ namespace PPS3.Shared.Models
         public int UnidadMedida { get; set; }
         [Column(TypeName = "decimal(11,2)")]
         public decimal CantMinAlerta { get; set; }
+        [Required(ErrorMessage = "El stock es requerido. Al menos en 0")]
         [Column(TypeName = "decimal(8,2)")]
+        [RegularExpression(@"^\d+(?:[,]\d{0,2})?$", ErrorMessage = "El stock no es correcto")]
         public decimal StockExistencia { get; set; }
         public bool Activo { get; set; }
         public int UsuarioCrea { get; set; }

@@ -3,7 +3,7 @@
 namespace PPS3.Server.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ClientesController : ControllerBase
     {
@@ -18,7 +18,14 @@ namespace PPS3.Server.Controllers
             return Ok(response);
         }
 
-        [HttpGet("id:int")]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ListaCliente>>> ObtenerListaClientes()
+        {
+            var response = await _repCliente.ObtenerListaClientes();
+            return Ok(response);
+        }
+
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<Cliente>> ObtenerCliente(int id)
         {
             var response = await _repCliente.ObtenerCliente(id);
@@ -28,7 +35,7 @@ namespace PPS3.Server.Controllers
                 return BadRequest();
         }
 
-        [HttpGet("nombreCliente")]
+        [HttpGet("{nombreCliente}")]
         public async Task<ActionResult<Cliente>> ObtenerCliente(string nombreCliente)
         {
             var response = await _repCliente.ObtenerCliente(nombreCliente);

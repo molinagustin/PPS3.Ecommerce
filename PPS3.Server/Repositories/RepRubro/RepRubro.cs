@@ -123,5 +123,32 @@
             var result = await db.QueryAsync<RubroListado>(sql, new { });
             return result;
         }
+
+        public async Task<IEnumerable<RubroCategoria>> ObtenerRubrosCategorias()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT r.IdRubro, r.DescRubro
+                        FROM rubros as r
+                        WHERE r.Activo = 1
+                        ORDER BY r.DescRubro
+                        ";
+            var result = await db.QueryAsync<RubroCategoria>(sql, new { });
+            return result;
+        }
+
+        public async Task<IEnumerable<TipoProductoCategoria>> ObtenerTiposProductosCategorias()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT pt.IdTipo, pt.DescripcionTipo, pt.Rubro
+                        FROM productos_tipos as pt
+                        WHERE pt.Activo = 1
+                        ";
+            var result = await db.QueryAsync<TipoProductoCategoria>(sql, new { });
+            return result;
+        }
     }
 }

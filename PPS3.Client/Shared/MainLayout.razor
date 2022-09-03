@@ -3,7 +3,7 @@
 @inject IServUsuario ServUsuario
 @inject AuthenticationStateProvider AuthStateProvider
 
-<PageTitle>Ecommerce Shop</PageTitle>
+<PageTitle>Expo Ceramicas</PageTitle>
 
 @*Si el usuario posee el nivel requerido de autorizacion, se le mostraran las opciones en el menu de navegacion*@
 @*<div class="page">
@@ -75,6 +75,7 @@
         if (result)
         {
             await AuthStateProvider.GetAuthenticationStateAsync();
+            StateHasChanged();
             NavigationManager.NavigateTo("/");    
         }        
     }

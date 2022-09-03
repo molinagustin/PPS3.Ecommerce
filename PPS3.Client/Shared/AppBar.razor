@@ -1,4 +1,9 @@
 ﻿@inject IServProducto ServProducto
+@inject IServCarroCompra ServCarro
+@inject IServDetalleCarroCompra ServDetalleCarro
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS /*JS Interop*/
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 
 <MudAppBar Elevation="3">
     <AuthorizeView Roles="1, 2">
@@ -10,44 +15,45 @@
 
         <NotAuthorized>
             <a href="/">
-           <MudAvatar Color="Color.Transparent" Size="Size.Large" Image="images/ecommerce_logo.jpg"/>
+                <MudAvatar Color="Color.Transparent" Size="Size.Large" Image="images/expo_ceramicas_logo.png" />
            </a>
-           <MudText Typo="Typo.h5" Color="Color.Default" Style="margin-top:10px; margin-left:15px;">E-Commerce</MudText>
+           <MudText Typo="Typo.h5" Color="Color.Default" Style="margin-top:10px; margin-left:15px;">Expo Ceramicas</MudText>
         </NotAuthorized>
     </AuthorizeView>
 
     <MudSpacer/>
 
-    <MudPaper Width="30em;" Style="padding:3px;">
-        <MudAutocomplete DisableUnderLine="true" Margin="Margin.Dense" T="string" 
-                        Label="Buscar Producto" @bind-Value="ValorBuscado" 
-                        SearchFunc="@BuscarEnLista"
-                        ResetValueOnEmptyText="true"
-                        CoerceText="true" CoerceValue="false"
-                        AdornmentIcon="@Icons.Material.Filled.Search" 
-                        MinCharacters="3"/>
+    <MudPaper Width="25em;">
+        <EditForm Model="@ValorBuscado" OnValidSubmit="Buscar">
+            <MudTextField @bind-Value="@ValorBuscado" Label="Buscar Producto" Variant="Variant.Text" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search"/>
+        </EditForm>        
     </MudPaper>
 
     <MudSpacer/>
 
     <AuthorizeView>
         <Authorized>
+            <input type="hidden" id="UsAct" value="@context.User.Claims.First().Value" />
+
             <MudBadge Content="@BadgeContent" Color="Color.Transparent" Overlap="true" Bordered="true" Class="mx-6 my-4">
-                <MudButton StartIcon="@Icons.Material.Filled.ShoppingCart" Color="Color.Info" Variant="Variant.Filled">Carro</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.ShoppingCart" Color="Color.Info" Variant="Variant.Filled" OnClick="VerCarro">Carro</MudButton>
             </MudBadge>   
 
-            <MudMenu FullWidth="true" ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight">
+            <MudMenu ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight">
                 <ActivatorContent>
                     <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Primary">@context.User.Identity.Name</MudChip>
                 </ActivatorContent>
                 <ChildContent>
-                    <MudMenuItem Href="/">Perfil</MudMenuItem>                    
+                    <MudMenuItem Href="/verPerfil">Perfil</MudMenuItem>
+                    <MudMenuItem OnClick="VerCompras">Compras</MudMenuItem>
                     <MudMenuItem OnClick="async ()=> await Logout.InvokeAsync()">Salir</MudMenuItem>
                 </ChildContent>
             </MudMenu>
 
         </Authorized>
         <NotAuthorized>
+            <input type="hidden" id="UsAct" value="0" />
+
             <MudButton Class="mr-2" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Login" 
                         Color="Color.Success" OnClick="async ()=> await Login.InvokeAsync()">Iniciar Sesion</MudButton>             
             <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AppRegistration" 
@@ -61,36 +67,72 @@
 </MudAppBar>
 
 @code {
-        [Parameter]
-        public EventCallback OnSidebarToggled { get; set; }
+    [Parameter]
+    public EventCallback OnSidebarToggled { get; set; }
 
-        [Parameter]
-        public EventCallback OnRightSidebarToggled { get; set; }
+    [Parameter]
+    public EventCallback OnRightSidebarToggled { get; set; }
 
-        [Parameter]
-        public EventCallback Login { get; set; }
+    [Parameter]
+    public EventCallback Login { get; set; }
 
-        [Parameter]
-        public EventCallback Logout { get; set; }
+    [Parameter]
+    public EventCallback Logout { get; set; }
 
-        [Parameter]
-        public EventCallback Register { get; set; }
+    [Parameter]
+    public EventCallback Register { get; set; }
 
-        public int BadgeContent { get; set; } = 0;
+    public int BadgeContent { get; set; } = 0;
 
-        /*PARA EL BUSCADOR*/
-        private string ValorBuscado = string.Empty;
+    private int idUsAct = 0;
 
-        private string[] productos = { "Ceramica 1", "Pegamento xLS" };
+    /*PARA EL BUSCADOR*/
+    private string ValorBuscado = string.Empty;
 
-        private async Task<IEnumerable<string>> BuscarEnLista(string value)
+    private void Buscar()
+    {
+        if(!string.IsNullOrEmpty(ValorBuscado.Trim()))
+            NavigationManager.NavigateTo($"/productosEnCategoria/{ValorBuscado.Trim()}", true);
+        else
+            NavigationManager.NavigateTo($"/", true);
+    }
+
+    private void VerCompras() => NavigationManager.NavigateTo($"/verCompras");
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) => await ProductosCarro();
+
+    private async Task VerCarro()
+    {
+        var idUsuario = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+
+        if(idUsuario > 0)
         {
-            // In real life use an asynchronous function for fetching data from an api.
-            await Task.Delay(5);
-
-            // if text is null or empty, don't return values (drop-down will not open)
-            if (string.IsNullOrEmpty(value))
-                return new string[0];
-            return productos.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+            CarroCompra carro = await ServCarro.ObtenerCarroActivoUsuario(idUsuario);
+            if (carro != null)
+                NavigationManager.NavigateTo($"/verCarro/{carro.IdCarro}");
+            else
+                Snackbar.Add($"No se puede acceder al carro.", Severity.Error);
         }
+        else
+            Snackbar.Add($"No se puede acceder al usuario.", Severity.Error);
+    }
+
+    private async Task ProductosCarro()
+    {
+        idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+
+        if(idUsAct > 0)
+        {
+            CarroCompra carro = await ServCarro.ObtenerCarroActivoUsuario(idUsAct);
+            if (carro != null)
+            {
+                IEnumerable<DetalleCarroCompra> detalles = await ServDetalleCarro.ObtenerDetallesCarro(carro.IdCarro);
+                if(detalles != null)
+                {
+                    BadgeContent = detalles.Count();
+                    StateHasChanged();
+                }                
+            }        
+        }              
+    }
 }

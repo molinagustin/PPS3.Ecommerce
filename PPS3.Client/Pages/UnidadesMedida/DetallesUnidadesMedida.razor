@@ -10,7 +10,7 @@
     <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
 </AuthorizeView>
 
-<MudText Align="Align.Center" Typo="Typo.h5">Detalles de la Unidad de Medida</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Detalles de la Unidad de Medida</MudText>
 
 <EditForm Model="@unidad" OnValidSubmit="GuardarUnidad" Context="conForm">
     <DataAnnotationsValidator/>

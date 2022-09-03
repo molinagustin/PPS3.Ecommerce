@@ -23,7 +23,7 @@ namespace PPS3.Client.Services.ServLocalidad
                 return false;
 
             //Creo una solicitud Http de tipo delete
-            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/Localidades/{id}");
+            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/Localidades/BorrarLocalidad/{id}");
             //Agrego el token al Encabezado Http
             request.Headers.Add("Authorization", "Bearer " + token);
 
@@ -56,7 +56,7 @@ namespace PPS3.Client.Services.ServLocalidad
             if (localidad.IdLocalidad > 0)
             {
                 //Creo una solicitud Http de tipo PUT
-                var request = new HttpRequestMessage(HttpMethod.Put, $"api/Localidades");
+                var request = new HttpRequestMessage(HttpMethod.Put, $"api/Localidades/ActualizarLocalidad");
                 //Agrego el token al Encabezado Http
                 request.Headers.Add("Authorization", "Bearer " + token);
                 //Agrego el JSON al BODY
@@ -67,7 +67,7 @@ namespace PPS3.Client.Services.ServLocalidad
             else
             {
                 //Creo una solicitud Http de tipo POST
-                var request = new HttpRequestMessage(HttpMethod.Post, $"api/Localidades");
+                var request = new HttpRequestMessage(HttpMethod.Post, $"api/Localidades/CrearLocalidad");
                 //Agrego el token al Encabezado Http
                 request.Headers.Add("Authorization", "Bearer " + token);
                 //Agrego el JSON al BODY
@@ -82,9 +82,18 @@ namespace PPS3.Client.Services.ServLocalidad
                 return false;
         }
 
+        public async Task<IEnumerable<ListaLocalidad>> ObtenerListaLocalidades()
+        {
+            var response = await _httpClient.GetStreamAsync($"api/Localidades/ObtenerListaLocalidades");
+
+            var localidades = await JsonSerializer.DeserializeAsync<IEnumerable<ListaLocalidad>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            return localidades;
+        }
+
         public async Task<Localidad> ObtenerLocalidad(int id)
         {
-            var response = await _httpClient.GetStreamAsync($"api/Localidades/{id}");
+            var response = await _httpClient.GetStreamAsync($"api/Localidades/ObtenerLocalidad/{id}");
 
             var localidad = await JsonSerializer.DeserializeAsync<Localidad>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
@@ -93,7 +102,7 @@ namespace PPS3.Client.Services.ServLocalidad
 
         public async Task<Localidad> ObtenerLocalidad(string nombreLocalidad)
         {
-            var response = await _httpClient.GetStreamAsync($"api/Localidades/{nombreLocalidad}");
+            var response = await _httpClient.GetStreamAsync($"api/Localidades/ObtenerLocalidad/{nombreLocalidad}");
 
             var localidad = await JsonSerializer.DeserializeAsync<Localidad>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
@@ -102,7 +111,7 @@ namespace PPS3.Client.Services.ServLocalidad
 
         public async Task<IEnumerable<Localidad>> ObtenerLocalidades()
         {
-            var response = await _httpClient.GetStreamAsync($"api/Localidades");
+            var response = await _httpClient.GetStreamAsync($"api/Localidades/ObtenerLocalidades");
 
             var localidades = await JsonSerializer.DeserializeAsync<IEnumerable<Localidad>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 

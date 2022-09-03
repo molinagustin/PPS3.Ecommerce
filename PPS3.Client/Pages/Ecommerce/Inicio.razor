@@ -2,11 +2,177 @@
 @inject IServProducto ServProducto
 @inject NavigationManager NavigationManager
 
-<PageTitle>Ecommerce Shop</PageTitle>
+<PageTitle>Expo Ceramicas</PageTitle>
 
-<MudText Align="Align.Center" Typo="Typo.h6">¡Revisa Nuestros Ultimos Productos!</MudText>
-<br />
+<MudText Typo="Typo.h2" Align="Align.Center" Color="Color.Primary" Style="margin-bottom:35px;">¡Bienvenido a Expo Ceramica!</MudText>
 
+<MudGrid Style="margin-bottom:35px;">
+    <MudItem xs="4">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Facilidad de Uso</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardMedia Image="images/facilidad_uso.jpg" Height="250" />
+            <MudCardContent>
+                <MudText Typo="Typo.body1" Align="Align.Center">Nuestro sitio fue diseñado para que puedas encontrar facilmente nuestros productos y solicitarlos de manera rapida.</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudGrid>
+                    <MudItem xs="4"></MudItem>
+                    <MudItem xs="4">
+                        <MudIconButton Icon="@Icons.Material.Filled.AddReaction" Color="Color.Primary"/>
+                        <MudIconButton Icon="@Icons.Material.Filled.AddShoppingCart" Color="Color.Primary" />
+                    </MudItem>
+                    <MudItem xs="4"></MudItem>                       
+                </MudGrid>                               
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+    
+    <MudItem xs="4">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Seguridad</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardMedia Image="images/seguridad.jpg" Height="250" />
+            <MudCardContent>
+                <MudText Typo="Typo.body1" Align="Align.Center">Tus datos estan seguros con nostros. Nunca divulgaremos ninguno de ellos y tenemos altos estandares para su proteccion.</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudGrid>
+                    <MudItem xs="4"></MudItem>
+                    <MudItem xs="4">
+                        <MudIconButton Icon="@Icons.Material.Filled.LockOutline" Color="Color.Primary"/>
+                        <MudIconButton Icon="@Icons.Material.Filled.AdminPanelSettings" Color="Color.Primary" />
+                    </MudItem>
+                    <MudItem xs="4"></MudItem>                       
+                </MudGrid>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+
+    <MudItem xs="4">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Calidad y Servicio</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardMedia Image="images/calidad_servicio.jpg" Height="250" />
+            <MudCardContent>
+                <MudText Typo="Typo.body1" Align="Align.Center">Porque nos interesa que puedas adquirir el producto en tiempo y forma, nuestro equipo esta en constante comunicacion con nuestros clientes.</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudGrid>
+                    <MudItem xs="4"></MudItem>
+                    <MudItem xs="4">
+                        <MudRating ReadOnly=true SelectedValue="4" Style="margin-top:20px;"></MudRating>
+                    </MudItem>
+                    <MudItem xs="4"></MudItem>                       
+                </MudGrid>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+<MudPaper Class="pa-1 ma-2" Elevation="1" Style="background-color:#594ae2; margin-bottom:20px;"/>
+
+<MudText Align="Align.Center" Typo="Typo.h6" Style="margin-bottom:20px;">¡Revisa Nuestros Ultimos Productos!</MudText>
+
+<MudGrid Style="margin-bottom:15px;">
+    @foreach (var prod in grupoUnoProductos)
+    {
+        <MudItem xs="3">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">@prod.NombreProd</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudImage Elevation="0" ObjectFit="ObjectFit.Fill" Src="@prod.UrlImagen" Style="width:100%; height:250px;" />
+                <MudCardContent>
+                    <MudText Typo="Typo.body1" Align="Align.Center">$@prod.PrecioFinal</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudGrid>
+                        <MudItem xs="4"></MudItem>
+                        <MudItem xs="4">
+                            <MudButton OnClick="@(() => VerProducto(prod.IdProducto))" Style="margin-bottom:10px;" FullWidth=true Color="Color.Primary">¡VER!</MudButton>
+                        </MudItem>
+                        <MudItem xs="4"></MudItem>                       
+                    </MudGrid>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    }
+</MudGrid>
+
+<MudGrid Style="margin-bottom:15px;">
+    @foreach (var prod in grupoDosProductos)
+    {
+        <MudItem xs="3">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">@prod.NombreProd</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudImage Elevation="0" ObjectFit="ObjectFit.Fill" Src="@prod.UrlImagen" Style="width:100%; height:250px;" />
+                <MudCardContent>
+                    <MudText Typo="Typo.body1" Align="Align.Center">$@prod.PrecioFinal</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudGrid>
+                        <MudItem xs="4"></MudItem>
+                        <MudItem xs="4">
+                            <MudButton OnClick="@(() => VerProducto(prod.IdProducto))" Style="margin-bottom:10px;" FullWidth=true Color="Color.Primary">¡VER!</MudButton>
+                        </MudItem>
+                        <MudItem xs="4"></MudItem>                       
+                    </MudGrid>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    }
+</MudGrid>
+
+<MudPaper Class="pa-1 ma-2" Elevation="1" Style="background-color:#594ae2; margin-bottom:20px;" />
+
+<MudText Align="Align.Center" Typo="Typo.h6" Style="margin-bottom:20px;">¿Que opinan nuestros clientes?</MudText>
+
+<MudPaper Class="pa-6 ma-2" Elevation="1">
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="4">
+            <MudStack Row=true>
+                <MudAvatar Color="Color.Transparent" Size="Size.Large" Image="images/avatar_hombre_1.jpg" />
+                <MudText Align="Align.Left" Typo="Typo.body1" Style="margin-bottom:5px; margin-top:15px;" Color="Color.Primary">Andres Martinez</MudText>
+            </MudStack>
+            <MudText Align="Align.Left" Typo="Typo.body2" Style="margin-bottom:5px;" Color="Color.Default">"¡La atencion impecable, y su coordinacion para la entrega de productos fue muy buena!"</MudText>
+            <MudRating ReadOnly=true SelectedValue="4"></MudRating>
+        </MudItem>
+        <MudItem xs="4">
+            <MudStack Row=true>
+                <MudAvatar Color="Color.Transparent" Size="Size.Large" Image="images/avatar_mujer.png" />
+                <MudText Align="Align.Left" Typo="Typo.body1" Style="margin-bottom:5px; margin-top:15px;" Color="Color.Primary">Fernanda Lopez</MudText>
+            </MudStack>            
+            <MudText Align="Align.Left" Typo="Typo.body2" Style="margin-bottom:5px;" Color="Color.Default">"Me gusto la facilidad con que pude ordenar mis productos, sin tantas vueltas, ¡solo un par de clicks y listo!"</MudText>
+            <MudRating ReadOnly=true SelectedValue="4"></MudRating>
+        </MudItem>
+        <MudItem xs="4">
+            <MudStack Row=true>
+                <MudAvatar Color="Color.Transparent" Size="Size.Large" Image="images/avatar_hombre_2.jpg" />
+                <MudText Align="Align.Left" Typo="Typo.body1" Style="margin-bottom:5px; margin-top:15px;" Color="Color.Primary">Mauro Reyna</MudText>
+            </MudStack>            
+            <MudText Align="Align.Left" Typo="Typo.body2" Style="margin-bottom:5px;" Color="Color.Default">"Tuve un problema con el pago de uno de mis productos, me contacte con ellos y en breve me buscaron la solucion que necesita. ¡Muy eficientes!"</MudText>
+            <MudRating ReadOnly=true SelectedValue="5"></MudRating>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@*
 @if(ultimosProductos == null)
 {
     <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
@@ -26,12 +192,27 @@ else
         </MudCarousel>
     </MudGrid>
 }
+*@
 
 @code {
     //Traigo los ultimos 5 productos modificados o creados recientemente
     IEnumerable<ProductoListado> ultimosProductos;
+    IEnumerable<ProductoListado> grupoUnoProductos = new List<ProductoListado>();
+    IEnumerable<ProductoListado> grupoDosProductos = new List<ProductoListado>();
+    Range rango1 = new Range(0, 4);
+    Range rango2 = new Range(4, 8);
 
-    protected override async Task OnInitializedAsync() => ultimosProductos = await ServProducto.ObtenerUltimos5Productos();
+    protected override async Task OnInitializedAsync() 
+    { 
+        ultimosProductos = await ServProducto.ObtenerUltimos5Productos();
+        if (ultimosProductos != null && ultimosProductos.Count() > 4)
+        {
+            grupoUnoProductos = ultimosProductos.Take(rango1);
+            grupoDosProductos = ultimosProductos.Take(rango2);
+        }
+        else
+            grupoUnoProductos = ultimosProductos;       
+    } 
 
     protected void VerProducto(int id) => NavigationManager.NavigateTo($"/verProducto/{id}");
 }

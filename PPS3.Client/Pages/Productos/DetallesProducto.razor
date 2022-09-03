@@ -14,17 +14,14 @@
     <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
 </AuthorizeView>
 
-<MudText Align="Align.Center" Typo="Typo.h5">Detalles de Producto</MudText>
-
-@if(id>0)
-{
-    @*Si es un producto ya creado, recien ahi muestro sus imagenes*@
-    <MudButton StartIcon="@Icons.Material.Filled.Image" Color="Color.Primary" Variant="Variant.Outlined" OnClick="VerImagenes" Size="Size.Small">IMAGENES</MudButton>
-}
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Detalles de Producto</MudText>
 
 <EditForm Model="@producto" OnValidSubmit="GuardarProducto" Context="conForm">
     <DataAnnotationsValidator/>
     <MudGrid Justify="Justify.Center">
+        <MudItem xs="3">
+            <br />
+        </MudItem>
         <MudItem xs="6">
             <MudCard Elevation="1">
                 <MudCardHeader>
@@ -42,7 +39,7 @@
                         <MudSelect T="int" @bind-Value="@rub" Label="Rubro" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                             @foreach(var rubro in rubros)
                             {
-                                <MudSelectItem Value="@rubro.IdRubro">@rubro.DescRubro</MudSelectItem>
+                                <MudSelectItem Value="@rubro.IdRubro">@(rubros.ToList().IndexOf(rubro) + 1) - @rubro.DescRubro</MudSelectItem>
                             }
                         </MudSelect>
                     }
@@ -56,7 +53,7 @@
                         <MudSelect T="int" @bind-Value="@tipo" Label="Tipo de Producto" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                             @foreach(var tp in tiposProds)
                             {
-                                <MudSelectItem Value="@tp.IdTipo">@tp.DescripcionTipo</MudSelectItem>
+                                <MudSelectItem Value="@tp.IdTipo">@(tiposProds.ToList().IndexOf(tp) + 1) - @tp.DescripcionTipo</MudSelectItem>
                             }
                         </MudSelect>
                     }
@@ -74,7 +71,7 @@
                         <MudSelect T="int" @bind-Value="@prov" Label="Proveedor" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                             @foreach(var pv in provs)
                             {
-                                <MudSelectItem Value="@pv.IdProveedor">@pv.NombreProv</MudSelectItem>
+                                <MudSelectItem Value="@pv.IdProveedor">@(provs.ToList().IndexOf(pv) + 1) - @pv.NombreProv</MudSelectItem>
                             }
                         </MudSelect>
                     }
@@ -88,7 +85,7 @@
                         <MudSelect T="int" @bind-Value="@uni" Label="Unidad de Medida" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                             @foreach(var um in unids)
                             {
-                                <MudSelectItem Value="@um.IdUnidad">@um.DescripcionUnidad</MudSelectItem>
+                                <MudSelectItem Value="@um.IdUnidad">@(unids.ToList().IndexOf(um) + 1) - @um.DescripcionUnidad</MudSelectItem>
                             }
                         </MudSelect>
                     }
@@ -97,7 +94,7 @@
                         <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
                     }
 
-                    <MudTextField Label="Cantidad Minima para Alerta" HelperText="El valor que se tomara para avisar de poco stock. Formato 999,99 ó 999" @bind-Value="producto.CantMinAlerta" For="@(() => producto.CantMinAlerta)"/>
+                    @*<MudTextField Label="Cantidad Minima para Alerta" HelperText="El valor que se tomara para avisar de poco stock. Formato 999,99 ó 999" @bind-Value="producto.CantMinAlerta" For="@(() => producto.CantMinAlerta)"/>*@
 
                     <MudTextField Label="Stock en Existencia" HelperText="Productos que quedan. Formato 999,99 ó 999" @bind-Value="producto.StockExistencia" For="@(() => producto.StockExistencia)"/>
 
@@ -113,6 +110,13 @@
                     <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.ExitToApp" Color="Color.Error" OnClick="Cancelar">Cancelar</MudButton>
                 </MudCardActions>
             </MudCard>
+        </MudItem>
+
+        <MudItem xs="3">
+            @if (id > 0)
+            {   @*Si es un producto ya creado, recien ahi muestro sus imagenes*@
+                <MudButton StartIcon="@Icons.Material.Filled.Image" Color="Color.Primary" Variant="Variant.Outlined" OnClick="VerImagenes" Size="Size.Large">IMAGENES</MudButton>
+            }
         </MudItem>
     </MudGrid>        
 </EditForm>

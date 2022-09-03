@@ -26,7 +26,7 @@
                             CondIva=@CondIva,
                             DomicilioC=@DomicilioC,
                             Telefono=@Telefono,
-                            Localidad=@Localidad,
+                            LocalidadC=@LocalidadC,
                             FechaUltModif=@FechaUltModif
                         WHERE IdCliente=@IdCliente
                         ";
@@ -170,6 +170,22 @@
                                                                    NombreCompleto = nombreCliente, 
                                                                    NumDocumento = numDocumento 
                                                                    });
+            return result;
+        }
+
+        public async Task<IEnumerable<ListaCliente>> ObtenerListaClientes()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT c.IdCliente, c.TipoCliente, c.Genero, td.Sigla as TipoDocumento, c.NumDocumento, c.NombreCompleto, ci.DescripcionCond as CondIva, c.DomicilioC,
+                        c.Telefono, l.NombreLoc as LocalidadC, c.Activo, c.FechaCrea, c.FechaUltModif
+                        FROM clientes as c
+                        INNER JOIN tipos_documentos as td ON td.IdTipoDoc = c.TipoDocumento
+                        INNER JOIN condiciones_iva as ci ON ci.IdCondicion = c.CondIva
+                        INNER JOIN localidades as l ON l.IdLocalidad = c.LocalidadC
+                        ";
+            var result = await db.QueryAsync<ListaCliente>(sql, new { });
             return result;
         }
     }

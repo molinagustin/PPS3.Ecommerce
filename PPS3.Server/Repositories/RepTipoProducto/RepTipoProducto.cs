@@ -19,6 +19,7 @@
                         UPDATE productos_tipos
                         SET
                             DescripcionTipo = @DescripcionTipo,
+                            Rubro = @Rubro,
                             Activo = @Activo,
                             UsuarioModif = @UsuarioModif,
                             FechaUltModif = @FechaUltModif
@@ -27,6 +28,7 @@
 
             var result = await db.ExecuteAsync(sql, new {
                                                         tipoProducto.DescripcionTipo,
+                                                        tipoProducto.Rubro,
                                                         tipoProducto.Activo,
                                                         tipoProducto.UsuarioModif,
                                                         FechaUltModif = DateTime.Now,
@@ -63,11 +65,13 @@
             var sql = @"
                         INSERT INTO productos_tipos (
                                                     DescripcionTipo,
+                                                    Rubro,
                                                     UsuarioCrea,
                                                     UsuarioModif
                                                     )
                         VALUES (
                                 @DescripcionTipo,
+                                @Rubro,
                                 @UsuarioCrea,
                                 @UsuarioModif
                                 )
@@ -75,6 +79,7 @@
 
             var result = await db.ExecuteAsync(sql, new { 
                                                         tipoProducto.DescripcionTipo,
+                                                        tipoProducto.Rubro,
                                                         tipoProducto.UsuarioCrea,
                                                         tipoProducto.UsuarioModif
                                                         });
@@ -113,9 +118,10 @@
             var db = dbConnection();
 
             var sql = @"
-                        SELECT pt.IdTipo, pt.DescripcionTipo, pt.Activo, u1.NombreUs as UsuarioCrea, u2.NombreUs as UsuarioModif,
+                        SELECT pt.IdTipo, pt.DescripcionTipo, r.DescRubro as Rubro, pt.Activo, u1.NombreUs as UsuarioCrea, u2.NombreUs as UsuarioModif,
                         pt.FechaCrea, pt.FechaUltModif
                         FROM productos_tipos as pt
+						INNER JOIN rubros as r ON pt.Rubro = r.IdRubro
                         INNER JOIN usuarios as u1 ON pt.UsuarioCrea = u1.IdUsuarioAct
                         INNER JOIN usuarios as u2 ON pt.UsuarioModif = u2.IdUsuarioAct
                         ORDER BY pt.DescripcionTipo

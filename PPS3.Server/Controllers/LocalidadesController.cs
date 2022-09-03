@@ -3,7 +3,7 @@
 namespace PPS3.Server.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class LocalidadesController : ControllerBase
     {
@@ -16,6 +16,14 @@ namespace PPS3.Server.Controllers
         public async Task<ActionResult<IEnumerable<Localidad>>> ObtenerLocalidades()
         {
             var response = await _repLocalidad.ObtenerLocalidades();
+            return Ok(response);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ListaLocalidad>>> ObtenerListaLocalidades()
+        {
+            var response = await _repLocalidad.ObtenerListaLocalidades();
             return Ok(response);
         }
 

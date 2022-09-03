@@ -1,0 +1,177 @@
+﻿@page "/verCompras/verDetalle/{idOrden:int}"
+@inject IServCarroCompra ServCarro
+@inject IServDetalleCarroCompra ServDetalleCarro
+@inject IServProducto ServProducto
+@inject IServImagenProducto ServImagen
+@using Radzen.Blazor
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS /*JS Interop*/
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+
+<AuthorizeView>
+    <Authorized>
+        <input type="hidden" id="UsAct" value="@context.User.Claims.First().Value" />
+
+        <MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:15px;">Orden de compra N° @idOrden</MudText>
+
+        @if(ordenListado == null || ordenListado.DetallesCarro == null)
+        {
+            <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+        }
+        else
+        {
+            <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Primary" Variant="Variant.Outlined" OnClick="Volver" Style="margin-bottom:15px;">Volver</MudButton>
+
+            <MudGrid Justify="Justify.Center" Style="margin-bottom:30px;">
+                <MudItem lg="12">
+                    <MudSimpleTable Striped="true">
+                        <thead>
+                            <tr>
+                                <td>#</td>
+                                <td>Producto</td>
+                                <td>Cantidad</td>
+                                <td>Unidad Medida</td>
+                                <td>Precio Venta</td>
+                                <td>% Bonificacion</td>
+                                <td>Bonificacion Total</td>
+                                <td>Sub Total</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach(var od in ordenListado.DetallesCarro)
+                            {
+                                <tr>
+                                    <td>@(ordenListado.DetallesCarro.ToList().IndexOf(od) + 1)</td>
+                                    <td>
+                                        <RadzenImage Path="@od.UrlImagen" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px; float: left;" />
+                                        <a href="/verProducto/@od.Producto">@od.NombreProducto</a>
+                                    </td>
+                                    <td>@od.Cantidad</td>
+                                    <td>@od.DescripcionUnidad</td>
+                                    <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", od.PrecioUnit)</td>
+                                    <td>@od.Bonificacion %</td>
+                                    <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", od.BonificacionTotal)</td>
+                                    <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", od.SubTotal)</td>
+                                </tr>
+                            }
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>TOTAL: <b>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", ordenListado.Total)</b></td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudItem>
+            </MudGrid>
+
+            <MudGrid Justify="Justify.Center" Style="margin-bottom:30px;">
+                @*DATOS PEDIDO*@
+                <MudItem xs="4">
+                    <MudStack>
+                        @if(ordenListado.Estado == "Pendiente")
+                        {
+                            <MudText Align="Align.Left" Typo="Typo.body1">Estado: <b style="color:deepskyblue">@ordenListado.Estado</b></MudText>
+                        }
+                        else if(ordenListado.Estado == "Aprobado")
+                        {
+                            <MudText Align="Align.Left" Typo="Typo.body1">Estado: <b style="color:lime">@ordenListado.Estado</b></MudText>
+                        }
+                        else if(ordenListado.Estado == "Finalizado")
+                        {
+                            <MudText Align="Align.Left" Typo="Typo.body1">Estado: <b style="color:darkmagenta">@ordenListado.Estado</b></MudText>
+                        }
+                        else if(ordenListado.Estado == "Cancelado")
+                        {
+                            <MudText Align="Align.Left" Typo="Typo.body1">Estado: <b style="color:crimson">@ordenListado.Estado</b></MudText>
+                        }
+                        else
+                        {
+                            <MudText Align="Align.Left" Typo="Typo.body1" Color="Color.Default">Estado: <b>----</b></MudText>
+                        }
+                    </MudStack>
+                    <MudStack>
+                        <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Orden: <b>@ordenListado.FechaOrden</b></MudText>
+                    </MudStack>
+                    <MudStack>
+                        <MudText Align="Align.Left" Typo="Typo.body1">Ultima Modificacion: <b>@ordenListado.FechaUltModif</b></MudText>
+                    </MudStack>
+                </MudItem>
+
+                @*DATOS PAGO Y ENTREGA*@
+                <MudItem xs="4">
+                    <MudStack>
+                        @if(ordenListado.FechaEntrega != null)
+                        {
+                            <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Entrega: <b>@ordenListado.FechaEntrega</b></MudText>
+                        }
+                        else
+                        {
+                            <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Entrega: <b>----</b></MudText>
+                        }
+                    </MudStack>
+                    <MudStack>
+                        <MudSwitch @bind-Checked="ordenListado.Pagado" Label="¿Pagado?" Color="Color.Success" ReadOnly=true/>                  
+                    </MudStack>
+
+                    @if(ordenListado.Pagado)
+                    {
+                        <MudStack>
+                            <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Pago: <b>@ordenListado.FechaPago</b></MudText>
+                        </MudStack>
+                        <MudStack>
+                            <MudText Align="Align.Left" Typo="Typo.body1">Forma de Pago: <b>@ordenListado.FormaP</b></MudText>
+                        </MudStack>
+                    }
+                </MudItem>
+
+                @*RECIBOS Y COMPROBANTES*@
+                <MudItem xs="4">                    
+                    @*
+                        COMPROBANTES ASOCIADOS
+                        RECIBOS DE PAGO                     
+                    *@
+                </MudItem>
+            </MudGrid>
+
+            <MudGrid Justify="Justify.Center" Style="margin-bottom:30px;">
+                <MudItem xs="6">
+                    <MudTextField T="string" Label="Observaciones" Variant="Variant.Outlined" @bind-Value="ordenListado.Observaciones" Lines="5" ReadOnly=true/>
+                </MudItem>
+            </MudGrid>
+        }        
+    </Authorized>
+
+    <NotAuthorized>
+        <input type="hidden" id="0" />
+
+        <MudText Align="Align.Center" Typo="Typo.h4" Color="Color.Error">No esta autorizado a ver el contenido</MudText>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public int idOrden { get; set; }
+
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
+    private int numItem = 1;
+
+    //Para guardar la orden solicitada
+    OrdenesCompraListado ordenListado;
+
+    //Guardo el ID del usuario actual
+    protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+
+    protected override async Task OnInitializedAsync()
+    {
+        ordenListado = await ServCarro.ObtenerOCDetalle(idOrden);
+    }
+
+    private void Volver() => NavigationManager.NavigateTo($"/verCompras");
+}

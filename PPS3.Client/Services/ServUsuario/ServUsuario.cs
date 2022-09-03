@@ -16,6 +16,36 @@ namespace PPS3.Client.Services.ServUsuario
             _sessionStorage = sessionStorage;
         }
 
+        public async Task<bool> ActualizarPerfilUsuario(UsuarioCliente usuarioCl)
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return false;
+
+            //Se procede a Serializar el contenido del objeto por parametro
+            var usuarioJson = new StringContent(JsonSerializer.Serialize(usuarioCl), Encoding.UTF8, "application/json");
+
+            //Creo el objeto donde se guardara el mensaje devuelto
+            var response = new HttpResponseMessage();
+
+            //Creo una solicitud Http de tipo PUT
+            var request = new HttpRequestMessage(HttpMethod.Put, $"api/Usuarios/ActualizarPerfilUsuario");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+            //Agrego el JSON al BODY
+            request.Content = usuarioJson;
+            //Envio la solicitud HTTP
+            response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            if (response.IsSuccessStatusCode)
+                return true;
+            else
+                return false;
+        }
+
         public async Task<bool> ActualizarUsuario(Usuario usuario)
         {
             //Obtengo el token de sesion del usuario
@@ -64,6 +94,36 @@ namespace PPS3.Client.Services.ServUsuario
             var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
 
             //Verifico que la respuesta sea exitosa
+            if (response.IsSuccessStatusCode)
+                return true;
+            else
+                return false;
+        }
+
+        public async Task<bool> CambiarPassword(UsuarioCliente usuarioCliente)
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return false;
+
+            //Se procede a Serializar el contenido del objeto por parametro
+            var usuarioJson = new StringContent(JsonSerializer.Serialize(usuarioCliente), Encoding.UTF8, "application/json");
+
+            //Creo el objeto donde se guardara el mensaje devuelto
+            var response = new HttpResponseMessage();
+
+            //Creo una solicitud Http de tipo PUT
+            var request = new HttpRequestMessage(HttpMethod.Put, $"api/Usuarios/CambiarPassword");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+            //Agrego el JSON al BODY
+            request.Content = usuarioJson;
+            //Envio la solicitud HTTP
+            response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
             if (response.IsSuccessStatusCode)
                 return true;
             else

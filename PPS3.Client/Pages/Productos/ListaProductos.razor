@@ -5,7 +5,7 @@
 @*Con el atributo Authorize se procede a regular el acceso a toda la pagina por usuarios autorizados solamente*@
 @attribute [Authorize(Roles = "1, 2")]
 
-<MudText Align="Align.Center" Typo="Typo.h5">Listado de Productos</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Listado de Productos Activos</MudText>
 
 @if(productos == null)
 {
@@ -16,25 +16,25 @@ else
     <RadzenGrid Data="@productos" TItem="ProductoListado" AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowColumnResize=true>
         <Columns>
             <RadzenGridColumn TItem="ProductoListado" Property="NombreProd" Title="Nombre"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripcion"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="DescRubro" Title="Rubro"></RadzenGridColumn>
+            @*<RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripcion"></RadzenGridColumn>*@
+            <RadzenGridColumn TItem="ProductoListado" Property="DescRubro" Title="Rubro" Width="120px"></RadzenGridColumn>
             <RadzenGridColumn TItem="ProductoListado" Property="DescripcionTipo" Title="Tipo Producto"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="PrecioCosto" Title="Precio de Costo">
+            <RadzenGridColumn TItem="ProductoListado" Property="PrecioCosto" Title="Precio de Costo" Width="120px">
                 <Template Context="pcosto">
                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pcosto.PrecioCosto)
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="PrecioFinal" Title="Precio Final">
+            <RadzenGridColumn TItem="ProductoListado" Property="PrecioFinal" Title="Precio Final" Width="120px">
                 <Template Context="pfinal">
                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pfinal.PrecioFinal)
                 </Template>
             </RadzenGridColumn>
             <RadzenGridColumn TItem="ProductoListado" Property="NombreProv" Title="Proveedor"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="DescripcionUnidad" Title="Medido en"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="DescripcionUnidad" Title="Medido en" Width="100px"></RadzenGridColumn>
             @*<RadzenGridColumn TItem="ProductoListado" Property="CantMinAlerta" Title="Alerta de Cantidad"></RadzenGridColumn>*@
-            <RadzenGridColumn TItem="ProductoListado" Property="StockExistencia" Title="Stock Existencia"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="UsuarioCrea" Title="Creado por"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="UsuarioModif" Title="Modificado por"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="StockExistencia" Title="Stock" Width="100px"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="UsuarioCrea" Title="Creado por" Width="100px"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="UsuarioModif" Title="Modificado por" Width="100px"></RadzenGridColumn>
             @*<RadzenGridColumn TItem="ProductoListado" Property="FechaCrea" Title="Fecha Creacion"></RadzenGridColumn>*@
             <RadzenGridColumn TItem="ProductoListado" Property="FechaUltModif" Title="Fecha Ult. Modif."></RadzenGridColumn>
             <RadzenGridColumn TItem="ProductoListado" Property="IdProducto">
@@ -47,7 +47,7 @@ else
     </RadzenGrid>
 }
 
-<MudText Align="Align.Center" Typo="Typo.h6">Listado de Productos Inactivos</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-top:30px; margin-bottom:30px;">Listado de Productos Inactivos</MudText>
 
 @if(productos == null)
 {
@@ -58,25 +58,25 @@ else
     <RadzenGrid Data="@productosInactivos" TItem="ProductoListado" AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowColumnResize=true>
         <Columns>
             <RadzenGridColumn TItem="ProductoListado" Property="NombreProd" Title="Nombre"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripcion"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="DescRubro" Title="Rubro"></RadzenGridColumn>
+            @*<RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripcion"></RadzenGridColumn>*@
+            <RadzenGridColumn TItem="ProductoListado" Property="DescRubro" Title="Rubro" Width="120px"></RadzenGridColumn>
             <RadzenGridColumn TItem="ProductoListado" Property="DescripcionTipo" Title="Tipo Producto"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="PrecioCosto" Title="Precio de Costo">
+            <RadzenGridColumn TItem="ProductoListado" Property="PrecioCosto" Title="Precio de Costo" Width="120px">
                 <Template Context="pcosto">
                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pcosto.PrecioCosto)
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="PrecioFinal" Title="Precio Final">
+            <RadzenGridColumn TItem="ProductoListado" Property="PrecioFinal" Title="Precio Final" Width="120px">
                 <Template Context="pfinal">
                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pfinal.PrecioFinal)
                 </Template>
             </RadzenGridColumn>
             <RadzenGridColumn TItem="ProductoListado" Property="NombreProv" Title="Proveedor"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="DescripcionUnidad" Title="Medido en"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="DescripcionUnidad" Title="Medido en" Width="100px"></RadzenGridColumn>
             @*<RadzenGridColumn TItem="ProductoListado" Property="CantMinAlerta" Title="Alerta de Cantidad"></RadzenGridColumn>*@
-            <RadzenGridColumn TItem="ProductoListado" Property="StockExistencia" Title="Stock Existencia"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="UsuarioCrea" Title="Creado por"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="UsuarioModif" Title="Modificado por"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="StockExistencia" Title="Stock" Width="100px"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="UsuarioCrea" Title="Creado por" Width="100px"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="UsuarioModif" Title="Modificado por" Width="100px"></RadzenGridColumn>
             @*<RadzenGridColumn TItem="ProductoListado" Property="FechaCrea" Title="Fecha Creacion"></RadzenGridColumn>*@
             <RadzenGridColumn TItem="ProductoListado" Property="FechaUltModif" Title="Fecha Ult. Modif."></RadzenGridColumn>
             <RadzenGridColumn TItem="ProductoListado" Property="IdProducto">

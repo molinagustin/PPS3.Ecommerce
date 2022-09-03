@@ -1,4 +1,4 @@
-﻿using PPS3.Shared.Models;
+﻿using PPS3.Client.Pages.Presupuestos;
 
 namespace PPS3.Client.Services.ServRubro
 {
@@ -100,6 +100,36 @@ namespace PPS3.Client.Services.ServRubro
             return rubros;
         }
 
+        public async Task<IEnumerable<RubroCategoria>> ObtenerRubrosCategorias()
+        {
+            var response = await _httpClient.GetStreamAsync($"api/Rubros/ObtenerRubrosCategorias");
+
+            var rubros = await JsonSerializer.DeserializeAsync<IEnumerable<RubroCategoria>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            if (rubros != null)
+            {
+                var categorias = await ObtenerTiposProductosCategorias();
+
+                if (categorias != null)
+                {
+                    //Creo la lista donde se guardaran los rubros
+                    var listaRubros = new List<RubroCategoria>();
+
+                    foreach (var rub in rubros)
+                    {
+                        rub.Categorias = categorias.Where(x => x.Rubro == rub.IdRubro).ToList();
+                        listaRubros.Add(rub);
+                    }
+
+                    return listaRubros;
+                }
+                else
+                    return null;
+            }
+            else
+                return null;            
+        }
+
         public async Task<IEnumerable<RubroListado>> ObtenerRubrosListado()
         {
             //Obtengo el token de sesion del usuario
@@ -128,6 +158,15 @@ namespace PPS3.Client.Services.ServRubro
             }
             else
                 return null;
+        }
+
+        public async Task<IEnumerable<TipoProductoCategoria>> ObtenerTiposProductosCategorias()
+        {
+            var response = await _httpClient.GetStreamAsync($"api/Rubros/ObtenerTiposProductosCategorias");
+
+            var categorias = await JsonSerializer.DeserializeAsync<IEnumerable<TipoProductoCategoria>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            return categorias;
         }
     }
 }

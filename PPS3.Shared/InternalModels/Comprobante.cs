@@ -12,6 +12,8 @@ namespace PPS3.Shared.InternalModels
         public DateTime FechaComp { get; set; }
         public string Cliente { get; set; } = string.Empty;
         public string FormaP { get; set; } = string.Empty;
+        //Uso el TipoVta para representar si fue un comprobante a la Cuenta Corriente o Sin la CC
+        public int TipoVta { get; set; }
         [Column(TypeName = "decimal(10,2)")]
         public decimal ImporteFinal { get; set; }
         [Column(TypeName = "decimal(10,2)")]

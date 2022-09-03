@@ -97,8 +97,8 @@
 
 <MudDrawer @bind-Open="SideBarOpen" Elevation="1">
     <MudDrawerHeader>
-        <MudAvatar Color="Color.Transparent" Size="Size.Large" Image="images/ecommerce_logo.jpg"/>
-        <MudText Typo="Typo.h5" Color="Color.Primary" Style="margin-top:10px; margin-left:15px;">E-Commerce</MudText>
+        <MudAvatar Color="Color.Transparent" Size="Size.Large" Image="images/expo_ceramicas_logo.png" />
+        <MudText Typo="Typo.h5" Color="Color.Primary" Style="margin-top:10px; margin-left:15px;">Expo Ceramicas</MudText>
     </MudDrawerHeader>
 
     <MudNavMenu>
@@ -153,10 +153,10 @@
             </MudNavGroup>
         </MudNavGroup>
 
-        <MudNavGroup Title="Informes" Icon="@Icons.Filled.PieChart">
+        @*<MudNavGroup Title="Informes" Icon="@Icons.Filled.PieChart">
                 <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Sell">Informe de Ventas</MudNavLink>
                 <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.MoneyOff">Informe de Deudores</MudNavLink>
-        </MudNavGroup>
+        </MudNavGroup>*@
 
         <AuthorizeView Roles="1">
             <MudNavGroup Title="Consultas Varias" Icon="@Icons.Filled.Layers">
@@ -177,10 +177,10 @@
                     <MudNavLink Href="/registro" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
             </MudNavGroup>
 
-            <MudNavGroup Title="Configuraciones" Icon="@Icons.Filled.SettingsApplications">
+            @*<MudNavGroup Title="Configuraciones" Icon="@Icons.Filled.SettingsApplications">
                 <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Settings">Opcion 1</MudNavLink>
                 <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Settings">Opcion 2</MudNavLink>
-            </MudNavGroup>  
+            </MudNavGroup>*@
         </AuthorizeView>
     </MudNavMenu>
 </MudDrawer>

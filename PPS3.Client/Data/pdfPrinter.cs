@@ -31,12 +31,13 @@ namespace PPS3.Client.Data
 
         public bool GenerarPdfPresupuesto(Presupuesto presBase)
         {
-            //Compruebo la existencia del objeto y sis detalles
+            //Compruebo la existencia del objeto y sus detalles
             if (presBase == null || presBase.DetallePresupuesto == null || presBase.DetallePresupuesto.Count() < 1)
                 return false;
 
             //Guardo los datos basicos del encabezado
             var numPres = presBase.NumPresu;
+            var cliente = presBase.Cliente;
             var observ = "NINGUNA";
             if(!string.IsNullOrEmpty(presBase.Observaciones))
                 observ = presBase.Observaciones;
@@ -59,14 +60,14 @@ namespace PPS3.Client.Data
 
             //Armo el encabezado
             Paragraph espacioBlanco = new Paragraph("\n");
-            var rutaImg = _env.WebRootFileProvider.GetFileInfo("images/ecommerce_logo.jpg").PhysicalPath;
+            var rutaImg = _env.WebRootFileProvider.GetFileInfo("images/expo_ceramicas_logo.png").PhysicalPath;
             Image logo = new Image(ImageDataFactory
                 .Create(rutaImg))
                 .SetHeight(50)
                 .SetWidth(50)
                 .SetTextAlignment(TextAlignment.LEFT);
 
-            Paragraph headNumPer = new Paragraph("PRESUPUESTO Nº " + numPres + "\n" + "GENERAL ALVEAR, MENDOZA - " + fecha)
+            Paragraph headNumPer = new Paragraph("PRESUPUESTO Nº " + numPres + "\n" + "GENERAL ALVEAR, MENDOZA - " + fecha + "\n" + "CLIENTE: " + cliente)
                 .SetTextAlignment(TextAlignment.RIGHT)
                 .SetBold()
                 .SetFontSize(12);

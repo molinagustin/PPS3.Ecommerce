@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using PPS3.Shared.InternalModels;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -13,13 +14,15 @@ namespace PPS3.Server.Controllers
     {
         private readonly IRepUsuario _repUsuario;
         private readonly IRepCliente _repCliente;
+        private readonly IRepEncabezadoCuentaCorriente _repCuentaCorriente;
         private readonly IRepPrivilegio _repPrivilegio;
         private readonly IConfiguration _config;
 
-        public UsuariosController(IRepUsuario repUsuario, IRepCliente repCliente, IRepPrivilegio repPrivilegio, IConfiguration config)
+        public UsuariosController(IRepUsuario repUsuario, IRepCliente repCliente, IRepEncabezadoCuentaCorriente repCuentaCorriente, IRepPrivilegio repPrivilegio, IConfiguration config)
         {
             _repUsuario = repUsuario;
             _repCliente = repCliente;
+            _repCuentaCorriente = repCuentaCorriente;
             _repPrivilegio = repPrivilegio;
             _config = config;
         } 
@@ -72,8 +75,23 @@ namespace PPS3.Server.Controllers
                 {
                     usuarioCliente.IdCliente = clienteResponse;
                     var response = await _repUsuario.CrearUsuario(usuarioCliente);
-                    if (response != false)
-                        return Ok();
+                    //Si se creo el usuario, procedo a crearle la cuenta corriente
+                    if (response > 0)
+                    {
+                        //Le creo su cuenta corriente, asignando el Id del Cliente y el Id del Usuario
+                        EncabezadoCuentaCorriente nuevaCuenta = new EncabezadoCuentaCorriente();
+                        nuevaCuenta.ClienteCC = clienteResponse;
+                        nuevaCuenta.UsuarioCrea = response;
+                        nuevaCuenta.UsuarioModif = response;
+
+                        var nuevaCuentaCreada = await _repCuentaCorriente.InsertarCuentaCorriente(nuevaCuenta);
+
+                        //Si fue creada correctamente, devuelvo OK
+                        if(nuevaCuentaCreada)
+                            return Ok();
+                        else
+                            return BadRequest();
+                    }                       
                     else
                         return BadRequest();
                 }
@@ -93,6 +111,46 @@ namespace PPS3.Server.Controllers
             if (ModelState.IsValid)
             {
                 var response = await _repUsuario.ActualizarUsuario(usuario);
+                if (response != false)
+                    return Ok();
+                else
+                    return StatusCode(500);
+            }
+            else
+                return Problem();
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> ActualizarPerfilUsuario([FromBody] UsuarioCliente usuario)
+        {
+            if (usuario == null)
+                return BadRequest();            
+
+            if (ModelState.IsValid)
+            {
+                //Valido que la contraseña ingresada coincida y genere el mismo hash que posee el usuario original
+                if (!_repUsuario.ValidarHash(usuario.Password, usuario.SaltCont, usuario.HashCont))
+                    return BadRequest();
+
+                var response = await _repUsuario.ActualizarPerfilUsuario(usuario);
+                if (response != false)
+                    return Ok();
+                else
+                    return StatusCode(500);
+            }
+            else
+                return Problem();
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> CambiarPassword([FromBody] UsuarioCliente usuario)
+        {
+            if (usuario == null)
+                return BadRequest();
+
+            if (ModelState.IsValid)
+            {
+                var response = await _repUsuario.CambiarPassword(usuario);
                 if (response != false)
                     return Ok();
                 else

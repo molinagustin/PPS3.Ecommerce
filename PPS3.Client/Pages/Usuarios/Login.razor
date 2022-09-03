@@ -4,18 +4,20 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 
+<MudText Typo="Typo.h4" Align="Align.Center" Style="margin-bottom:30px;">Ingresar al sitio</MudText>
+
 <EditForm Model="@usuarioReq" OnValidSubmit="@Validar">
     <DataAnnotationsValidator/>
-    <MudGrid Justify="Justify.Center">
+    <MudGrid Justify="Justify.Center" Style="margin-bottom:30px;">
         <MudItem xs="5">
-            <MudCardMedia Image="images/ecommerce_logo.jpg" Height="300"/>
+            <MudCardMedia Image="images/expo_ceramicas_logo_login.png" Height="300" />
         </MudItem>
 
         <MudItem xs="5" >
             <MudCard>
                 <MudCardHeader>
                     <CardHeaderContent>
-                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Iniciar Sesion</MudText>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos de Inicio Sesion</MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent>
@@ -34,6 +36,16 @@
         </MudItem>
     </MudGrid>
 </EditForm>
+
+<MudGrid Justify="Justify.Center">
+    <MudPaper Class="pa-1 ma-2" Elevation="1" Style="background-color:#594ae2; margin-bottom:25px;" Width="100%" Height="20px;"/>
+
+    <MudPaper Class="pa-1 ma-2" Elevation="1" Style="background-color:#594ae2; margin-bottom:25px;" Width="75%" Height="15px;" />
+
+    <MudPaper Class="pa-1 ma-2" Elevation="1" Style="background-color:#594ae2; margin-bottom:25px;" Width="50%" Height="10px;" />
+
+</MudGrid>
+
 
 @code {
     //Objeto que guardara los datos de login

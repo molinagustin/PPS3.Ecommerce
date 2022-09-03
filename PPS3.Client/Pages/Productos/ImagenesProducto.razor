@@ -9,52 +9,63 @@
     <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
 </AuthorizeView>
 
-<MudText Align="Align.Center" Typo="Typo.h5">Imagenes</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Cargar Imagenes del Producto</MudText>
 
-<MudItem xs="4">
+<MudGrid Style="margin-bottom:30px;">
+    <MudItem xs="4">
         <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Primary" Variant="Variant.Outlined" OnClick="Volver" Size="Size.Small">Volver</MudButton>
-</MudItem>
+    </MudItem>
 
-<MudItem xs="4">
+    <MudItem xs="4">
         <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Primary">Las imagenes seleccionadas se guardan automaticamente</MudText>
-        <InputFile OnChange="OnInputFileChanged" multiple/>
-</MudItem>
+        <MudText Align="Align.Center" Typo="Typo.body1" Color="Color.Default"><b>¡Para una correcta visualizacion, usar imagenes de 100px x 100px maximo!</b></MudText>
+        <MudGrid Justify="Justify.Center" Style="margin-top:30px;">
+            <InputFile OnChange="OnInputFileChanged"/>
+        </MudGrid>        
+    </MudItem>
+</MudGrid>
 
-<MudText Align="Align.Center" Typo="Typo.h5">Imagenes Guardadas</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Imagenes Guardadas</MudText>
 
-<MudGrid>
-    <MudItem xs="12" md="9">
-        <MudStack Row="true" Style="max-width:max-content;">            
-            @if(imagenes != null && imagenes.Count() > 0)
+<MudGrid Justify="Justify.Center">
+    @if (imagenes != null && imagenes.Count() > 0)
+    {
+        <MudStack Row="true" Style="max-width:max-content; margin-top:30px;">
+            @foreach (var image in imagenes)
             {
-                @foreach(var image in imagenes)
-                {
-                    <MudItem xs="3">
-                        <MudCard>                    
-                            <MudCardContent>
-                                <MudImage Elevation="2" ObjectFit="ObjectFit.Fill" Src="@image.UrlImagen" Style="width:250px; height:250px; margin:5px;"/>
-                            </MudCardContent>
-                            <MudCardActions>
-                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => BorrarImagen(image.IdImg))"/>
-                                    @if(image.Principal)
-                                    {
-                                        <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Primary"/>
-                                    }
-                                    else
-                                    {
-                                        <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" OnClick="@(() => ImagenFavorita(image))"/>
-                                    }
-                            </MudCardActions>                    
-                        </MudCard>
-                    </MudItem>
-                }
-            }            
-            else
-            {
-                <MudText Align="Align.Center" Typo="Typo.h5" Color="Color.Error">El producto no posee imagenes todavia</MudText>
+                <MudItem>
+                    <MudCard>
+                        <MudCardContent>
+                            <MudImage Elevation="0" ObjectFit="ObjectFit.Fill" Src="@image.UrlImagen" Style="width:250px; height:250px;" />
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudGrid Justify="Justify.Center">
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => BorrarImagen(image.IdImg))" />
+                                @if (image.Principal)
+                                {
+                                    <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Primary" />
+                                }
+                                else
+                                {
+                                    <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" OnClick="@(() => ImagenFavorita(image))" />
+                                }
+                            </MudGrid>                            
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
             }
         </MudStack>
-    </MudItem>    
+    }
+    else
+    {
+        <MudItem lg="4"></MudItem>
+        <MudItem lg="4">
+            <MudText Align="Align.Center" Typo="Typo.h5" Color="Color.Error">El producto no posee imagenes todavia</MudText>
+         </MudItem> 
+         <MudItem lg="4">
+
+         </MudItem>
+    }
 </MudGrid>
 
 @code {
@@ -70,35 +81,46 @@
     //private IList<string> imagesDataUrls = new List<string>();
 
     IEnumerable<ImagenProducto>? imagenes;
-    private int maxAllowedFiles = 10;
+    private int maxAllowedFiles = 1;
     private string format = "image/png";
 
     private async Task OnInputFileChanged(InputFileChangeEventArgs e)
     {
-        foreach(var imageFile in e.GetMultipleFiles(maxAllowedFiles))
+        var cantImgSum = e.FileCount;
+        if(cantImgSum == 1)
         {
-            var resisedFile = await imageFile.RequestImageFileAsync(format, 250, 250);
-            var buffer = new byte[resisedFile.Size];
-
-            await resisedFile.OpenReadStream().ReadAsync(buffer);
-
-            //var imageDataUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
-            //var imageBytes = System.Convert.FromBase64String(Convert.ToBase64String(buffer));
-            //var imageStrng = System.Convert.ToBase64String(imageBytes);
-            //imagesDataUrls.Add(imageDataUrl);
-
-            var imagen = new ImagenProducto()
+            if(imagenes == null || imagenes.Count() < 5)
             {
-                IdProducto = id,
-                Contenido = buffer,
-                UsuarioCrea = idUsAct,
-                UsuarioModif = idUsAct
-            };
+                foreach (var imageFile in e.GetMultipleFiles(maxAllowedFiles))
+                {
+                    var resisedFile = await imageFile.RequestImageFileAsync(format, 250, 170);
+                    var buffer = new byte[resisedFile.Size];
 
-            await ServImagenProducto.GuardarImagen(imagen);
+                    await resisedFile.OpenReadStream().ReadAsync(buffer);
+
+                    //var imageDataUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+                    //var imageBytes = System.Convert.FromBase64String(Convert.ToBase64String(buffer));
+                    //var imageStrng = System.Convert.ToBase64String(imageBytes);
+                    //imagesDataUrls.Add(imageDataUrl);
+
+                    var imagen = new ImagenProducto()
+                        {
+                            IdProducto = id,
+                            Contenido = buffer,
+                            UsuarioCrea = idUsAct,
+                            UsuarioModif = idUsAct
+                        };
+
+                    await ServImagenProducto.GuardarImagen(imagen);
+                }
+
+                NavigationManager.NavigateTo($"/detallesProducto/imagenes/{id}", forceLoad: true);
+            }
+            else
+                Snackbar.Add($"Solo se pueden cargar hasta 5 imagenes por producto. Debera borrar alguna ya cargada.", Severity.Info);
         }
-
-        NavigationManager.NavigateTo($"/detallesProducto/imagenes/{id}", forceLoad: true);
+        else
+            Snackbar.Add($"Cargar 1 imagen a la vez", Severity.Info);
     }
 
     protected override async Task OnInitializedAsync()

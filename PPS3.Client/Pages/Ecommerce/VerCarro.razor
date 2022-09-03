@@ -1,9 +1,143 @@
 ﻿@page "/verCarro/{id:int}"
+@inject IServCarroCompra ServCarro
+@inject IServDetalleCarroCompra ServDetalleCarro
+@using Radzen.Blazor
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
+@inject IDialogService DialogService
 
-<h3>VerCarro</h3>
+<AuthorizeView Context="usCont">
+    <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+</AuthorizeView>
+
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Productos en Carro Compras</MudText>
+
+@if(carro == null || detalles == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+}
+else
+{
+    @if(detalles.Count() > 0)
+    {     
+        <RadzenGrid Data="@detalles" TItem="DetalleCarroCompra" PageSize="15">
+            <Columns>
+                <RadzenGridColumn TItem="DetalleCarroCompra" Width="10px" TextAlign="Radzen.TextAlign.Center" Property="IdDetalle" Title="#">
+                    <Template Context="data">
+                        @(detalles.ToList().IndexOf(data) + 1)
+                    </Template>
+                </RadzenGridColumn>
+                <RadzenGridColumn TItem="DetalleCarroCompra" Width="40px" TextAlign="Radzen.TextAlign.Center" Property="NombreProducto" Title="Producto">
+                    <Template Context="prod">
+                        <RadzenImage Path="@prod.UrlImagen" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px; float: left;" />
+                        <h6 class="mt-1 mb-0">@prod.NombreProducto</h6>
+                    </Template>
+                </RadzenGridColumn>
+                <RadzenGridColumn TItem="DetalleCarroCompra" TextAlign="Radzen.TextAlign.Center" Property="Descripcion" Title="Descripcion" Width="50px"></RadzenGridColumn>
+                <RadzenGridColumn TItem="DetalleCarroCompra" Property="Cantidad" Title="Cantidad" Width="10px"></RadzenGridColumn>
+                <RadzenGridColumn TItem="DetalleCarroCompra" Property="DescripcionUnidad" Title="Unidad Medida" Width="15px"></RadzenGridColumn>
+                <RadzenGridColumn TItem="DetalleCarroCompra" Property="PrecioUnit" Title="Precio" Width="15px">
+                    <Template Context="precio">
+                        @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", precio.PrecioUnit)
+                    </Template>
+                    <FooterTemplate>
+                        @string.Format("TOTAL: ")
+                    </FooterTemplate>
+                </RadzenGridColumn>
+                <RadzenGridColumn TItem="DetalleCarroCompra" Property="SubTotal" Title="Sub Total" Width="15px">
+                    <Template Context="stot">
+                        @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", stot.SubTotal)
+                    </Template>
+                    <FooterTemplate>                    
+                        @if(detalles != null)
+                        {                            
+                            <b>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", detalles.Sum(s => s.SubTotal))</b>
+                        }
+                    </FooterTemplate>
+                </RadzenGridColumn>
+                <RadzenGridColumn Width="10px" TItem="DetalleCarroCompra" Property="IdDetalle">
+                    <Template Context="data">
+                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Icon="highlight_off" Class="m-1" Click="@(() => EliminarProducto(data.IdDetalle))" Size="Radzen.ButtonSize.Small" Text="Quitar"/>
+                    </Template>
+                </RadzenGridColumn>
+            </Columns>
+        </RadzenGrid>
+        <br />
+        <MudGrid Justify="Justify.FlexEnd">
+            <MudButton StartIcon="@Icons.Material.Filled.ShoppingCartCheckout" Color="Color.Primary" Variant="Variant.Outlined" OnClick="RealizarPedido" Style="margin-right:10px;">Realizar Pedido</MudButton>
+        </MudGrid>
+    }
+    else
+    {
+        <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Info">No tienes ningun producto, ¡ve a comprar algo!</MudText>
+    }
+}
 
 @code {
     //Parametro que se recibe por URL para una consulta del objeto
     [Parameter]
     public int id { get; set; }
+
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
+    CarroCompra carro = new CarroCompra();
+    IEnumerable<DetalleCarroCompra> detalles;
+
+    //Guardo el ID del usuario actual
+    protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+
+    protected override async Task OnInitializedAsync()
+    {
+        carro = await ServCarro.ObtenerCarro(id);
+        detalles = await ServDetalleCarro.ObtenerDetallesCarro(id);
+    }
+
+    private async Task EliminarProducto(int idDetalle)
+    {
+        var borrado = await ServDetalleCarro.BorrarDetalle(idDetalle);
+        if(borrado)
+            NavigationManager.NavigateTo($"/verCarro/{id}", forceLoad:true);
+        else
+            Snackbar.Add($"No se pudo quitar el detalle.", Severity.Error);
+    }
+
+    private async Task RealizarPedido()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var dialog = DialogService.Show<DialogOrder>("Confirmar Pedido", options);
+        var result = await dialog.Result;
+
+        if(!result.Cancelled)
+        {
+            //Actualizar los datos del carro activo y crear uno nuevo
+            // Estado PENDIENTE (Lo revisa un admin para aprobarlo y entregar los productos)
+            carro.Estado = 2;
+            carro.FechaOrden = DateTime.Now;
+            carro.Total = detalles.Sum(s => s.SubTotal);
+
+            //Actualizo el carro
+            var carroActualizado = await ServCarro.GuardarCarro(carro);
+            if(carroActualizado)
+            {
+                //Le creo el nuevo carro en estado Activo y redirijo el usuario al listado de compras
+                CarroCompra nuevoCarro = new CarroCompra();
+                nuevoCarro.UsuarioCarro = carro.UsuarioCarro;
+                var carroCreado = await ServCarro.GuardarCarro(nuevoCarro);
+
+                if(carroCreado)
+                {
+                    //NavigationManager.NavigateTo($"/verCompras/{nuevoCarro.UsuarioCarro}");
+                    NavigationManager.NavigateTo($"/verCompras");
+                    StateHasChanged();
+                    Snackbar.Add($"Orden #{carro.IdCarro} solicitada de forma exitosa", Severity.Success);
+                }
+                else
+                    Snackbar.Add($"No se pudo crear el nuevo carro activo", Severity.Error);
+            }
+            else
+                Snackbar.Add($"No se pudo actualizar el carro para generar la orden", Severity.Error);
+        }
+    }
 }

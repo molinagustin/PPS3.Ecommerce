@@ -57,6 +57,18 @@ namespace PPS3.Server.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet("{busqueda}")]
+        public async Task<ActionResult<IEnumerable<ProductoListado>>> ObtenerProductosPorBusqueda(string busqueda)
+        {
+            var response = await _repProducto.ObtenerProductosPorBusqueda(busqueda);
+
+            if (response != null)
+                return Ok(response);
+            else
+                return BadRequest();
+        }
+
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductoListado>>> ObtenerUltimos5Productos()
         {
@@ -84,6 +96,17 @@ namespace PPS3.Server.Controllers
             else
                 return BadRequest();
         }
+        [AllowAnonymous]
+        [HttpGet("{idTipoProd:int}")]
+        public async Task<ActionResult<IEnumerable<ProductoListado>>> ObtenerProductosPorTipoProducto(int idTipoProd)
+        {
+            var response = await _repProducto.ObtenerProductosPorTipoProducto(idTipoProd);
+
+            if (response != null)
+                return Ok(response);
+            else
+                return BadRequest();
+        }
 
         [HttpGet("{id:int}")]
         public async Task<ActionResult<int>> UltimoProductoCreado(int idUsuario)
@@ -91,6 +114,17 @@ namespace PPS3.Server.Controllers
             var response = await _repProducto.UltimoProductoCreado(idUsuario);
 
             if (response > 0)
+                return Ok(response);
+            else
+                return BadRequest();
+        }
+
+        [HttpGet("{idCarro:int}")]
+        public async Task<ActionResult<IEnumerable<ProductoListado>>> ObtenerProductosCarro(int idCarro)
+        {
+            var response = await _repProducto.ObtenerProductosCarro(idCarro);
+
+            if (response != null)
                 return Ok(response);
             else
                 return BadRequest();

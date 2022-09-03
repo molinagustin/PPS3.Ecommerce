@@ -10,7 +10,7 @@
     <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
 </AuthorizeView>
 
-<MudText Align="Align.Center" Typo="Typo.h5">Detalles de Proveedor</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Detalles de Proveedor</MudText>
 
 <EditForm Model="@prov" OnValidSubmit="GuardarProveedor" Context="conForm">
     <DataAnnotationsValidator/>
@@ -85,8 +85,8 @@
 
         if (result)
         {              
-            //Se redirige hacia el listado de productos
-            NavigationManager.NavigateTo("/listaProveedores");
+            //Se redirige hacia la pagina para agregar un contacto de proveedor
+            NavigationManager.NavigateTo("/detallesContactosProv");
             Snackbar.Add($"Proveedor agregado de forma exitosa", Severity.Success);
         }        
         else

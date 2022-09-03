@@ -2,7 +2,7 @@
 @inject IServTipoProducto ServTipoProd
 @attribute [Authorize(Roles = "1, 2")]
 
-<MudText Align="Align.Center" Typo="Typo.h5">Listado de Tipos de Productos</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Listado de Tipos de Productos</MudText>
 
 @if(tiposProdList == null)
 {
@@ -20,6 +20,7 @@ else
         </ToolBarContent>
         <HeaderContent>
             <MudTh>Tipo de Producto</MudTh>
+            <MudTh>Rubro</MudTh>
             <MudTh>Activo</MudTh>
             <MudTh>Creado por</MudTh>
             <MudTh>Modificado por</MudTh>
@@ -28,6 +29,7 @@ else
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Tipo de Producto">@context.DescripcionTipo</MudTd>
+            <MudTd DataLabel="Rubro">@context.Rubro</MudTd>
             <MudTd DataLabel="Activo">@context.Activo</MudTd>
             <MudTd DataLabel="Creado por">@context.UsuarioCrea</MudTd>
             <MudTd DataLabel="Modificado por">@context.UsuarioModif</MudTd>

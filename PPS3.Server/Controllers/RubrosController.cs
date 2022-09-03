@@ -20,6 +20,22 @@ namespace PPS3.Server.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<RubroCategoria>>> ObtenerRubrosCategorias()
+        {
+            var response = await _repRubro.ObtenerRubrosCategorias();
+            return Ok(response);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<TipoProductoCategoria>>> ObtenerTiposProductosCategorias()
+        {
+            var response = await _repRubro.ObtenerTiposProductosCategorias();
+            return Ok(response);
+        }
+
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<Rubro>> ObtenerRubro(int id)
         {

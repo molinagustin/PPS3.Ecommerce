@@ -56,6 +56,16 @@ namespace PPS3.Server.Controllers
         }
 
         [HttpGet("{idUsuario}")]
+        public async Task<ActionResult<IEnumerable<OrdenesCompraListado>>> ObtenerOrdenesCompraUsuario(int idUsuario)
+        {
+            var response = await _repCarroCompra.ObtenerOrdenesCompraUsuario(idUsuario);
+            if (response != null)
+                return Ok(response);
+            else
+                return BadRequest();
+        }
+
+        [HttpGet("{idUsuario}")]
         public async Task<ActionResult<CarroCompra>> ObtenerCarroActivoUsuario(int idUsuario)
         {
             var response = await _repCarroCompra.ObtenerCarroActivoUsuario(idUsuario);
@@ -66,7 +76,7 @@ namespace PPS3.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> CrearCarroCompra([FromBody] int idUsuario)
+        public async Task<ActionResult<int>> CrearCarroCompra(int idUsuario)
         {
             if (idUsuario < 1)
                 return BadRequest();

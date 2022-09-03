@@ -2,7 +2,7 @@
 @inject IServFormaPago ServFormaPago
 @attribute [Authorize(Roles = "1")]
 
-<MudText Align="Align.Center" Typo="Typo.h5">Listado de Formas Pago</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Listado de Formas Pago</MudText>
 
 @if(formasP == null)
 {
@@ -17,21 +17,21 @@ else
             <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>Id Forma Pago</MudTh>
+            <MudTh Style="width:100px;">Id Forma Pago</MudTh>
             <MudTh>Forma de Pago</MudTh>
             <MudTh>Activo</MudTh>
-            <MudTh>Usuario Creacion</MudTh>
+            @*<MudTh>Usuario Creacion</MudTh>*@
             <MudTh>Fecha Creacion</MudTh>
             <MudTh>Usuario Ult. Modif.</MudTh>
-            <MudTh>Fecha Ult. Modif.</MudTh>
+            @*<MudTh>Fecha Ult. Modif.</MudTh>*@
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Id Forma Pago">@context.IdFormaP</MudTd>
             <MudTd DataLabel="Forma de Pago">@context.FormaP</MudTd>
             <MudTd DataLabel="Activo">@context.Activo</MudTd>
-            <MudTd DataLabel="Usuario Creacion">@context.UsuarioCrea</MudTd>
+            @*<MudTd DataLabel="Usuario Creacion">@context.UsuarioCrea</MudTd>*@
             <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
-            <MudTd DataLabel="Usuario Ult. Modif.">@context.UsuarioModif</MudTd>
+            @*<MudTd DataLabel="Usuario Ult. Modif.">@context.UsuarioModif</MudTd>*@
             <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>
         </RowTemplate>
         <PagerContent>

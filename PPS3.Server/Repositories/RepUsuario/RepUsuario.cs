@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using PPS3.Shared.InternalModels;
+using PPS3.Shared.Models;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -64,7 +66,7 @@ namespace PPS3.Server.Repositories.RepUsuario
             return result > 0;
         }
 
-        public async Task<bool> CrearUsuario(UsuarioCliente usuarioCliente)
+        public async Task<int> CrearUsuario(UsuarioCliente usuarioCliente)
         {
             var db = dbConnection();
 
@@ -100,7 +102,26 @@ namespace PPS3.Server.Repositories.RepUsuario
                 usuarioCliente.IdCliente,
                 usuarioCliente.Email
             });
-            return result > 0;
+
+            if (result > 0)
+            {
+                //Obtengo el ID del nuevo usuario creado
+                var nuevoId = await ObtenerUltimoIdCreado(usuarioCliente.NombreUs);
+                if (nuevoId > 0)
+                {
+                    //Le creo un carro de compras nuevo a ese usuario
+                    var carroCreado = await CrearCarroNuevoUsuario(nuevoId);
+                    //Si se creo correctamente el carro, devuelvo el Id del Usuario para que pueda utilizarlo en otras llamadas
+                    if (carroCreado)
+                        return nuevoId;
+                    else
+                        return 0;
+                }
+                else
+                    return 0;
+            }
+            else
+                return 0;
         }
 
         public async Task<Usuario> ObtenerUsuario(int id)
@@ -195,6 +216,130 @@ namespace PPS3.Server.Repositories.RepUsuario
                         ";
 
             var result = await db.ExecuteScalarAsync<int>(sql, new { NombreUs = nombreUsuario });
+            return result > 0;
+        }
+
+        public async Task<int> ObtenerUltimoIdCreado(string NombreUs)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT MAX(IdUsuarioAct)
+                        FROM usuarios
+                        WHERE NombreUs = @NombreUs
+                        ";
+            //Uso ExecuteScalar para obtener solo el ID del cliente. Tambien le especifico de que tipo es el dato que quiero obtener
+            var result = await db.ExecuteScalarAsync<int>(sql, new { NombreUs });
+            return result;
+        }
+
+        public async Task<bool> CrearCarroNuevoUsuario(int idUsuario)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        INSERT INTO carros_compras(
+                                            UsuarioCarro
+                                            )
+                        VALUES (
+                                @UsuarioCarro
+                                )
+                        ";
+
+            var result = await db.ExecuteAsync(sql, new{ UsuarioCarro = idUsuario });
+
+            return result > 0;
+        }
+
+        public async Task<bool> ActualizarPerfilUsuario(UsuarioCliente usuario)
+        {
+            //Actualizo los datos del usuario
+            var db = dbConnection();
+
+            var sql = @"
+                        UPDATE usuarios
+                        SET
+                            NombreCompleto = @NombreCompleto,
+                            Email = @Email,
+                            FechaUltModif = @FechaUltModif
+                        WHERE IdUsuarioAct = @IdUsuarioAct
+                        ";
+
+            var result = await db.ExecuteAsync(sql, new
+            {
+                usuario.NombreCompleto,
+                usuario.Email,
+                FechaUltModif = DateTime.Now,
+                usuario.IdUsuarioAct
+            });
+
+            //Si se actualizaron correctamente, actualizo los datos del cliente
+            if (result > 0)
+            {
+                sql = "";
+                sql = @"
+                        UPDATE clientes
+                        SET
+                            TipoCliente=@TipoCliente,
+                            Genero=@Genero,
+                            TipoDocumento=@TipoDocumento,
+                            NumDocumento=@NumDocumento,
+                            NombreCompleto=@NombreCompleto,
+                            CondIva=@CondIva,
+                            DomicilioC=@DomicilioC,
+                            Telefono=@Telefono,
+                            LocalidadC=@LocalidadC,
+                            FechaUltModif=@FechaUltModif
+                        WHERE IdCliente=@IdCliente
+                        ";
+                
+                var resultCl = await db.ExecuteAsync(sql, new
+                {
+                    usuario.TipoCliente,
+                    usuario.Genero,
+                    usuario.TipoDocumento,
+                    usuario.NumDocumento,
+                    usuario.NombreCompleto,
+                    usuario.CondIva,
+                    usuario.DomicilioC,
+                    usuario.Telefono,
+                    usuario.LocalidadC,
+                    FechaUltModif = DateTime.Now,
+                    usuario.IdCliente
+                });
+
+                //Devuelvo la comprobacion de si fueron actualizados los datos
+                return resultCl > 0;
+            }
+            else
+                return false;
+        }
+
+        public async Task<bool> CambiarPassword(UsuarioCliente usuarioCliente)
+        {
+            var nuevoHash = CrearHash(usuarioCliente.CambioPassword, usuarioCliente.SaltCont);
+
+            if (string.IsNullOrEmpty(nuevoHash))
+                return false;
+
+            usuarioCliente.HashCont = nuevoHash;
+
+            var db = dbConnection();
+
+            var sql = @"
+                        UPDATE usuarios
+                        SET
+                            HashCont = @HashCont,
+                            FechaUltModif = @FechaUltModif
+                        WHERE IdUsuarioAct = @IdUsuarioAct
+                        ";
+
+            var result = await db.ExecuteAsync(sql, new
+            {
+                usuarioCliente.HashCont,
+                FechaUltModif = DateTime.Now,
+                usuarioCliente.IdUsuarioAct
+            });
             return result > 0;
         }
     }
