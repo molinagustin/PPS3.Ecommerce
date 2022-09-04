@@ -10,6 +10,9 @@
 *.userosscache
 *.sln.docstates
 
+#PERSONALIZADOS
+PPS3.Server/appsettings.*
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
