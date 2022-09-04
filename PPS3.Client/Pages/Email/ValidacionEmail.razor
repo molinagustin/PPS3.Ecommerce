@@ -1,0 +1,77 @@
+﻿@page "/validacionEmail/{id:int}"
+@inject IServUsuario ServUsuario
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS /*JS Interop*/
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@attribute [Authorize]
+
+<AuthorizeView>
+    <Authorized>
+        <input type="hidden" id="UsAct" value="@context.User.Claims.First().Value" />
+    </Authorized>
+    <NotAuthorized>
+        <input type="hidden" id="UsAct" value="0" />
+    </NotAuthorized>
+</AuthorizeView>
+
+@if (id > 0 && (id == idUsAct))
+{    
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="3"></MudItem>
+        <MudItem xs="6">
+                <MudText Align="Align.Center" Typo="Typo.h4">Validando Correo</MudText>
+                <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
+        </MudItem>
+        <MudItem xs="3"></MudItem>
+    </MudGrid>
+}
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
+    Usuario usuario = new Usuario();
+
+    //Guardo el ID del usuario actual
+    protected override async Task OnAfterRenderAsync(bool firstRender) 
+    {
+        idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+
+        if(idUsAct > 0)
+        {
+            usuario = await ServUsuario.ObtenerUsuario(idUsAct);
+
+            if(usuario.IdUsuarioAct == id)
+            {
+                if(!usuario.EmailVerificado)
+                {
+                    StateHasChanged();
+                    usuario.EmailVerificado = true;
+                    var validado = await ServUsuario.ActualizarUsuario(usuario);
+                    if (validado)
+                    {
+                        NavigationManager.NavigateTo("/");
+                        Snackbar.Add($"Correo validado exitosamente", Severity.Success);
+                    }
+                    else
+                    {
+                        NavigationManager.NavigateTo("/");
+                        Snackbar.Add($"No se pudo validar el correo, compruebe los datos suministrados", Severity.Error);
+                    }
+                }
+                else
+                    NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/");
+                Snackbar.Add($"El usuario y la verificacion no coinciden", Severity.Error);
+            }
+        }
+        else
+            NavigationManager.NavigateTo("/");
+    }
+}

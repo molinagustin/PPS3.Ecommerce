@@ -4,6 +4,7 @@
 @inject IServCondicionIVA ServCondIVA
 @inject IServTipoDocumento ServTipoDoc
 @inject IServLocalidad ServLocalidad
+@inject IServEmail ServEmail
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @inject IJSRuntime JS /*JS Interop*/
@@ -37,14 +38,43 @@ else
                         <MudTextField Label="Nombre de Usuario" @bind-Value="usuarioCliente.NombreUs" ReadOnly=true />
                         @if (usuario.EmailVerificado)
                         {
-                                <MudTextField Label="Email" HelperText="Correo electronico" @bind-Value="usuarioCliente.Email" ReadOnly=true/>
+                            <MudGrid Justify="Justify.Center">
+                                <MudItem xs="6">
+                                    <MudTextField Label="Email" HelperText="Correo electronico" @bind-Value="usuarioCliente.Email" ReadOnly=true />
+                                </MudItem>
+                                <MudItem xs="3">
+                                    <MudText Color="Color.Success" Style="margin-top:20px;">Email Verificado</MudText>
+                                </MudItem>
+                                <MudItem xs="3">
+                                    <MudIcon Icon="@Icons.Filled.Check" Color="Color.Success" Style="margin-top:20px;"></MudIcon>
+                                </MudItem>
+                            </MudGrid>                                
                         }
                         else
                         {
-                                <MudTextField Label="Email" HelperText="Correo electronico" @bind-Value="usuarioCliente.Email" For="@(() => usuarioCliente.Email)"/>
+                            <MudGrid Justify="Justify.Center">
+                                <MudItem xs="6">
+                                    <MudTextField Label="Email" HelperText="Correo electronico" @bind-Value="usuarioCliente.Email" For="@(() => usuarioCliente.Email)" Immediate=true/>
+                                </MudItem>
+                                <MudItem xs="4">
+                                    <MudGrid Justify="Justify.Center" Style="margin-top:20px;">
+                                        @if(!enviandoEmail)
+                                        {
+                                            <MudButton EndIcon="@Icons.Material.Filled.Send" Color="Color.Info" Variant="Variant.Outlined" OnClick="EnviarEmail" Disabled=enviandoEmail>Reenviar Email de Verificacion</MudButton>  
+                                        }
+                                        else
+                                        {
+                                            <MudProgressCircular Color="Color.Info" Indeterminate="true"/>
+                                        }
+                                    </MudGrid>
+                                </MudItem>
+                                <MudItem xs="2">
+                                    
+                                </MudItem>
+                            </MudGrid>                                
                         }
 
-                        <MudTextField Label="Contraseña Actual" HelperText="Minimo 4 caracteres" Class="mt-3" @bind-Value="usuarioCliente.Password" For="@(() => usuarioCliente.Password)" InputType="InputType.Password" />
+                        <MudTextField Label="Contraseña Actual" HelperText="Minimo 4 caracteres" @bind-Value="usuarioCliente.Password" For="@(() => usuarioCliente.Password)" InputType="InputType.Password" />
 
                         <MudTextField Label="Nueva Contraseña" HelperText="Minimo 4 caracteres" Class="mt-3" @bind-Value="passNuevo" For="@(() => usuarioCliente.CambioPassword)" InputType="InputType.Password" />
 
@@ -143,7 +173,7 @@ else
 
                     </MudCardContent>
                     <MudCardActions>
-                        <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Save" Color="Color.Success" ButtonType="ButtonType.Submit" Style="margin-bottom:15%;">Guardar Cambios</MudButton>
+                        <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Save" Color="Color.Success" ButtonType="ButtonType.Submit" Style="margin-bottom:15%;" Disabled=enviandoEmail>Guardar Cambios</MudButton>
                     </MudCardActions>
                 </MudCard>
             </MudItem>
@@ -176,6 +206,7 @@ else
     private string passNuevo2 = "";
 
     private bool actualizado = false;
+    private bool enviandoEmail = false;
 
     //Guardo el ID del usuario actual
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -318,5 +349,37 @@ else
 
             actualizado = true;
         }        
+    }
+
+    protected async Task EnviarEmail()
+    {
+        enviandoEmail = true;
+        EmailAutenticacion datosEmail = new EmailAutenticacion();
+        datosEmail.Destinatario = usuarioCliente.Email;
+        datosEmail.Usuario = idUsAct;
+
+        var emailEnviado = await ServEmail.EmailVerificacion(datosEmail);
+        if(emailEnviado)
+        {
+            Usuario usuarioActualizado = new Usuario();
+            usuarioActualizado = await ServUsuario.ObtenerUsuario(idUsAct);
+            usuarioActualizado.Email = usuarioCliente.Email;
+            var actualizado = await ServUsuario.ActualizarUsuario(usuarioActualizado);
+            if(actualizado)
+            {
+                NavigationManager.NavigateTo("/");
+                Snackbar.Add($"Email reenviado con exito. Recuerde estar logueado al momento de validar el email.", Severity.Success);
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/");
+                Snackbar.Add($"Se envio un email pero no se pudo actualizar los datos del usuario, compruebe los mismos.", Severity.Warning);
+            }            
+        }
+        else
+        {
+            Snackbar.Add($"No se pudo enviar el email. Compruebe los datos suministrados", Severity.Error);
+            enviandoEmail = false;
+        }
     }
 }

@@ -64,7 +64,7 @@ else
             <AuthorizeView Context="usCont">
                 <Authorized>
                     <EditForm Model="producto" OnValidSubmit="AgregarProducto">
-                        <MudTextField Label="Cantidad" HelperText="Formato 999,99 ó 999" @bind-Value="cantidad" For="@(() => producto.Cantidad)" Required="true" OnBlur="CalculoSubTotal"/>
+                        <MudTextField Label="Cantidad" HelperText="Formato 999,99 ó 999" @bind-Value="cantidad" For="@(() => producto.Cantidad)" Required="true" Immediate=true OnBlur="CalculoSubTotal"/>
                         <MudText @bind-Value="subTotal" ReadOnly=true>
                             Sub Total:
                             <b>
@@ -209,7 +209,7 @@ else
                     //Verifico que el producto no exista en el carro
                     productoYaAgregado = listaDetalles.Exists(p => p.Producto == producto.IdProducto);
                 }
-                
+
                 if(!productoYaAgregado)
                 {
                     //Creo un detalle del carro donde se guardara el producto

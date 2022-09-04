@@ -16,14 +16,16 @@ namespace PPS3.Server.Controllers
         private readonly IRepCliente _repCliente;
         private readonly IRepEncabezadoCuentaCorriente _repCuentaCorriente;
         private readonly IRepPrivilegio _repPrivilegio;
+        private readonly IServEmail _servEmail;
         private readonly IConfiguration _config;
 
-        public UsuariosController(IRepUsuario repUsuario, IRepCliente repCliente, IRepEncabezadoCuentaCorriente repCuentaCorriente, IRepPrivilegio repPrivilegio, IConfiguration config)
+        public UsuariosController(IRepUsuario repUsuario, IRepCliente repCliente, IRepEncabezadoCuentaCorriente repCuentaCorriente, IRepPrivilegio repPrivilegio, IServEmail servEmail, IConfiguration config)
         {
             _repUsuario = repUsuario;
             _repCliente = repCliente;
             _repCuentaCorriente = repCuentaCorriente;
             _repPrivilegio = repPrivilegio;
+            _servEmail = servEmail;
             _config = config;
         } 
 
@@ -88,7 +90,14 @@ namespace PPS3.Server.Controllers
 
                         //Si fue creada correctamente, devuelvo OK
                         if(nuevaCuentaCreada)
+                        {
+                            //Envio un email para su verificacion
+                            EmailAutenticacion datosEmail = new EmailAutenticacion();
+                            datosEmail.Destinatario = usuarioCliente.Email;
+                            datosEmail.Usuario = response;
+                            _servEmail.EmailVerificacion(datosEmail);
                             return Ok();
+                        }                            
                         else
                             return BadRequest();
                     }                       

@@ -38,6 +38,7 @@ global using PPS3.Client.Services.ServContactoProveedor;
 global using PPS3.Client.Services.ServCondicionIVA;
 global using PPS3.Client.Services.ServCliente;
 global using PPS3.Client.Services.ServCarroCompra;
+global using PPS3.Client.Services.ServEmail;
 #endregion
 
 using MudBlazor.Services;
@@ -108,6 +109,7 @@ builder.Services.AddHttpClient<IServContactoProveedor, ServContactoProveedor>(cl
 builder.Services.AddHttpClient<IServCondicionIVA, ServCondicionIVA>(client => { client.BaseAddress = API_URL; });
 builder.Services.AddHttpClient<IServCliente, ServCliente>(client => { client.BaseAddress = API_URL; });
 builder.Services.AddHttpClient<IServCarroCompra, ServCarroCompra>(client => { client.BaseAddress = API_URL; });
+builder.Services.AddHttpClient<IServEmail, ServEmail>(client => { client.BaseAddress = API_URL; });
 
 var app = builder.Build();
 

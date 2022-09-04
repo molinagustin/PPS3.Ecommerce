@@ -1,0 +1,116 @@
+﻿@page "/contacto"
+@inject IServUsuario ServUsuario
+@inject IServEmail ServEmail
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
+
+<AuthorizeView Context="usCont">
+    <Authorized>
+        <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+    </Authorized>
+    <NotAuthorized>
+        <input type="hidden" id="UsAct" value="0" />
+    </NotAuthorized>
+</AuthorizeView>
+
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Contacto</MudText>
+
+<MudGrid Justify="Justify.Center">
+    <MudItem xs="3"></MudItem>
+    <MudItem xs="6">
+        <MudCard Elevation="0">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Comentanos en que podemos ayudarte</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+
+            <MudCardContent>
+                @if (usuario != null && usuario.EmailVerificado)
+                {
+                    <MudTextField Label="Email" HelperText="Correo electronico" @bind-Value="usuario.Email" ReadOnly=true Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Email" AdornmentColor="Color.Primary" />
+                }
+                else if(usuario != null)
+                {
+                    <MudTextField Label="Email" HelperText="Correo electronico" @bind-Value="usuario.Email" For="@(() => usuario.Email)" Required=true Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Email" AdornmentColor="Color.Primary" Immediate=true/>
+                }
+
+                <MudTextField T="string" Label="¿Qué necesitas decirnos?" Variant="Variant.Outlined" @bind-Value="texto" Lines="7" MaxLength="350" Counter="0" Required=true Immediate=true Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Edit" AdornmentColor="Color.Primary"/>
+            </MudCardContent>
+
+            <MudCardActions>
+                <MudGrid Justify="Justify.FlexEnd">
+                    @if(!enviandoEmail)
+                    {
+                        <MudButton EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary" Variant="Variant.Outlined" OnClick="EnviarEmail" Style="margin-right:10px;" Disabled=enviandoEmail>Enviar Correo</MudButton>
+                    }
+                    else
+                    {
+                        <MudProgressCircular Color="Color.Primary" Indeterminate="true" Style="margin-right:30px;" />
+                    }
+                </MudGrid>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="3"></MudItem>
+</MudGrid>
+
+@code {
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
+    private Usuario usuario = new Usuario();
+    private string texto = "";
+    private bool enviandoEmail = false;
+
+    //Guardo el ID del usuario actual
+    protected override async Task OnAfterRenderAsync(bool firstRender) 
+    { 
+        idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+
+        if(idUsAct > 0)
+        {
+            usuario = await ServUsuario.ObtenerUsuario(idUsAct);
+            StateHasChanged();
+        }
+    }
+
+    protected async Task EnviarEmail()
+    {
+        try
+        {
+            //Intento crear un email valido con el correo suministrado, si no es posible se lanza una exepcion
+            var emailValido = new System.Net.Mail.MailAddress(usuario.Email);
+
+            if (emailValido.Address == usuario.Email)
+            {
+                if (!string.IsNullOrEmpty(texto.Trim()))
+                {
+                    enviandoEmail = true;
+
+                    EmailBasico datosEmail = new EmailBasico();
+                    datosEmail.Remitente = usuario.Email;
+                    datosEmail.Tema = @"Email de Contacto de: " + usuario.Email;
+                    datosEmail.Mensaje = texto;
+
+                    var mensajeEnviado = await ServEmail.EmailContacto(datosEmail);
+
+                    if(mensajeEnviado)
+                    {
+                        NavigationManager.NavigateTo("/");
+                        Snackbar.Add($"¡Correo Enviado! Pronto nos pondremos en contacto contigo.", Severity.Success);
+                    }                        
+                    else
+                        Snackbar.Add($"No se pudo enviar el correo", Severity.Error);
+                }
+                else
+                    Snackbar.Add($"Se debe colocar la consulta", Severity.Error);
+            }
+        }
+        catch
+        {
+            Snackbar.Add($"El email no es valido", Severity.Error);
+        }        
+    }
+}

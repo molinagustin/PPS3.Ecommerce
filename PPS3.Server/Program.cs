@@ -5,6 +5,7 @@ global using Dapper; //Para que los repositorios usen Dapper
 global using Microsoft.AspNetCore.Authorization; //Libreria que permite decoradores [Authorize] y demas opciones de autorizacion
 global using PPS3.Shared.Models;
 global using PPS3.Shared.InternalModels;
+global using PPS3.Server.ExternalServices.ServEmail; 
 global using PPS3.Server.Data; //Para poder instanciar en todos los repositorios la clase SqlConfiguration
 global using PPS3.Server.Repositories.RepProducto;
 global using PPS3.Server.Repositories.RepProveedor;
@@ -50,6 +51,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //Servicios Propios
+//Servicio de email
+builder.Services.AddScoped<IServEmail, ServEmail>();
+
 //Conexion a la BD
 var sqlConnectionString = new SqlConfiguration(builder.Configuration.GetConnectionString("SqlConnection"));
 builder.Services.AddSingleton(sqlConnectionString); //Para inyectarlo en los servicios, se usa Singleton para que se intancie solo 1 vez
