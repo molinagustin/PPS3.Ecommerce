@@ -83,11 +83,20 @@
 
         var result = await ServProv.GuardarProveedor(prov);
 
-        if (result)
+        if (result > 0)
         {              
-            //Se redirige hacia la pagina para agregar un contacto de proveedor
-            NavigationManager.NavigateTo("/detallesContactosProv");
-            Snackbar.Add($"Proveedor agregado de forma exitosa", Severity.Success);
+            if(id > 0)
+            {
+                //Se redirige hacia la lista de proveedores
+                NavigationManager.NavigateTo("/listaProveedores");
+                Snackbar.Add($"Proveedor modificado de forma exitosa", Severity.Success);
+            }
+            else
+            {
+                //Se redirige hacia la pagina para agregar un contacto de proveedor
+                NavigationManager.NavigateTo($"/agregarContactoProv/{result}");
+                Snackbar.Add($"Proveedor agregado de forma exitosa", Severity.Success);
+            }            
         }        
         else
             Snackbar.Add($"No se pudo crear/modificar el proveedor", Severity.Error);

@@ -37,14 +37,14 @@ namespace PPS3.Client.Services.ServRubro
                 return false;
         }
 
-        public async Task<bool> GuardarRubro(Rubro rubro)
+        public async Task<int> GuardarRubro(Rubro rubro)
         {
             //Obtengo el token de sesion del usuario
             var token = await _sessionStorage.GetItemAsync<string>("token");
 
             //Verifico que exista un token
             if (String.IsNullOrEmpty(token))
-                return false;
+                return 0;
 
             //Se procede a Serializar el contenido del producto por parametro
             var rubJson = new StringContent(JsonSerializer.Serialize(rubro), Encoding.UTF8, "application/json");
@@ -77,9 +77,15 @@ namespace PPS3.Client.Services.ServRubro
             }
 
             if (response.IsSuccessStatusCode)
-                return true;
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var id = await JsonSerializer.DeserializeAsync<int>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return id;
+            }            
             else
-                return false;            
+                return 0;            
         }
 
         public async Task<Rubro> ObtenerRubro(int id)

@@ -7,8 +7,8 @@
         Task<IEnumerable<RubroCategoria>> ObtenerRubrosCategorias();
         Task<IEnumerable<TipoProductoCategoria>> ObtenerTiposProductosCategorias();
         Task<Rubro> ObtenerRubro(int id);
-        Task<bool> InsertarRubro(Rubro rubro);
-        Task<bool> ActualizarRubro(Rubro rubro);
+        Task<int> InsertarRubro(Rubro rubro);
+        Task<int> ActualizarRubro(Rubro rubro);
         Task<bool> BorrarRubro(int id);
     }
 }

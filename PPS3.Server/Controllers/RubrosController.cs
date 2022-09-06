@@ -55,7 +55,7 @@ namespace PPS3.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CrearRubro([FromBody] Rubro rubro)
+        public async Task<ActionResult<int>> CrearRubro([FromBody] Rubro rubro)
         { 
             if (rubro == null)  
                 return BadRequest();
@@ -63,8 +63,8 @@ namespace PPS3.Server.Controllers
             if (ModelState.IsValid)
             {
                 var response = await _repRubro.InsertarRubro(rubro);
-                if (response != false)
-                    return Ok();
+                if (response > 0)
+                    return Ok(response);
                 else
                     return BadRequest();
             }
@@ -73,7 +73,7 @@ namespace PPS3.Server.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult> ActualizarRubro([FromBody] Rubro rubro)
+        public async Task<ActionResult<int>> ActualizarRubro([FromBody] Rubro rubro)
         {
             if (rubro == null)
                 return BadRequest();
@@ -81,8 +81,8 @@ namespace PPS3.Server.Controllers
             if (ModelState.IsValid)
             {
                 var response = await _repRubro.ActualizarRubro(rubro);
-                if (response != false)
-                    return Ok();
+                if (response > 0)
+                    return Ok(response);
                 else
                     return BadRequest();
             }

@@ -108,7 +108,7 @@ namespace PPS3.Server.Controllers
                 return BadRequest();
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{idUsuario:int}")]
         public async Task<ActionResult<int>> UltimoProductoCreado(int idUsuario)
         {
             var response = await _repProducto.UltimoProductoCreado(idUsuario);

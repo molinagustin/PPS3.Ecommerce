@@ -11,7 +11,7 @@
             return new SqlConnection(_connectionString);
         }
         
-        public async Task<bool> ActualizarProveedor(Proveedor proveedor)
+        public async Task<int> ActualizarProveedor(Proveedor proveedor)
         {
             var db = dbConnection();
 
@@ -33,7 +33,7 @@
                                                         FechaUltModif = DateTime.Now,
                                                         proveedor.IdProveedor
                                                         });
-            return result > 0;
+            return result; //Devuelvo el valor haciendo referencia que se creo o no un registro
         }
 
         public async Task<bool> BorrarProveedor(int id)
@@ -58,7 +58,7 @@
             return result > 0;
         }
 
-        public async Task<bool> InsertarProveedor(Proveedor proveedor)
+        public async Task<int> InsertarProveedor(Proveedor proveedor)
         {
             var db = dbConnection();
 
@@ -83,7 +83,14 @@
                                                         proveedor.UsuarioCrea,
                                                         proveedor.UsuarioModif
                                                         });
-            return result > 0;
+            if (result > 0)
+            {
+                var ultimoId = await UltimoIdProveedor();
+
+                return ultimoId;
+            }
+            else
+                return 0;
         }
 
         public async Task<Proveedor> ObtenerProveedor(int id)
@@ -129,5 +136,18 @@
             var result = await db.QueryAsync<ProveedorListado>(sql, new { });
             return result;
         }
-    }
+
+        public async Task<int> UltimoIdProveedor()
+        {
+            var db = dbConnection();    
+
+            var sql = @"
+                        SELECT MAX(p.IdProveedor) as IdProveedor
+                        FROM proveedores as p
+                        ";
+
+            var result = await db.ExecuteScalarAsync<int>(sql, new { });
+            return result;
+        }
+    }    
 }

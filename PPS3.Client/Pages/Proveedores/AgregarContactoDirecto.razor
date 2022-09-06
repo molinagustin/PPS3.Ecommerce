@@ -1,0 +1,99 @@
+﻿@page "/agregarContactoProv/{id:int}"
+@inject IServProveedor ServProv
+@inject IServContactoProveedor ServContactoProv
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
+@attribute [Authorize(Roles = "1, 2")]
+
+<AuthorizeView Context="usCont">
+    <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+</AuthorizeView>
+
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Detalles de Contacto de Proveedor</MudText>
+
+<EditForm Model="@contacto" OnValidSubmit="GuardarContacto" Context="conForm">
+    <DataAnnotationsValidator />
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="6">
+            <MudCard Elevation="1">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos del Contacto</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTextField Label="Nombre del Contacto" HelperText="Nombre Completo" @bind-Value="contacto.Nombre" For="@(() => contacto.Nombre)" AutoFocus="true" Required="true" />
+
+                    <MudTextField Label="Domicilio del Contacto" HelperText="Con detalles" @bind-Value="contacto.Domicilio" For="@(() => contacto.Domicilio)" />
+
+                    <MudTextField Label="Telefono del Contacto" HelperText="Solo numeros sin espacios o guiones" @bind-Value="contacto.Telefono" For="@(() => contacto.Telefono)" />
+
+                    <MudTextField Label="Email" HelperText="Correo electronico" @bind-Value="contacto.Email" For="@(() => contacto.Email)" />
+
+                    @if (proveedores != null)
+                    {
+                        <MudSelect T="int" @bind-Value="@prov" Label="Proveedor" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                            @foreach (var pv in proveedores)
+                            {
+                                <MudSelectItem Value="@pv.IdProveedor">@(proveedores.ToList().IndexOf(pv) + 1) - @pv.NombreProv</MudSelectItem>
+                            }
+                        </MudSelect>
+                    }
+                    else
+                    {
+                        <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                    }
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Save" Color="Color.Success" ButtonType="ButtonType.Submit">Guardar</MudButton>
+                    <MudDivider />
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.ExitToApp" Color="Color.Error" OnClick="Cancelar">Cancelar</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    //Parametro que se recibe por URL para una consulta del objeto
+    [Parameter]
+    public int id { get; set; }
+
+    ContactoProveedor contacto = new ContactoProveedor();
+
+    private IEnumerable<Proveedor> proveedores;
+    private int prov;
+
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
+    //Guardo el ID del usuario actual
+    protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+
+    protected override async Task OnInitializedAsync()
+    {
+        proveedores = await ServProv.ObtenerProveedores();
+        prov = id;
+    }
+
+    protected async Task GuardarContacto()
+    {
+        contacto.Proveedor = prov;
+        contacto.UsuarioCrea = idUsAct;
+        contacto.UsuarioModif = idUsAct;       
+
+        var result = await ServContactoProv.GuardarContacto(contacto);
+
+        if (result)
+        {
+            //Se redirige hacia el listado de contactos
+            NavigationManager.NavigateTo("/listaContactosProv");
+            Snackbar.Add($"Contacto agregado de forma exitosa", Severity.Success);
+        }
+        else
+            Snackbar.Add($"No se pudo crear el contacto", Severity.Error);
+    }
+
+    protected void Cancelar() => NavigationManager.NavigateTo("/listaContactosProv");
+}

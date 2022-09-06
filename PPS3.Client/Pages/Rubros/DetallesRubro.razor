@@ -69,7 +69,7 @@
 
         var result = await ServRubro.GuardarRubro(rubro);
 
-        if (result)
+        if (result > 0)
         {              
             if(id > 0)
             {
@@ -80,7 +80,7 @@
             else
             {
                 //Se redirige hacia agregar un nuevo tipo de producto
-                NavigationManager.NavigateTo("/detallesTiposProd", true);
+                NavigationManager.NavigateTo($"/agregarTipoProd/{result}", true);
                 Snackbar.Add($"Rubro agregado de forma exitosa", Severity.Success);
             }            
         }        

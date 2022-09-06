@@ -11,7 +11,7 @@
             return new SqlConnection(_connectionString);
         }
 
-        public async Task<bool> ActualizarRubro(Rubro rubro)
+        public async Task<int> ActualizarRubro(Rubro rubro)
         {
             var db = dbConnection();
 
@@ -32,7 +32,7 @@
                                                         FechaUltModif = DateTime.Now, 
                                                         rubro.IdRubro
                                                         });
-            return result > 0;
+            return result;
         }
 
         public async Task<bool> BorrarRubro(int id)
@@ -56,7 +56,7 @@
             return result > 0;
         }
 
-        public async Task<bool> InsertarRubro(Rubro rubro)
+        public async Task<int> InsertarRubro(Rubro rubro)
         {
             var db = dbConnection();
 
@@ -78,7 +78,16 @@
                                                         rubro.UsuarioCrea, 
                                                         rubro.UsuarioModif
                                                         });
-            return result > 0;
+            if (result > 0)
+            {
+                var idRubro = await ObtenerUltimoRubroCreado();
+                if (idRubro > 0)
+                    return idRubro;
+                else
+                    return 0;
+            }
+            else
+                return 0;
         }
 
         public async Task<Rubro> ObtenerRubro(int id)
@@ -148,6 +157,18 @@
                         WHERE pt.Activo = 1
                         ";
             var result = await db.QueryAsync<TipoProductoCategoria>(sql, new { });
+            return result;
+        }
+
+        public async Task<int> ObtenerUltimoRubroCreado()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT MAX(r.IdRubro) as IdRubro
+                        FROM rubros as r
+                        ";
+            var result = await db.ExecuteScalarAsync<int>(sql, new { });
             return result;
         }
     }

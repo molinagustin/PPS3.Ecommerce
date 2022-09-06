@@ -192,9 +192,27 @@
 
         if (result)
         {              
-            //Se redirige hacia el listado de productos
-            NavigationManager.NavigateTo("/listaProductos");
-            Snackbar.Add($"Producto agregado/modificado de forma exitosa", Severity.Success);
+            if(id > 0)
+            {
+                //Se redirige hacia el listado de productos
+                NavigationManager.NavigateTo("/listaProductos");
+                Snackbar.Add($"Producto modificado de forma exitosa", Severity.Success);
+            }
+            else
+            {
+                var idUltimoProducto = await ServProducto.UltimoProductoCreado(idUsAct);
+                if(idUltimoProducto > 0)
+                {
+                    //Se redirige hacia las imagenes del producto
+                    NavigationManager.NavigateTo($"/detallesProducto/imagenes/{idUltimoProducto}");
+                    Snackbar.Add($"Producto agregado de forma exitosa", Severity.Success);
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/listaProductos");
+                    Snackbar.Add($"Producto agregado de forma exitosa", Severity.Success);
+                }
+            }            
         }        
         else
             Snackbar.Add($"No se pudo crear/modificar el producto", Severity.Error);

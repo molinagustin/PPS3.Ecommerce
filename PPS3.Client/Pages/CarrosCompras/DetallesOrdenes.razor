@@ -3,6 +3,7 @@
 @inject NavigationManager NavigationManager
 @inject IServCarroCompra ServCarro
 @inject IServEstadoCarroCompra ServEstadoCarro
+@inject IServMovCarro ServMovCarro
 @inject IServFormaPago ServFormaPago
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @inject IJSRuntime JS /*JS Interop*/
@@ -194,6 +195,30 @@ else
             </MudStack>
         </MudItem>
     </MudGrid>
+
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="4"></MudItem>
+        <MudItem xs="4">
+            <MudText Align="Align.Left" Typo="Typo.body1">Historial de Movimientos:</MudText>
+            @if (historial != null && historial.Count() > 0)
+            {
+                @foreach (var hist in historial)
+                {
+                    <MudText Align="Align.Left" Typo="Typo.body1">
+                        <b>@(historial.ToList().IndexOf(hist) + 1)°</b> 
+                        <b>Fecha:</b> @hist.FechaUltModif ||
+                        <b>Estado:</b> @hist.Estado ||
+                        <b>Usuario Modif.:</b> @hist.Usuario
+                    </MudText>
+                }
+            }
+            else
+            {
+                <MudText Align="Align.Center" Typo="Typo.body1" Color="Color.Info"><b>SIN MOVIMIENTOS</b></MudText>
+            }
+        </MudItem>
+        <MudItem xs="4"></MudItem>        
+    </MudGrid>
 }
 
 @code {
@@ -213,6 +238,7 @@ else
 
     IEnumerable<FormaPago> formaPago;
     IEnumerable<EstadoCarroCompra> estados;
+    IEnumerable<HistorialMovimientoCarro> historial;
 
     //Guardo el ID del usuario actual
     protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId")); 
@@ -224,13 +250,18 @@ else
         formaPago = await ServFormaPago.ObtenerFormasPago();
         estados = await ServEstadoCarro.ObtenerEstados();
         estados = estados.Where(e => e.IdEstado > 1);
+        historial = await ServMovCarro.ObtenerHistorial(id);
 
         //Obtengo el carro por si necesito actualizar datos
         carro = await ServCarro.ObtenerCarro(id);
 
         //Asigno las formas de pago y estado de la orden
         estado = estados.FirstOrDefault(e => e.Estado == ordenListado.Estado).IdEstado;
-        formaP = formaPago.FirstOrDefault(f => f.FormaP == ordenListado.FormaP).IdFormaP;
+        if(formaPago.FirstOrDefault(f => f.FormaP == ordenListado.FormaP) != null)
+            formaP = formaPago.FirstOrDefault(f => f.FormaP == ordenListado.FormaP).IdFormaP;
+        else
+            formaP = 1;
+              
         pgdo = ordenListado.Pagado;
     }
 
@@ -243,10 +274,15 @@ else
             carro.FechaEntrega = Convert.ToDateTime(ordenListado.FechaEntrega);
         else
             carro.FechaEntrega = null;
+
         if (ordenListado.FechaPago != null)
             carro.FechaPago = Convert.ToDateTime(ordenListado.FechaPago);
         else
             carro.FechaPago = null;
+
+        if (ordenListado.FechaPago == null && pgdo)
+            carro.FechaPago = Convert.ToDateTime(DateTime.Today);
+
         carro.Pagado = pgdo;
         if(!string.IsNullOrEmpty(ordenListado.Observaciones))
             carro.Observaciones = ordenListado.Observaciones;
@@ -255,6 +291,16 @@ else
         var result = await ServCarro.GuardarCarro(carro);
         if(result)
         {
+            //Creo el movimiento del carro de compra
+            MovimientoCarroCompra movimiento = new MovimientoCarroCompra();
+            movimiento.IdOrden = id;
+            movimiento.IdEstado = estado; // Pendiente
+            movimiento.Usuario = idUsAct;
+
+            var movimientoCreado = await ServMovCarro.CrearMovimiento(movimiento);
+            if (!movimientoCreado)
+                Snackbar.Add($"No se creo el movimiento", Severity.Error);
+
             NavigationManager.NavigateTo("/listaOrdenesCompra");
             Snackbar.Add($"Orden de compra modificada exitosamente", Severity.Success);
         }

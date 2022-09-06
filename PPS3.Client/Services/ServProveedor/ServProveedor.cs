@@ -37,14 +37,14 @@ namespace PPS3.Client.Services.ServProveedor
                 return false;
         }
 
-        public async Task<bool> GuardarProveedor(Proveedor proveedor)
+        public async Task<int> GuardarProveedor(Proveedor proveedor)
         {
             //Obtengo el token de sesion del usuario
             var token = await _sessionStorage.GetItemAsync<string>("token");
 
             //Verifico que exista un token
             if (String.IsNullOrEmpty(token))
-                return false;
+                return 0;
 
             //Se procede a Serializar el contenido del producto por parametro
             var provJson = new StringContent(JsonSerializer.Serialize(proveedor), Encoding.UTF8, "application/json");
@@ -77,9 +77,15 @@ namespace PPS3.Client.Services.ServProveedor
             }
 
             if (response.IsSuccessStatusCode)
-                return true;
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var id = await JsonSerializer.DeserializeAsync<int>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return id;
+            }
             else
-                return false;
+                return 0;
         }
 
         public async Task<Proveedor> ObtenerProveedor(int id)

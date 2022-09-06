@@ -1,5 +1,6 @@
 ﻿@page "/verCarro/{id:int}"
 @inject IServCarroCompra ServCarro
+@inject IServMovCarro ServMovCarro
 @inject IServDetalleCarroCompra ServDetalleCarro
 @using Radzen.Blazor
 @inject NavigationManager NavigationManager
@@ -119,8 +120,18 @@ else
 
             //Actualizo el carro
             var carroActualizado = await ServCarro.GuardarCarro(carro);
-            if(carroActualizado)
+            if (carroActualizado)
             {
+                //Creo el movimiento del carro de compra
+                MovimientoCarroCompra movimiento = new MovimientoCarroCompra();
+                movimiento.IdOrden = id;
+                movimiento.IdEstado = 2; // Pendiente
+                movimiento.Usuario = idUsAct;
+
+                var movimientoCreado = await ServMovCarro.CrearMovimiento(movimiento);
+                if(!movimientoCreado)
+                    Snackbar.Add($"No se creo el movimiento", Severity.Error);                   
+
                 //Le creo el nuevo carro en estado Activo y redirijo el usuario al listado de compras
                 CarroCompra nuevoCarro = new CarroCompra();
                 nuevoCarro.UsuarioCarro = carro.UsuarioCarro;

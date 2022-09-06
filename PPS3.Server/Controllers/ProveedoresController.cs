@@ -39,7 +39,7 @@ namespace PPS3.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CrearProveedor([FromBody] Proveedor proveedor)
+        public async Task<ActionResult<int>> CrearProveedor([FromBody] Proveedor proveedor)
         {
             if (proveedor == null)
                 return BadRequest();
@@ -47,8 +47,8 @@ namespace PPS3.Server.Controllers
             if (ModelState.IsValid)
             {
                 var response = await _repProveedor.InsertarProveedor(proveedor);
-                if (response != false)
-                    return Ok();
+                if (response > 0)
+                    return Ok(response);
                 else
                     return BadRequest();
             }
@@ -57,7 +57,7 @@ namespace PPS3.Server.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult> ActualizarProveedor([FromBody] Proveedor proveedor)
+        public async Task<ActionResult<int>> ActualizarProveedor([FromBody] Proveedor proveedor)
         {
             if (proveedor == null)
                 return BadRequest();
@@ -65,8 +65,8 @@ namespace PPS3.Server.Controllers
             if (ModelState.IsValid)
             {
                 var response = await _repProveedor.ActualizarProveedor(proveedor);
-                if (response != false)
-                    return Ok();
+                if (response > 0)
+                    return Ok(response);
                 else
                     return BadRequest();
             }

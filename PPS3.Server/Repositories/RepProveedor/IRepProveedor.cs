@@ -5,8 +5,8 @@
         Task<IEnumerable<Proveedor>> ObtenerProveedores();
         Task<IEnumerable<ProveedorListado>> ObtenerProveedoresListado();
         Task<Proveedor> ObtenerProveedor(int id);
-        Task<bool> InsertarProveedor(Proveedor proveedor);
-        Task<bool> ActualizarProveedor(Proveedor proveedor);
+        Task<int> InsertarProveedor(Proveedor proveedor);
+        Task<int> ActualizarProveedor(Proveedor proveedor);
         Task<bool> BorrarProveedor(int id);
     }
 }

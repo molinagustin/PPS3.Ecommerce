@@ -1,6 +1,7 @@
 ﻿@page "/verCompras/verDetalle/{idOrden:int}"
 @inject IServCarroCompra ServCarro
 @inject IServDetalleCarroCompra ServDetalleCarro
+@inject IServMovCarro ServMovCarro
 @inject IServProducto ServProducto
 @inject IServImagenProducto ServImagen
 @using Radzen.Blazor
@@ -107,7 +108,7 @@
                     <MudStack>
                         @if(ordenListado.FechaEntrega != null)
                         {
-                            <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Entrega: <b>@ordenListado.FechaEntrega</b></MudText>
+                            <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Entrega: <b>@string.Format("{0:d}", ordenListado.FechaEntrega)</b></MudText>
                         }
                         else
                         {
@@ -121,7 +122,7 @@
                     @if(ordenListado.Pagado)
                     {
                         <MudStack>
-                            <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Pago: <b>@ordenListado.FechaPago</b></MudText>
+                            <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Pago: <b>@string.Format("{0:d}", ordenListado.FechaPago)</b></MudText>
                         </MudStack>
                         <MudStack>
                             <MudText Align="Align.Left" Typo="Typo.body1">Forma de Pago: <b>@ordenListado.FormaP</b></MudText>
@@ -129,12 +130,25 @@
                     }
                 </MudItem>
 
-                @*RECIBOS Y COMPROBANTES*@
-                <MudItem xs="4">                    
-                    @*
-                        COMPROBANTES ASOCIADOS
-                        RECIBOS DE PAGO                     
-                    *@
+                @*HISTORIAL DE MOVIMIENTOS*@
+                <MudItem xs="4">
+                    <MudText Align="Align.Left" Typo="Typo.body1">Historial de Movimientos:</MudText>
+                    @if(historial != null && historial.Count() > 0)
+                    {
+                        @foreach (var hist in historial)
+                    {
+                            <MudText Align="Align.Left" Typo="Typo.body1">
+                                <b>@(historial.ToList().IndexOf(hist) + 1)°</b> 
+                                <b>Fecha:</b> @hist.FechaUltModif || 
+                                <b>Estado:</b> @hist.Estado || 
+                                <b>Usuario Modif.:</b> @hist.Usuario
+                            </MudText>
+                        }
+                    }
+                    else
+                    {
+                        <MudText Align="Align.Center" Typo="Typo.body1" Color="Color.Info"><b>SIN MOVIMIENTOS</b></MudText>
+                    }
                 </MudItem>
             </MudGrid>
 
@@ -164,6 +178,7 @@
 
     //Para guardar la orden solicitada
     OrdenesCompraListado ordenListado;
+    IEnumerable<HistorialMovimientoCarro> historial;
 
     //Guardo el ID del usuario actual
     protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
@@ -171,6 +186,7 @@
     protected override async Task OnInitializedAsync()
     {
         ordenListado = await ServCarro.ObtenerOCDetalle(idOrden);
+        historial = await ServMovCarro.ObtenerHistorial(idOrden);
     }
 
     private void Volver() => NavigationManager.NavigateTo($"/verCompras");

@@ -31,6 +31,7 @@
             var sql = @"
                         SELECT *
                         FROM formas_pago
+                        WHERE Activo = 1
                         ";
             var result = await db.QueryAsync<FormaPago>(sql, new {});
             return result;
