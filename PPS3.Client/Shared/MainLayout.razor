@@ -5,38 +5,6 @@
 
 <PageTitle>Expo Ceramicas</PageTitle>
 
-@*Si el usuario posee el nivel requerido de autorizacion, se le mostraran las opciones en el menu de navegacion*@
-@*<div class="page">
-    
-    <AuthorizeView>
-        <Authorized>
-            <div class="sidebar">
-                <NavMenu />
-            </div>
-        </Authorized>
-    </AuthorizeView>
-    <main>
-        <div class="top-row px-4">
-            <AuthorizeView>
-                <Authorized>
-                    <button class="btn btn-danger" @onclick="@LogoutUser">
-                        <span class="oi oi-account-logout" aria-hidden="true"></span> Cerrar Sesion
-                    </button>
-                </Authorized>
-                <NotAuthorized>
-                    <button class="btn btn-primary" @onclick="@Login">
-                        <span class="oi oi-account-login" aria-hidden="true"></span> Iniciar Sesion
-                    </button>
-                </NotAuthorized>
-            </AuthorizeView>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>*@
-
 <MudLayout>    
     <AppBar OnSidebarToggled="ToggleSideBar" OnRightSidebarToggled="ToggleRightSideBar" Login="Login" Logout="LogoutUser" Register="Register"/>
 
@@ -76,7 +44,7 @@
         {
             await AuthStateProvider.GetAuthenticationStateAsync();
             StateHasChanged();
-            NavigationManager.NavigateTo("/");    
+            NavigationManager.NavigateTo("/", true);    
         }        
     }
 
