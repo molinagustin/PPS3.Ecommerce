@@ -114,6 +114,7 @@
             var sql = @"
                         SELECT *
                         FROM proveedores
+                        ORDER BY NombreProv
                         ";
 
             var result = await db.QueryAsync<Proveedor>(sql, new {});

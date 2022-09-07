@@ -119,6 +119,7 @@
             var sql = @"
                         SELECT *
                         FROM localidades
+                        ORDER BY NombreLoc
                         ";
             var result = await db.QueryAsync<Localidad>(sql, new { });
             return result;

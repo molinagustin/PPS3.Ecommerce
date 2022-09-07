@@ -84,7 +84,7 @@ else
                             </RadzenGridColumn>
                             <RadzenGridColumn TItem="DetalleComprobante" Property="Bonificacion" Title="Bonificacion" Width="180px">
                                 <Template Context="precio">
-                                    @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0} %", precio.PrecioUnitario)
+                                    @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0} %", precio.Bonificacion)
                                 </Template>
                             </RadzenGridColumn>
                             <RadzenGridColumn TItem="DetalleComprobante" Property="BonificacionTotal" Title="BonificacionTotal" Width="180px">

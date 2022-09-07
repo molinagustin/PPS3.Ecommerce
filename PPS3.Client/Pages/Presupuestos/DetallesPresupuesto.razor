@@ -136,7 +136,7 @@ else
     ProductoListado? prodSelect;
 
     //Para completar el formulario
-    private int cant = 1;
+    private decimal cant = 1;
     private decimal bonif = 0;
     private string observ = "";
     private string cliente = "";
@@ -157,27 +157,36 @@ else
     {
         if (prodSelect != null)
         {
-            //Verifico que el producto no se encuentre en la lista agregada
-            var prodYaAgregado = productosAgregados.Exists(a => a.IdProducto == prodSelect.IdProducto);
-            if(!prodYaAgregado)
+            if(cant > 0)
             {
-                //Realizo los calculos y asignaciones correspondientes
-                prodSelect.Cantidad = cant;
-                prodSelect.Bonificacion = bonif;
-                var precioTotCant = prodSelect.Cantidad * prodSelect.PrecioFinal;
-                var bonifUnit = (prodSelect.Bonificacion * prodSelect.PrecioFinal) / 100;
-                prodSelect.BonificacionTotal = bonifUnit * cant;
-                prodSelect.SubTotal = precioTotCant - prodSelect.BonificacionTotal;
+                if(bonif >= 0 && bonif <= 100)
+                {
+                    //Verifico que el producto no se encuentre en la lista agregada
+                    var prodYaAgregado = productosAgregados.Exists(a => a.IdProducto == prodSelect.IdProducto);
+                    if (!prodYaAgregado)
+                    {
+                        //Realizo los calculos y asignaciones correspondientes
+                        prodSelect.Cantidad = cant;
+                        prodSelect.Bonificacion = bonif;
+                        var precioTotCant = prodSelect.Cantidad * prodSelect.PrecioFinal;
+                        var bonifUnit = (prodSelect.Bonificacion * prodSelect.PrecioFinal) / 100;
+                        prodSelect.BonificacionTotal = bonifUnit * cant;
+                        prodSelect.SubTotal = precioTotCant - prodSelect.BonificacionTotal;
 
-                //Agrego el producto al listado y reestablezco los controles
-                productosAgregados.Add(prodSelect);
-                prodSelect = null;
-                cant = 1;
-                bonif = 0;
+                        //Agrego el producto al listado y reestablezco los controles
+                        productosAgregados.Add(prodSelect);
+                        prodSelect = null;
+                        cant = 1;
+                        bonif = 0;
+                    }
+                    else
+                        Snackbar.Add($"El producto que intenta agregar, ya se encuentra en el presupuesto, debe seleccionar otro o bien remover el existente del listado del presupuesto", Severity.Error);
+                }
+                else
+                    Snackbar.Add($"Bonificacion incorrecta", Severity.Error);                
             }
             else
-                Snackbar.Add($"El producto que intenta agregar, ya se encuentra en el presupuesto, debe seleccionar otro o bien remover el existente del listado del presupuesto", Severity.Error);
-
+                Snackbar.Add($"La cantidad debe ser mayor a 0", Severity.Error);
         }
         else
             Snackbar.Add($"Debe seleccionar el producto a agregar", Severity.Error);

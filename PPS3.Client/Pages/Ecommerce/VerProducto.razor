@@ -6,6 +6,7 @@
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @inject IJSRuntime JS /*JS Interop*/
+@inject IDialogService DialogService
 
 @*Con ese modo de ver la autorizacion, se obtiene el Id del usuario si esta logueado o no*@
 <AuthorizeView Context="usCont">
@@ -225,8 +226,19 @@ else
                     //Si se guarda correctamente el detalle, procedo a mostrar una alerta y llevar al usuario al carro de compra para ver los detalles
                     if(nuevoDetalle)
                     {
-                        NavigationManager.NavigateTo($"/verCarro/{carro.IdCarro}");
-                        Snackbar.Add($"El detalle fue añadido correctamente.", Severity.Success);
+                        //Consulto si quiere ver el carro o seguir comprando
+                        var result = await DialogService.ShowMessageBox(
+                                    "Elegir Accion",
+                                    "El producto fue agregado. ¿Ver carro de compra?",
+                                    yesText: "Ver Carro", cancelText: "Seguir Viendo Productos");
+
+                        if (result == true)
+                        {
+                            NavigationManager.NavigateTo($"/verCarro/{carro.IdCarro}");
+                            Snackbar.Add($"El detalle fue añadido correctamente.", Severity.Success);
+                        }
+                        else
+                            NavigationManager.NavigateTo($"/");                        
                     }
                     else
                         Snackbar.Add($"El detalle del carro no pudo ser agregado correctamente.", Severity.Error);

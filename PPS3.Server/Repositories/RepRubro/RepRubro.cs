@@ -111,6 +111,7 @@
             var sql = @"
                         SELECT * 
                         FROM rubros
+                        ORDER BY DescRubro
                         ";
 
             var result = await db.QueryAsync<Rubro>(sql, new { });

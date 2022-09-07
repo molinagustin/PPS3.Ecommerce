@@ -248,6 +248,7 @@ else
     {
         if(!string.IsNullOrEmpty(usuarioCliente.Password))
         {
+            enviandoEmail = true;
             //Asigno los valores para proceder a actualizarlos
             usuarioCliente.SaltCont = usuario.SaltCont;
             usuarioCliente.HashCont = usuario.HashCont;
@@ -299,7 +300,11 @@ else
                 }
             }
             else
+            {
                 Snackbar.Add($"Los datos del perfil no se actualizaron correctamente. Compruebe la contraseña o los datos suministrados.", Severity.Error);
+                enviandoEmail = false;
+            }
+                
         }
         else
             Snackbar.Add($"La contraseña actual no puede estar vacia", Severity.Error);

@@ -7,6 +7,7 @@
 @inject IServFormaPago ServFormaPago
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @inject IJSRuntime JS /*JS Interop*/
+@inject IDialogService DialogService
 @attribute [Authorize(Roles = "1, 2")]
 
 <AuthorizeView Context="usCont">
@@ -231,6 +232,7 @@ else
     private int formaP;
     private int estado;
     private bool pgdo;
+    private bool pgdoInicial = false;
 
     //Para guardar la orden solicitada
     OrdenesCompraListado ordenListado;
@@ -261,15 +263,70 @@ else
             formaP = formaPago.FirstOrDefault(f => f.FormaP == ordenListado.FormaP).IdFormaP;
         else
             formaP = 1;
-              
+
         pgdo = ordenListado.Pagado;
+        pgdoInicial = ordenListado.Pagado;
     }
 
     private async Task GuardarOrden()
     {
+        if(pgdo != pgdoInicial)
+        {
+            var resultDialog = await DialogService.ShowMessageBox(
+                    "¡Atencion!",
+                    "Una vez guardada la confirmacion de pago, no se puede modificar. ¿Desea continuar?",
+                    yesText: "Continuar", cancelText: "Cancelar");
+
+            if (resultDialog == true)
+            {
+                //Si la orden va a ser CANCELADA o FINALIZADA, alerto al usuario
+                if (estado == 4 || estado == 5)
+                {
+                    var options = new DialogOptions { CloseOnEscapeKey = true };
+                    var dialog = DialogService.Show<DialogModifyOrder>("Confirmar Modificacion", options);
+                    var result = await dialog.Result;
+
+                    if (!result.Cancelled)
+                        await ModificarOrden();
+                    else
+                        Snackbar.Add($"Se cancela la modificacion", Severity.Warning);
+                }
+                else
+                    await ModificarOrden();
+            }
+            else
+                Snackbar.Add($"Se cancela la modificacion", Severity.Warning);
+        }
+        else
+        {
+            //Si la orden va a ser CANCELADA o FINALIZADA, alerto al usuario
+            if (estado == 4 || estado == 5)
+            {
+                var options = new DialogOptions { CloseOnEscapeKey = true };
+                var dialog = DialogService.Show<DialogModifyOrder>("Confirmar Modificacion", options);
+                var result = await dialog.Result;
+
+                if (!result.Cancelled)
+                    await ModificarOrden();
+                else
+                    Snackbar.Add($"Se cancela la modificacion", Severity.Warning);
+            }
+            else
+                await ModificarOrden();
+        }        
+    }
+
+    private void Cancelar() => NavigationManager.NavigateTo("/listaOrdenesCompra");
+
+    private async Task ModificarOrden()
+    {
         //Asigno los valores cambiados la carro
         carro.Estado = estado;
-        carro.MetodoPago = formaP;
+        if(pgdo)
+            carro.MetodoPago = formaP;
+        else
+            carro.MetodoPago = 7; //Sin pagar
+
         if (ordenListado.FechaEntrega != null)
             carro.FechaEntrega = Convert.ToDateTime(ordenListado.FechaEntrega);
         else
@@ -284,12 +341,12 @@ else
             carro.FechaPago = Convert.ToDateTime(DateTime.Today);
 
         carro.Pagado = pgdo;
-        if(!string.IsNullOrEmpty(ordenListado.Observaciones))
+        if (!string.IsNullOrEmpty(ordenListado.Observaciones))
             carro.Observaciones = ordenListado.Observaciones;
 
         //Procedo a guardar los cambios
         var result = await ServCarro.GuardarCarro(carro);
-        if(result)
+        if (result)
         {
             //Creo el movimiento del carro de compra
             MovimientoCarroCompra movimiento = new MovimientoCarroCompra();
@@ -307,6 +364,4 @@ else
         else
             Snackbar.Add($"No se pudo modificar la Orden de Compra", Severity.Error);
     }
-
-    private void Cancelar() => NavigationManager.NavigateTo("/listaOrdenesCompra");
 }

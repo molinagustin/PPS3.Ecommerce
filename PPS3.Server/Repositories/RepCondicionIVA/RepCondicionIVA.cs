@@ -18,6 +18,7 @@
             var sql = @"
                         SELECT *
                         FROM condiciones_iva
+                        ORDER BY DescripcionCond
                         ";
             var result = await db.QueryAsync<CondicionIVA>(sql, new {});
             return result;

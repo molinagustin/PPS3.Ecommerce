@@ -107,6 +107,7 @@
             var sql = @"
                         SELECT *
                         FROM productos_tipos
+                        ORDER BY DescripcionTipo
                         ";
 
             var result = await db.QueryAsync<TipoProducto>(sql, new { });

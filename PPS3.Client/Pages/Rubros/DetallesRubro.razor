@@ -4,6 +4,7 @@
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @inject IJSRuntime JS /*JS Interop*/
+@inject IDialogService DialogService
 @attribute [Authorize(Roles = "1, 2")]
 
 <AuthorizeView Context="usCont">
@@ -79,9 +80,24 @@
             }
             else
             {
-                //Se redirige hacia agregar un nuevo tipo de producto
-                NavigationManager.NavigateTo($"/agregarTipoProd/{result}", true);
-                Snackbar.Add($"Rubro agregado de forma exitosa", Severity.Success);
+                //Pregunto si quiere ir a crear un tipo de producto nuevo
+                var options = new DialogOptions { CloseOnEscapeKey = true };
+                var dialog = DialogService.Show<DialogRubro>("Rubro Agregado Correctamente", options);
+                var resultDialog = await dialog.Result;
+
+                if (!resultDialog.Cancelled)
+                {
+                    //Se redirige hacia agregar un nuevo tipo de producto
+                    NavigationManager.NavigateTo($"/agregarTipoProd/{result}", true);
+                    Snackbar.Add($"Rubro agregado de forma exitosa", Severity.Success);
+                }
+                else
+                {
+                    //Se redirige hacia la lista de rubros
+                    NavigationManager.NavigateTo($"/listaRubros", true);
+                    Snackbar.Add($"Rubro agregado de forma exitosa", Severity.Success);
+                }
+                
             }            
         }        
         else

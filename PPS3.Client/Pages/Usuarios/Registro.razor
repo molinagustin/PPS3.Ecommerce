@@ -124,7 +124,7 @@
 
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.AppRegistration" Color="Color.Success" ButtonType="ButtonType.Submit">REGISTRARSE</MudButton>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.AppRegistration" Color="Color.Success" ButtonType="ButtonType.Submit" Disabled=registrando>REGISTRARSE</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>
@@ -146,6 +146,8 @@
     private int tipoDocu = 3;
     private int loca = 1;
 
+    private bool registrando = false;
+
     private string password2 = "";
 
     protected override async Task OnInitializedAsync()
@@ -162,6 +164,9 @@
         else
             if (usuarioCliente.Password == password2)
             {
+                //Deshabilito el boton
+                registrando = true;
+
                 //Asigno los valores apropiados
                 usuarioCliente.TipoCliente = Convert.ToChar(tipoCl.Substring(0, 1));
                 usuarioCliente.Genero = Convert.ToChar(genero.Substring(0, 1));
@@ -178,7 +183,10 @@
                     Snackbar.Add($"Registro exitoso, ahora puede iniciar sesion.", Severity.Success);
                 }                    
                 else
+                {
+                    registrando = false;
                     Snackbar.Add($"No se pudo crear el usuario", Severity.Error); 
+                }                    
             }
             else
                 Snackbar.Add($"Las contraseñas no coinciden", Severity.Error);              

@@ -8,6 +8,7 @@
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @inject IJSRuntime JS /*JS Interop*/
+@inject IDialogService DialogService
 @attribute [Authorize(Roles = "1, 2")]
 
 <AuthorizeView Context="usCont">
@@ -36,10 +37,10 @@
                 
                     @if (rubros != null)
                     {
-                        <MudSelect T="int" @bind-Value="@rub" Label="Rubro" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelect T="int" @bind-Value="@rub" Label="Rubro" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" onchange="@(()=>FiltrarTiposProductos)">
                             @foreach(var rubro in rubros)
                             {
-                                <MudSelectItem Value="@rubro.IdRubro">@(rubros.ToList().IndexOf(rubro) + 1) - @rubro.DescRubro</MudSelectItem>
+                                <MudSelectItem Value="@rubro.IdRubro" >@(rubros.ToList().IndexOf(rubro) + 1) - @rubro.DescRubro</MudSelectItem>
                             }
                         </MudSelect>
                     }
@@ -48,18 +49,20 @@
                         <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
                     }
                 
-                    @if (tiposProds != null)
+                    @if (tiposProdsPorRubro != null && tiposProdsPorRubro.Count() > 0)
                     {
-                        <MudSelect T="int" @bind-Value="@tipo" Label="Tipo de Producto" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                            @foreach(var tp in tiposProds)
+                        <MudSelect T="int" @bind-Value="@tipo" Label="Tipo de Producto" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Immediate=true>
+                            @foreach (var tp in tiposProdsPorRubro)
                             {
-                                <MudSelectItem Value="@tp.IdTipo">@(tiposProds.ToList().IndexOf(tp) + 1) - @tp.DescripcionTipo</MudSelectItem>
+                                <MudSelectItem Value="@tp.IdTipo">@(tiposProdsPorRubro.ToList().IndexOf(tp) + 1) - @tp.DescripcionTipo</MudSelectItem>
                             }
                         </MudSelect>
                     }
                     else
                     {
-                        <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                        tipo = 9999;
+                        <MudText Align="Align.Center" Color="Color.Info" Typo="Typo.body1">Sin Tipos de Productos</MudText>
+                        @*<MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />*@
                     }
 
                     <MudTextField Label="Precio de Costo" HelperText="Sin los adicionales. Formato 999,99 ó 999" @bind-Value="producto.PrecioCosto" For="@(() => producto.PrecioCosto)" Required="true"/>
@@ -135,12 +138,13 @@
     //Objetos para los CBO
     private IEnumerable<Rubro> rubros;
     private IEnumerable<TipoProducto> tiposProds;
+    private IEnumerable<TipoProducto> tiposProdsPorRubro = new List<TipoProducto>();
     private IEnumerable<Proveedor> provs;
     private IEnumerable<UnidadMedida> unids;
 
     //Objetos para guardar los valores
     private int rub = 1;
-    private int tipo = 1;
+    private int tipo = 9999;
     private int prov = 1;
     private int uni = 1;
 
@@ -154,6 +158,8 @@
         tiposProds = await ServTipoProd.ObtenerTiposProd();
         provs = await ServProv.ObtenerProveedores();
         unids = await ServUnidadMed.ObtenerUnidades();
+        if(rubros != null)
+            rub = rubros.FirstOrDefault().IdRubro;
 
         if(id > 0)
         {
@@ -163,8 +169,9 @@
             tipo = producto.TipoProd;
             prov = producto.Proveedor;
             uni = producto.UnidadMedida;
-            titulo = "Modificacion de Producto";
-        }             
+            titulo = "Modificacion de Producto";            
+        }  
+        FiltrarTiposProductos();
     }
 
     //Guardo el ID del usuario actual
@@ -173,26 +180,85 @@
     //A traves de un metodo se va a guardar los cambios del producto
     protected async Task GuardarProducto()
     {
-        //Asigno valores por si se cambiaron desde los CBO
-        producto.Rubro = rub;
-        producto.TipoProd = tipo;
-        producto.Proveedor = prov;
-        producto.UnidadMedida = uni;
-
-        if (producto.IdProducto > 0)
-            producto.UsuarioModif = idUsAct;
-        else
+        if(tiposProdsPorRubro != null && tiposProdsPorRubro.Count() > 0 && tipo != 9999)
         {
-            producto.UsuarioCrea = idUsAct;
-            producto.UsuarioModif = idUsAct;
-        }
+            //Asigno valores por si se cambiaron desde los CBO
+            producto.Rubro = rub;
+            producto.TipoProd = tipo;
+            producto.Proveedor = prov;
+            producto.UnidadMedida = uni;
 
+            if (producto.IdProducto > 0)
+                producto.UsuarioModif = idUsAct;
+            else
+            {
+                producto.UsuarioCrea = idUsAct;
+                producto.UsuarioModif = idUsAct;
+            }
+
+            if (producto.StockExistencia == 0 && (producto.PrecioCosto == 0 || producto.PrecioFinal == 0))
+            {
+                var resultDialog = await DialogService.ShowMessageBox(
+                    "¡Atencion!",
+                    "Esta por crear un producto con stock = 0 y precio = 0. ¿Desea continuar?",
+                    yesText: "Continuar", cancelText: "Cancelar");
+
+                if (resultDialog == true)
+                    await GuardandoRegistro();
+                else
+                    Snackbar.Add($"Se cancela la accion", Severity.Info);
+            }
+            else if(producto.StockExistencia == 0)
+            {
+                var resultDialog = await DialogService.ShowMessageBox(
+                    "¡Atencion!",
+                    "Esta por crear un producto con stock = 0. ¿Desea continuar?",
+                    yesText: "Continuar", cancelText: "Cancelar");
+
+                if (resultDialog == true)
+                    await GuardandoRegistro();
+                else
+                    Snackbar.Add($"Se cancela la accion", Severity.Info);
+            }
+            else if (producto.PrecioCosto == 0 || producto.PrecioFinal == 0)
+            {
+                var resultDialog = await DialogService.ShowMessageBox(
+                    "¡Atencion!",
+                    "Esta por crear un producto con precio = 0. ¿Desea continuar?",
+                    yesText: "Continuar", cancelText: "Cancelar");
+
+                if (resultDialog == true)
+                    await GuardandoRegistro();
+                else
+                    Snackbar.Add($"Se cancela la accion", Severity.Info);
+            }
+            else
+                await GuardandoRegistro();            
+        }
+        else
+            Snackbar.Add($"Debe seleccionar un tipo de producto valido", Severity.Warning);       
+    }
+
+
+    protected void FiltrarTiposProductos()
+    {
+        tiposProdsPorRubro = null;
+        tiposProdsPorRubro = tiposProds.Where(t => t.Rubro == rub).Where(t=> t.Activo = true);
+        if (tiposProdsPorRubro != null && tiposProdsPorRubro.Count() > 0)
+        {
+            tipo = 9999;
+            tipo = tiposProdsPorRubro.First().IdTipo;
+        }            
+    }
+
+    private async Task GuardandoRegistro()
+    {
         //Se llama al servicio para guardar
         var result = await ServProducto.GuardarProducto(producto);
 
         if (result)
-        {              
-            if(id > 0)
+        {
+            if (id > 0)
             {
                 //Se redirige hacia el listado de productos
                 NavigationManager.NavigateTo("/listaProductos");
@@ -201,7 +267,7 @@
             else
             {
                 var idUltimoProducto = await ServProducto.UltimoProductoCreado(idUsAct);
-                if(idUltimoProducto > 0)
+                if (idUltimoProducto > 0)
                 {
                     //Se redirige hacia las imagenes del producto
                     NavigationManager.NavigateTo($"/detallesProducto/imagenes/{idUltimoProducto}");
@@ -212,12 +278,12 @@
                     NavigationManager.NavigateTo("/listaProductos");
                     Snackbar.Add($"Producto agregado de forma exitosa", Severity.Success);
                 }
-            }            
-        }        
+            }
+        }
         else
             Snackbar.Add($"No se pudo crear/modificar el producto", Severity.Error);
     }
-
+    
     protected void Cancelar() => NavigationManager.NavigateTo("/listaProductos");
 
     protected void VerImagenes() => NavigationManager.NavigateTo($"/detallesProducto/imagenes/{id}");

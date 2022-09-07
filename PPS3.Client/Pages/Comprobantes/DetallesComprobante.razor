@@ -8,6 +8,7 @@
 @inject IServProducto ServProducto
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @inject IJSRuntime JS /*JS Interop*/
+@inject IDialogService DialogService
 @using Radzen.Blazor
 @*Con el atributo Authorize se procede a regular el acceso a toda la pagina por usuarios autorizados solamente*@
 @attribute [Authorize(Roles = "1, 2")]
@@ -188,7 +189,7 @@ else
     IEnumerable<FormaPago> formasPago;
 
     //Para completar el formulario
-    private int cant = 1;
+    private decimal cant = 1;
     private decimal bonif = 0;
     private string observ = "";
     private int tipoComp = 3;
@@ -228,64 +229,74 @@ else
                     Snackbar.Add($"Debe seleccionar la fecha del comprobante", Severity.Error);
                 else
                 {
-                    //Creo el objeto del encabezado del comprobante y asigno los valores
-                    EncabezadoComprobante enc = new EncabezadoComprobante();
-                    enc.Periodo = DateTime.Today.Year.ToString();
-                    enc.NumComp = "-";
-                    enc.TipoComprobante = tipoComp;
-                    enc.FechaComp = Convert.ToDateTime(fecha);
-                    enc.ClienteComp = cliente.IdCliente;
-                    enc.FormaPago = formaPago;
-                    enc.TipoVta = tipoVta;
-                    enc.ImporteFinal = productosAgregados.Sum(s => s.SubTotal);
-                    enc.SaldoRestante = enc.ImporteFinal;
-                    enc.Observaciones = observ;
-                    enc.UsuarioCrea = idUsAct;
+                    //Verifico la accion del usuario
+                    var options = new DialogOptions { CloseOnEscapeKey = true };
+                    var dialog = DialogService.Show<DialogComprobante>("Confirmar Acción", options);
+                    var resultDialog = await dialog.Result;
 
-                    var idEnc = await ServComp.CrearEncabezado(enc);
-                    if(idEnc > 0)
+                    if (!resultDialog.Cancelled)
                     {
-                        //Al haberse creado el encabezado, se lo asigno a cada elemento a guardarse de la lista de detalles del comprobante
-                        //Voy a comprobar que se guarden todos los registros
-                        var cantProd = productosAgregados.Count();
-                        var cantProdGuard = 0;
+                        //Creo el objeto del encabezado del comprobante y asigno los valores
+                        EncabezadoComprobante enc = new EncabezadoComprobante();
+                        enc.Periodo = DateTime.Today.Year.ToString();
+                        enc.NumComp = "-";
+                        enc.TipoComprobante = tipoComp;
+                        enc.FechaComp = Convert.ToDateTime(fecha);
+                        enc.ClienteComp = cliente.IdCliente;
+                        enc.FormaPago = formaPago;
+                        enc.TipoVta = tipoVta;
+                        enc.ImporteFinal = productosAgregados.Sum(s => s.SubTotal);
+                        enc.SaldoRestante = enc.ImporteFinal;
+                        enc.Observaciones = observ;
+                        enc.UsuarioCrea = idUsAct;
 
-                        foreach (var prod in productosAgregados)
+                        var idEnc = await ServComp.CrearEncabezado(enc);
+                        if(idEnc > 0)
                         {
-                            var detalle = new CuerpoComprobante();
-                            detalle.IdEncab = idEnc;
-                            detalle.ProductoCuerpo = prod.IdProducto;
-                            detalle.CantidadProdC = prod.Cantidad;
-                            detalle.PrecioUnitario = prod.PrecioFinal;
-                            detalle.Bonificacion = prod.Bonificacion;
-                            detalle.BonificacionTotal = prod.BonificacionTotal;
-                            detalle.Total = prod.SubTotal;
+                            //Al haberse creado el encabezado, se lo asigno a cada elemento a guardarse de la lista de detalles del comprobante
+                            //Voy a comprobar que se guarden todos los registros
+                            var cantProd = productosAgregados.Count();
+                            var cantProdGuard = 0;
 
-                            //Guardo cada registro del detalle
-                            var detalleGuardado = await ServDetalleComp.CrearCuerpo(detalle);
-                            if (detalleGuardado)
+                            foreach (var prod in productosAgregados)
                             {
-                                cantProdGuard++;
-                                continue;
+                                var detalle = new CuerpoComprobante();
+                                detalle.IdEncab = idEnc;
+                                detalle.ProductoCuerpo = prod.IdProducto;
+                                detalle.CantidadProdC = prod.Cantidad;
+                                detalle.PrecioUnitario = prod.PrecioFinal;
+                                detalle.Bonificacion = prod.Bonificacion;
+                                detalle.BonificacionTotal = prod.BonificacionTotal;
+                                detalle.Total = prod.SubTotal;
+
+                                //Guardo cada registro del detalle
+                                var detalleGuardado = await ServDetalleComp.CrearCuerpo(detalle);
+                                if (detalleGuardado)
+                                {
+                                    cantProdGuard++;
+                                    continue;
+                                }
+                                else
+                                {
+                                    Snackbar.Add($"No se pudo generar el comprobante correctamente. Problema en los detalles", Severity.Error);
+                                    break;                        
+                                }
+                            }
+
+                            if(cantProdGuard == cantProd)
+                            {
+                                //Si se guardaron todos los detalles de forma exitosa, navego hacia el listado de comprobantes
+                            NavigationManager.NavigateTo("/listaComprobantes");
+                            Snackbar.Add($"Comprobante Generado Correctamente", Severity.Success);
                             }
                             else
-                            {
-                                Snackbar.Add($"No se pudo generar el comprobante correctamente. Problema en los detalles", Severity.Error);
-                                break;                        
-                            }
-                        }
-
-                        if(cantProdGuard == cantProd)
-                        {
-                            //Si se guardaron todos los detalles de forma exitosa, navego hacia el listado de comprobantes
-                        NavigationManager.NavigateTo("/listaComprobantes");
-                        Snackbar.Add($"Comprobante Generado Correctamente", Severity.Success);
+                                Snackbar.Add($"No se pudo generar el comprobante", Severity.Error);
                         }
                         else
-                            Snackbar.Add($"No se pudo generar el comprobante", Severity.Error);
+                            Snackbar.Add($"No se pudo crear el comprobante, error en los datos principales", Severity.Error);
                     }
                     else
-                        Snackbar.Add($"No se pudo crear el comprobante, error en los datos principales", Severity.Error);
+                        Snackbar.Add($"Operacion Cancelada", Severity.Warning);
                 }
             }
         }

@@ -31,6 +31,7 @@
             var sql = @"
                         SELECT *
                         FROM tipos_documentos
+                        ORDER BY Sigla
                         ";
             var result = await db.QueryAsync<TipoDocumento>(sql, new { });
             return result;

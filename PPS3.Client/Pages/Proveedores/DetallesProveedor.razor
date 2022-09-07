@@ -4,6 +4,7 @@
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @inject IJSRuntime JS /*JS Interop*/
+@inject IDialogService DialogService
 @attribute [Authorize(Roles = "1, 2")]
 
 <AuthorizeView Context="usCont">
@@ -93,9 +94,23 @@
             }
             else
             {
-                //Se redirige hacia la pagina para agregar un contacto de proveedor
-                NavigationManager.NavigateTo($"/agregarContactoProv/{result}");
-                Snackbar.Add($"Proveedor agregado de forma exitosa", Severity.Success);
+                //Pregunto si redirigir hacia los contactos del proveedor
+                var resultDialog = await DialogService.ShowMessageBox(
+                            "Elegir Accion",
+                            "Proveedor agregado. ¿Ir a agregar un contacto del proveedor?",
+                            yesText: "Si", cancelText: "No");
+
+                if (resultDialog == true)
+                {
+                    //Se redirige hacia la pagina para agregar un contacto de proveedor
+                    NavigationManager.NavigateTo($"/agregarContactoProv/{result}");
+                    Snackbar.Add($"Proveedor agregado de forma exitosa", Severity.Success);
+                }
+                else
+                {
+                    NavigationManager.NavigateTo($"/listaProveedores");
+                    Snackbar.Add($"Proveedor agregado de forma exitosa", Severity.Success);
+                }                
             }            
         }        
         else

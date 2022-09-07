@@ -32,6 +32,7 @@
                         SELECT *
                         FROM formas_pago
                         WHERE Activo = 1
+                        ORDER BY FormaP
                         ";
             var result = await db.QueryAsync<FormaPago>(sql, new {});
             return result;

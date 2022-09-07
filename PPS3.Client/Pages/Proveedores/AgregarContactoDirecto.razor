@@ -4,6 +4,7 @@
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @inject IJSRuntime JS /*JS Interop*/
+@inject IDialogService DialogService
 @attribute [Authorize(Roles = "1, 2")]
 
 <AuthorizeView Context="usCont">
@@ -87,9 +88,24 @@
 
         if (result)
         {
-            //Se redirige hacia el listado de contactos
-            NavigationManager.NavigateTo("/listaContactosProv");
-            Snackbar.Add($"Contacto agregado de forma exitosa", Severity.Success);
+            //Le doy la opcion al usuario de seguir creando registros o volver a la lista de contactos
+            var resultDialog = await DialogService.ShowMessageBox(
+                                    "Elegir Accion",
+                                    "Contacto de proveedor agregado. ¿Crear otro?",
+                                    yesText: "Si", cancelText: "No");
+
+            if (resultDialog == true)
+            {
+                //Se mantiene en la pagina para seguir creando registros
+                NavigationManager.NavigateTo($"/agregarContactoProv/{id}", true);
+                Snackbar.Add($"Contacto agregado de forma exitosa", Severity.Success);
+            }
+            else
+            {
+                //Se redirige hacia el listado de contactos
+                NavigationManager.NavigateTo("/listaContactosProv");
+                Snackbar.Add($"Contacto agregado de forma exitosa", Severity.Success);
+            }
         }
         else
             Snackbar.Add($"No se pudo crear el contacto", Severity.Error);

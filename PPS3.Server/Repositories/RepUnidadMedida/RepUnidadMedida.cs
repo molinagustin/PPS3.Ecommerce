@@ -90,6 +90,7 @@ namespace PPS3.Server.Repositories.RepUnidadMedida
             var sql = @"
                         SELECT *
                         FROM unidades_medida
+                        ORDER BY DescripcionUnidad
                         ";
 
             var result = await db.QueryAsync<UnidadMedida>(sql, new { });
