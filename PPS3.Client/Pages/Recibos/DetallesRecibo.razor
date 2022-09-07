@@ -293,22 +293,18 @@ else
                                 if(idRec > 0)
                                 {
                                     //Guardo el importe total del recibo para irlo restando de los comprobantes
-                                    var saldoReciboRest = recibo.ImporteTotal;
-
-                                    //Con una variable veo si se terminan de guardar los comprobantes
-                                    var cantCompr = comprobantesAgregados.Count();
-                                    var cantComprGuardados = 0;
+                                    var saldoReciboRest = recibo.ImporteTotal;                                   
 
                                     //Veo cada comprobante y le voy restando el importe restante del recibo
                                     foreach (var comp in comprobantesAgregados)
                                     {
+                                        //En cada iteracion, se analiza si el saldo restante del recibo es mayor a 0, queriendo decir que todavia se puede quitar importe de los comprobantes siguientes
                                         if (saldoReciboRest > 0)
                                         {
-                                            var saldo = saldoReciboRest;
-                                            var saldoRestanteComp = comp.SaldoRestante;
+                                            //Lo primero que hay es analizar si el saldo final que me da entre el importe del comprobante y lo que restaba del recibo, es mayor que 0. Si es mayor, quiere decir que el saldo del recibo no alcanza para cubrir la totalidad del comprobante por lo que solo se restara una parte del saldo restante de ese comprobante. En cambio si es =0 o <0 quiere decir que el saldo restante del recibo alcanza para cubrir el saldo restante del comprobante, y si queda mas saldo del recibo, se puede seguir restando a los siguientes comprobantes
                                             //             2500                6000 = -3500
                                             //             6000                2500 = 3500
-                                            saldo = comp.SaldoRestante - saldoReciboRest;
+                                            var saldo = comp.SaldoRestante - saldoReciboRest;
 
                                             if(saldo > 0)
                                             {
@@ -331,10 +327,7 @@ else
                                                     var compAct = await ServComp.ActualizarComprobante(comp);
 
                                                     if (compAct)
-                                                    {
-                                                        cantComprGuardados++;
-                                                        continue;
-                                                    }                                            
+                                                        break;                              
                                                     else
                                                     {
                                                         Snackbar.Add($"No se pudo actualizar el comprobante del recibo por un error. Se descontinua la operacion.", Severity.Error);                   
@@ -358,7 +351,7 @@ else
                                                 //Guardo los valores del detalle del recibo
                                                 detalle.IdComprobante = comp.IdEncab;
                                                 detalle.IdRecibo = idRec;
-                                                detalle.Importe = saldoRestanteComp;
+                                                detalle.Importe = comp.SaldoRestante;
 
                                                 var detalleCreado = await ServDetRecibo.CrearDetalleRecibo(detalle);
 
@@ -371,16 +364,11 @@ else
 
                                                     var compAct = await ServComp.ActualizarComprobante(comp);
 
-                                                    if (compAct)
+                                                    if (!compAct)
                                                     {
-                                                        cantComprGuardados++;
-                                                        continue;
-                                                    }                                            
-                                                    else
-                                                    {
-                                                        Snackbar.Add($"No se pudo actualizar el comprobante del recibo por un error. Se descontinua la operacion.", Severity.Error);                   
+                                                        Snackbar.Add($"No se pudo actualizar el comprobante del recibo por un error. Se descontinua la operacion.", Severity.Error);
                                                         break;
-                                                    }                                    
+                                                    }
                                                 }
                                                 else
                                                 {
@@ -393,9 +381,8 @@ else
                                             break;
                                     }
 
-                                    //Si se terminan todas las operaciones correctamente, recargo la pagina
-                                    if (cantCompr == cantComprGuardados)
-                                        NavigationManager.NavigateTo("/detallesRecibo", forceLoad:true);
+                                    //Navego a la pagina de inicio
+                                    NavigationManager.NavigateTo("/detallesRecibo", forceLoad:true);
                                 }
                                 else
                                     Snackbar.Add($"No se pudo generar el recibo (encabezado). Error de insercion.", Severity.Error);   
@@ -407,7 +394,7 @@ else
                             Snackbar.Add($"El importe del recibo no puede superar la suma a ingresar de los comprobantes", Severity.Error);
                     }
                     else
-                        Snackbar.Add($"La forma de pago debe ser distinta de Sin Pagar", Severity.Error);                    
+                        Snackbar.Add($"La forma de pago debe ser distinta de Sin Pagar", Severity.Error);
                 }
                 else
                     Snackbar.Add($"La fecha es incorrecta", Severity.Error);
