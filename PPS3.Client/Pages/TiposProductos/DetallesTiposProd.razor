@@ -69,6 +69,7 @@
 
     private bool active;
     private int rubro = 1;
+    private bool estadoTipoProdInicial = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -78,7 +79,8 @@
         {
             tipoProd = await ServTipoProd.ObtenerTipoProd(id);
             rubro = tipoProd.Rubro;
-            active = tipoProd.Activo;            
+            active = tipoProd.Activo;
+            estadoTipoProdInicial = tipoProd.Activo;
         }
     }
 
@@ -100,16 +102,38 @@
             tipoProd.UsuarioModif = idUsAct;
         }
 
-        var result = await ServTipoProd.GuardarTipoProd(tipoProd);
+        if (tipoProd.IdTipo > 0)
+        {
+            if(estadoTipoProdInicial != tipoProd.Activo && estadoTipoProdInicial)
+            {
+                //Verifico que no haya ningun producto activo dentro de ese tipo de producto
+                var cantProdActivos = await ServTipoProd.CantidadProductosActivos(tipoProd.IdTipo);
 
-        if (result)
-        {              
-            //Se redirige hacia el listado de productos
-            NavigationManager.NavigateTo("/listaTiposProd", true);
-            Snackbar.Add($"Tipo de Producto agregado/modificado de forma exitosa", Severity.Success);
-        }        
+                //Si existen productos activos, no dejo dar de baja ese tipo de producto
+                if (cantProdActivos > 0)
+                    Snackbar.Add($"No se puede dar de baja el tipo de producto ya que todavia existen {cantProdActivos} productos activos en el mismo.", Severity.Error);
+                else
+                    await CodigoInterno();
+            }
+            else
+                await CodigoInterno();
+        }
         else
-            Snackbar.Add($"No se pudo crear/modificar el Tipo de Producto", Severity.Error);
+            await CodigoInterno();
+
+        async Task CodigoInterno()
+        {
+            var result = await ServTipoProd.GuardarTipoProd(tipoProd);
+
+            if (result)
+            {
+                //Se redirige hacia el listado de productos
+                NavigationManager.NavigateTo("/listaTiposProd", true);
+                Snackbar.Add($"Tipo de Producto agregado/modificado de forma exitosa", Severity.Success);
+            }
+            else
+                Snackbar.Add($"No se pudo crear/modificar el Tipo de Producto", Severity.Error);
+        }
     }
 
     protected void Cancelar() => NavigationManager.NavigateTo("/listaTiposProd");

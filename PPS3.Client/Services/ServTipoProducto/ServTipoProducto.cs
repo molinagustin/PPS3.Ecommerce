@@ -37,6 +37,34 @@ namespace PPS3.Client.Services.ServTipoProducto
                 return false;
         }
 
+        public async Task<int> CantidadProductosActivos(int idTipo)
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return 0;
+
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/TiposProductos/CantidadProductosActivos/{idTipo}");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+            //Envio la solicitud HTTP
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var cantidad = await JsonSerializer.DeserializeAsync<int>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return cantidad;
+            }
+            else
+                return 0;
+        }
+
         public async Task<bool> GuardarTipoProd(TipoProducto tipoProd)
         {
             //Obtengo el token de sesion del usuario

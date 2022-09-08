@@ -172,5 +172,19 @@
             var result = await db.ExecuteScalarAsync<int>(sql, new { });
             return result;
         }
+
+        public async Task<int> CantidadTiposProductosActivos(int idRubro)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT COUNT(r.IdRubro) as Cantidad
+                        FROM rubros as r
+                        INNER JOIN productos_tipos as pt ON r.IdRubro = pt.Rubro
+                        WHERE pt.Activo = 1 AND r.IdRubro = @idRubro
+                        ";
+            var result = await db.ExecuteScalarAsync<int>(sql, new { idRubro });
+            return result;
+        }
     }
 }

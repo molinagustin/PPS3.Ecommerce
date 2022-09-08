@@ -7,7 +7,7 @@ namespace PPS3.Shared.InternalModels
         //=======>>>    PROPIEDADES DE USUARIO    <<<=======
         public int IdUsuarioAct { get; set; }
         [Required(ErrorMessage = "Se debe introducir el Nombre Completo del Usuario/Cliente a crear.")]
-        [RegularExpression(@"^[a-zA-Z ]{4,}$", ErrorMessage = "El nombre de usuario debe contener letras mayusculas y/o minusculas solamente y se puede usar espaciado (Min. 4)")]
+        [RegularExpression(@"^[a-zA-Z ]{4,}$", ErrorMessage = "El nombre debe contener letras mayusculas y/o minusculas solamente y se puede usar espaciado (Min. 4)")]
         public string NombreCompleto { get; set; } = string.Empty;
         [Required(ErrorMessage = "Se debe introducir un Nombre de Usuario.")]
         [RegularExpression(@"^[a-zA-Z]{4,8}$", ErrorMessage = "El nombre de usuario debe contener letras mayusculas y/o minusculas solamente (Min. 4 Max. 8)")]

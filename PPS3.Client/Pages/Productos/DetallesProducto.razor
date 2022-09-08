@@ -148,6 +148,8 @@
     private int prov = 1;
     private int uni = 1;
 
+    private bool estadoActivoInicial = false;
+
     private string titulo = "Creacion de Nuevo Producto";
 
     //Se verifica si el formulario sera de insercion o de modificacion
@@ -169,6 +171,7 @@
             tipo = producto.TipoProd;
             prov = producto.Proveedor;
             uni = producto.UnidadMedida;
+            estadoActivoInicial = producto.Activo;
             titulo = "Modificacion de Producto";            
         }  
         FiltrarTiposProductos();
@@ -196,44 +199,63 @@
                 producto.UsuarioModif = idUsAct;
             }
 
-            if (producto.StockExistencia == 0 && (producto.PrecioCosto == 0 || producto.PrecioFinal == 0))
+            //Voy a emitir una alerta si llego a querer dar de baja un producto con stock
+            if (producto.StockExistencia > 0 && (estadoActivoInicial != producto.Activo) && estadoActivoInicial)
             {
                 var resultDialog = await DialogService.ShowMessageBox(
-                    "¡Atencion!",
-                    "Esta por crear un producto con stock = 0 y precio = 0. ¿Desea continuar?",
-                    yesText: "Continuar", cancelText: "Cancelar");
+                       "¡Atención!",
+                       "Esta intentado dar de baja un producto con stock > 0. ¿Continuar?",
+                       yesText: "Continuar", cancelText: "Cancelar");
 
                 if (resultDialog == true)
-                    await GuardandoRegistro();
-                else
-                    Snackbar.Add($"Se cancela la accion", Severity.Info);
-            }
-            else if(producto.StockExistencia == 0)
-            {
-                var resultDialog = await DialogService.ShowMessageBox(
-                    "¡Atencion!",
-                    "Esta por crear un producto con stock = 0. ¿Desea continuar?",
-                    yesText: "Continuar", cancelText: "Cancelar");
-
-                if (resultDialog == true)
-                    await GuardandoRegistro();
-                else
-                    Snackbar.Add($"Se cancela la accion", Severity.Info);
-            }
-            else if (producto.PrecioCosto == 0 || producto.PrecioFinal == 0)
-            {
-                var resultDialog = await DialogService.ShowMessageBox(
-                    "¡Atencion!",
-                    "Esta por crear un producto con precio = 0. ¿Desea continuar?",
-                    yesText: "Continuar", cancelText: "Cancelar");
-
-                if (resultDialog == true)
-                    await GuardandoRegistro();
+                    await EmpezarGuardado();
                 else
                     Snackbar.Add($"Se cancela la accion", Severity.Info);
             }
             else
-                await GuardandoRegistro();            
+                await EmpezarGuardado();
+
+            async Task EmpezarGuardado()
+            {
+                if (producto.StockExistencia == 0 && (producto.PrecioCosto == 0 || producto.PrecioFinal == 0))
+                {
+                    var resultDialog = await DialogService.ShowMessageBox(
+                        "¡Atencion!",
+                        "Esta por guardar un producto con stock = 0 y precio = 0. ¿Desea continuar?",
+                        yesText: "Continuar", cancelText: "Cancelar");
+
+                    if (resultDialog == true)
+                        await GuardandoRegistro();
+                    else
+                        Snackbar.Add($"Se cancela la accion", Severity.Info);
+                }
+                else if (producto.StockExistencia == 0)
+                {
+                    var resultDialog = await DialogService.ShowMessageBox(
+                        "¡Atencion!",
+                        "Esta por guardar un producto con stock = 0. ¿Desea continuar?",
+                        yesText: "Continuar", cancelText: "Cancelar");
+
+                    if (resultDialog == true)
+                        await GuardandoRegistro();
+                    else
+                        Snackbar.Add($"Se cancela la accion", Severity.Info);
+                }
+                else if (producto.PrecioCosto == 0 || producto.PrecioFinal == 0)
+                {
+                    var resultDialog = await DialogService.ShowMessageBox(
+                        "¡Atencion!",
+                        "Esta por guardar un producto con precio = 0. ¿Desea continuar?",
+                        yesText: "Continuar", cancelText: "Cancelar");
+
+                    if (resultDialog == true)
+                        await GuardandoRegistro();
+                    else
+                        Snackbar.Add($"Se cancela la accion", Severity.Info);
+                }
+                else
+                    await GuardandoRegistro();
+            }                       
         }
         else
             Snackbar.Add($"Debe seleccionar un tipo de producto valido", Severity.Warning);       

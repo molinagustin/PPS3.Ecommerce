@@ -7,5 +7,6 @@
         Task<TipoProducto> ObtenerTipoProd(int id);
         Task<bool> GuardarTipoProd(TipoProducto tipoProd);
         Task<bool> BorrarTipoProd(int id);
+        Task<int> CantidadProductosActivos(int idTipo);
     }
 }

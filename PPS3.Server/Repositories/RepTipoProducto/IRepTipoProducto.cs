@@ -8,5 +8,6 @@
         Task<bool> InsertarTipoProducto(TipoProducto tipoProducto);
         Task<bool> ActualizarTipoProducto(TipoProducto tipoProducto);
         Task<bool> BorrarTipoProducto(int id);
+        Task<int> CantidadProductosActivos(int idTipo);
     }
 }

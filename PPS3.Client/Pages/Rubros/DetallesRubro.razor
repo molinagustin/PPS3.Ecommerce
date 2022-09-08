@@ -54,6 +54,7 @@
     Rubro rubro = new Rubro();
 
     private bool active;
+    private bool estadoActivoInicial = false;
 
     protected async Task GuardarRubro()
     {
@@ -68,40 +69,61 @@
             rubro.UsuarioModif = idUsAct;
         }
 
-        var result = await ServRubro.GuardarRubro(rubro);
-
-        if (result > 0)
-        {              
-            if(id > 0)
+        if (rubro.IdRubro > 0)
+        {
+            if (estadoActivoInicial != rubro.Activo && estadoActivoInicial)
             {
-                //Se redirige hacia el listado de productos
-                NavigationManager.NavigateTo("/listaRubros", true);
-                Snackbar.Add($"Rubro modificado de forma exitosa", Severity.Success);
+                var cantTipoProdsAct = await ServRubro.CantidadTiposProductosActivos(rubro.IdRubro);
+
+                if (cantTipoProdsAct > 0)
+                    Snackbar.Add($"No se puede dar de baja el rubro ya que posee {cantTipoProdsAct} tipos de productos (categorias) activas", Severity.Error);
+                else
+                    await CodigoInterno();
             }
             else
-            {
-                //Pregunto si quiere ir a crear un tipo de producto nuevo
-                var options = new DialogOptions { CloseOnEscapeKey = true };
-                var dialog = DialogService.Show<DialogRubro>("Rubro Agregado Correctamente", options);
-                var resultDialog = await dialog.Result;
+                await CodigoInterno();
+        }
+        else
+            await CodigoInterno();
 
-                if (!resultDialog.Cancelled)
+
+        async Task CodigoInterno()
+        {
+            var result = await ServRubro.GuardarRubro(rubro);
+
+            if (result > 0)
+            {
+                if (id > 0)
                 {
-                    //Se redirige hacia agregar un nuevo tipo de producto
-                    NavigationManager.NavigateTo($"/agregarTipoProd/{result}", true);
-                    Snackbar.Add($"Rubro agregado de forma exitosa", Severity.Success);
+                    //Se redirige hacia el listado de productos
+                    NavigationManager.NavigateTo("/listaRubros", true);
+                    Snackbar.Add($"Rubro modificado de forma exitosa", Severity.Success);
                 }
                 else
                 {
-                    //Se redirige hacia la lista de rubros
-                    NavigationManager.NavigateTo($"/listaRubros", true);
-                    Snackbar.Add($"Rubro agregado de forma exitosa", Severity.Success);
+                    //Pregunto si quiere ir a crear un tipo de producto nuevo
+                    var options = new DialogOptions { CloseOnEscapeKey = true };
+                    var dialog = DialogService.Show<DialogRubro>("Rubro Agregado Correctamente", options);
+                    var resultDialog = await dialog.Result;
+
+                    if (!resultDialog.Cancelled)
+                    {
+                        //Se redirige hacia agregar un nuevo tipo de producto
+                        NavigationManager.NavigateTo($"/agregarTipoProd/{result}", true);
+                        Snackbar.Add($"Rubro agregado de forma exitosa", Severity.Success);
+                    }
+                    else
+                    {
+                        //Se redirige hacia la lista de rubros
+                        NavigationManager.NavigateTo($"/listaRubros", true);
+                        Snackbar.Add($"Rubro agregado de forma exitosa", Severity.Success);
+                    }
+
                 }
-                
-            }            
+            }
+            else
+                Snackbar.Add($"No se pudo crear/modificar el Rubro", Severity.Error);
         }        
-        else
-            Snackbar.Add($"No se pudo crear/modificar el Rubro", Severity.Error);
     }
 
     protected override async Task OnInitializedAsync()
@@ -110,6 +132,7 @@
         {
             rubro = await ServRubro.ObtenerRubro(id);
             active = rubro.Activo;
+            estadoActivoInicial = rubro.Activo;
         }
     }
 

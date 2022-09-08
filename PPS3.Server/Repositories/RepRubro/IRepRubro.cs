@@ -10,5 +10,6 @@
         Task<int> InsertarRubro(Rubro rubro);
         Task<int> ActualizarRubro(Rubro rubro);
         Task<bool> BorrarRubro(int id);
+        Task<int> CantidadTiposProductosActivos(int idRubro);
     }
 }

@@ -54,6 +54,13 @@ namespace PPS3.Server.Controllers
             return Ok(response);
         }
 
+        [HttpGet("{idRubro}")]
+        public async Task<ActionResult<int>> CantidadTiposProductosActivos(int idRubro)
+        {
+            var response = await _repRubro.CantidadTiposProductosActivos(idRubro);
+            return Ok(response);
+        }
+
         [HttpPost]
         public async Task<ActionResult<int>> CrearRubro([FromBody] Rubro rubro)
         { 

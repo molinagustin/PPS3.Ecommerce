@@ -4,52 +4,64 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 
-<MudText Typo="Typo.h4" Align="Align.Center" Style="margin-bottom:30px;">Ingresar al sitio</MudText>
 
-<EditForm Model="@usuarioReq" OnValidSubmit="@Validar">
-    <DataAnnotationsValidator/>
-    <MudGrid Justify="Justify.Center" Style="margin-bottom:30px;">
-        <MudItem xs="5">
-            <MudCardMedia Image="images/expo_ceramicas_logo_login.png" Height="300" />
-        </MudItem>
+<AuthorizeView Context="usCont">
+    <Authorized>
+        @if(redirigir)
+        {
+            Redireccion();
+        }
+    </Authorized>
 
-        <MudItem xs="5" >
-            <MudCard>
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos de Inicio Sesion</MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudTextField Label="Nombre Usuario" HelperText="Mayusculas y Minusculas no son iguales"
-                              @bind-Value="usuarioReq.NombreUs" For="@(() => usuarioReq.NombreUs)"
-                              AutoFocus = "true"/>
-                    <MudTextField Label="Password" Class="mt-3"
-                                  @bind-Value="usuarioReq.Password" For="@(() => usuarioReq.Password)" 
-                                  InputType="InputType.Password"/>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Login" Color="Color.Success" ButtonType="ButtonType.Submit">INGRESAR</MudButton>
-                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Login" Color="Color.Info" Href="/registro">REGISTRARSE</MudButton>
-                </MudCardActions>
-            </MudCard>
-        </MudItem>
-    </MudGrid>
-</EditForm>
+    <NotAuthorized>
+        <MudText Typo="Typo.h4" Align="Align.Center" Style="margin-bottom:30px;">Ingresar al sitio</MudText>
 
-<MudGrid Justify="Justify.Center">
-    <MudPaper Class="pa-1 ma-2" Elevation="1" Style="background-color:#594ae2; margin-bottom:25px;" Width="100%" Height="20px;"/>
+        <EditForm Model="@usuarioReq" OnValidSubmit="@Validar">
+            <DataAnnotationsValidator />
+            <MudGrid Justify="Justify.Center" Style="margin-bottom:30px;">
+                <MudItem xs="5">
+                    <MudCardMedia Image="images/expo_ceramicas_logo_login.png" Height="300" />
+                </MudItem>
 
-    <MudPaper Class="pa-1 ma-2" Elevation="1" Style="background-color:#594ae2; margin-bottom:25px;" Width="75%" Height="15px;" />
+                <MudItem xs="5">
+                    <MudCard>
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos de Inicio Sesion</MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudTextField Label="Nombre Usuario" HelperText="Mayusculas y Minusculas no son iguales"
+                                          @bind-Value="usuarioReq.NombreUs" For="@(() => usuarioReq.NombreUs)"
+                                          AutoFocus="true" />
+                            <MudTextField Label="Password" Class="mt-3"
+                                          @bind-Value="usuarioReq.Password" For="@(() => usuarioReq.Password)"
+                                          InputType="InputType.Password" />
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Login" Color="Color.Success" ButtonType="ButtonType.Submit">INGRESAR</MudButton>
+                            <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Login" Color="Color.Info" Href="/registro">REGISTRARSE</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
 
-    <MudPaper Class="pa-1 ma-2" Elevation="1" Style="background-color:#594ae2; margin-bottom:25px;" Width="50%" Height="10px;" />
+        <MudGrid Justify="Justify.Center">
+            <MudPaper Class="pa-1 ma-2" Elevation="1" Style="background-color:#594ae2; margin-bottom:25px;" Width="100%" Height="20px;" />
 
-</MudGrid>
+            <MudPaper Class="pa-1 ma-2" Elevation="1" Style="background-color:#594ae2; margin-bottom:25px;" Width="75%" Height="15px;" />
 
+            <MudPaper Class="pa-1 ma-2" Elevation="1" Style="background-color:#594ae2; margin-bottom:25px;" Width="50%" Height="10px;" />
+        </MudGrid>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     //Objeto que guardara los datos de login
     private UsuarioRequest usuarioReq = new UsuarioRequest();
+
+    private bool redirigir = true;
 
     private async Task Validar()
     {
@@ -65,4 +77,6 @@
         else
             Snackbar.Add($"El usuario y/o contraseña no son correctos", Severity.Error);      
     }
+
+    private void Redireccion() => NavigationManager.NavigateTo("/");
 }

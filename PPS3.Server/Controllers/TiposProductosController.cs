@@ -37,6 +37,13 @@ namespace PPS3.Server.Controllers
             return Ok(response);
         }
 
+        [HttpGet("{idTipo}")]
+        public async Task<ActionResult<int>> CantidadProductosActivos(int idTipo)
+        {
+            var response = await _repTipoProducto.CantidadProductosActivos(idTipo);
+            return Ok(response);
+        }
+
         [HttpPost]
         public async Task<ActionResult> CrearTipoProducto([FromBody] TipoProducto tipoProducto)
         {
