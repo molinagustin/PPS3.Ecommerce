@@ -19,6 +19,10 @@ namespace PPS3.Shared.InternalModels
         public string? FormaP { get; set; }
         public string? Observaciones { get; set; }
 
+        //Propiedad para buscar el cliente y relacionarlo en la generacion de comprobantes
+        public int Cliente { get; set; }
+        public bool CompGenerado { get; set; } = false;
+
         //Para guardar los detalles del carro
         public ICollection<DetalleCarroCompra>? DetallesCarro { get; set; }
     }

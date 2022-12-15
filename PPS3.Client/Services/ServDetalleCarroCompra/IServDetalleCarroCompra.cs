@@ -9,5 +9,6 @@ namespace PPS3.Client.Services.ServDetalleCarroCompra
         Task<IEnumerable<DetalleCarroCompra>> ObtenerDetallesCarro(int idCarro);
         Task<bool> GuardarDetalle(DetalleCarroCompra detalle);
         Task<bool> BorrarDetalle(int id);
+        Task<bool> ActualizarStockProductos(int id);
     }
 }

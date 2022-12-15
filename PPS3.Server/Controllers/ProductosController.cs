@@ -150,6 +150,25 @@ namespace PPS3.Server.Controllers
                 return Problem();            
         }
 
+        [HttpPost]
+        public async Task<ActionResult> ActualizarStockProductos(List<StockProducto> productos)
+        {
+            if (productos == null || productos.Count() < 1)
+                return BadRequest();
+
+            if (ModelState.IsValid)
+            {
+                var response = await _repProducto.ActualizarStockProductos(productos);
+
+                if (response != false)
+                    return Ok();
+                else
+                    return BadRequest();
+            }
+            else
+                return Problem();
+        }
+
         [HttpPut]
         public async Task<ActionResult> ActualizarProducto([FromBody] Producto producto)
         {

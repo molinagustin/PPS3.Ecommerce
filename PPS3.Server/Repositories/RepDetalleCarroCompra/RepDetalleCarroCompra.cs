@@ -1,4 +1,6 @@
-﻿namespace PPS3.Server.Repositories.RepDetalleCarroCompra
+﻿using PPS3.Shared.Models;
+
+namespace PPS3.Server.Repositories.RepDetalleCarroCompra
 {
     public class RepDetalleCarroCompra : IRepDetalleCarroCompra
     {
@@ -133,6 +135,30 @@
                         ";
             var result = await db.QueryAsync<DetalleCarroCompra>(sql, new { });
             return result;
+        }
+
+        public async Task<bool> ActualizarStockProductos(int id)
+        {
+            var db = dbConnection();
+
+            var sql = $"SELECT ccd.Producto AS IdProducto, (ccd.Cantidad + p.StockExistencia) AS StockExistencia FROM carros_compras_detalles ccd INNER JOIN productos p ON ccd.Producto = p.IdProducto WHERE ccd.Carro = {id};";
+            var result = await db.QueryAsync<StockProducto>(sql);
+
+            if(result != null && result.Count() > 0)
+            {
+                //Actualizo el stock de cada producto
+                var cantProd = result.Count();
+                var cantProdAct = 0;
+
+                foreach (var prod in result)
+                {
+                    var sqlAct = "UPDATE productos SET StockExistencia=@StockExistencia WHERE IdProducto=@IdProducto;";
+                    cantProdAct += await db.ExecuteAsync(sqlAct, new { prod.StockExistencia, prod.IdProducto });
+                }
+
+                return (cantProd == cantProdAct);
+            }
+            else return false;
         }
     }
 }

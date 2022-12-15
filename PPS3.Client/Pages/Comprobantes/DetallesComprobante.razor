@@ -4,8 +4,8 @@
 @inject IServCuerpoComprobante ServDetalleComp
 @inject IServTipoComprobante ServTipoComp
 @inject IServCliente ServCliente
-@inject IServFormaPago ServFormaPago
 @inject IServProducto ServProducto
+@inject IServCarroCompra ServCarro
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @inject IJSRuntime JS /*JS Interop*/
 @inject IDialogService DialogService
@@ -21,7 +21,7 @@
 
 <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Primary" Variant="Variant.Outlined" Href="/listaComprobantes" Size="Size.Small" Style="margin-bottom:10px;">Volver</MudButton>
 
-@if (productosDisponibles == null || clientes == null || tiposComp == null || formasPago == null)
+@if (ordenes == null || clientes == null || tiposComp == null)
 {
     <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
 }
@@ -31,169 +31,212 @@ else
         @*CLIENTES*@
         <MudItem xs="2">
             <MudText Align="Align.Center" Typo="Typo.h6">Clientes</MudText>
-            <RadzenGrid Data="@clientes" TItem="Cliente" RowSelect="@(args => cliente = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
+            <RadzenGrid Data="@clientes" TItem="Cliente" RowSelect="@(args => cliente = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true" ValueChanged="cliente => CambioCliente()">
                 <Columns>
                     <RadzenGridColumn TItem="Cliente" Property="NombreCompleto" Title="Nombre"></RadzenGridColumn>
                     <RadzenGridColumn TItem="Cliente" Property="NumDocumento" Title="N° Doc." Width="90px"></RadzenGridColumn>
                 </Columns>
             </RadzenGrid>
         </MudItem>
-        @*LISTADO PRODUCTOS*@
+
+        @*LISTADO ORDENES COMPRA*@
         <MudItem lg="8">
-            <MudText Align="Align.Center" Typo="Typo.h6">Lista de Productos</MudText>
-            <RadzenGrid Data="@productosDisponibles" TItem="ProductoListado" RowSelect="@(args => prodSelect = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
-                <Columns>
-                    <RadzenGridColumn TItem="ProductoListado" Property="NombreProd" Title="Nombre Producto"></RadzenGridColumn>
-                    @*<RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripcion"></RadzenGridColumn>*@
-                    <RadzenGridColumn TItem="ProductoListado" Property="DescRubro" Title="Rubro" Width="120px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductoListado" Property="DescripcionTipo" Title="Tipo Producto"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductoListado" Property="PrecioFinal" Title="Precio Venta" Width="100px">
-                        <Template Context="pVta">
-                            @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pVta.PrecioFinal)
-                        </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductoListado" Property="DescripcionUnidad" Title="Unidad Medida" Width="120px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductoListado" Property="NombreProv" Title="Proveedor" Width="135px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductoListado" Property="StockExistencia" Title="Stock" Width="85px"></RadzenGridColumn>
-                </Columns>
-            </RadzenGrid>
+            <MudText Align="Align.Center" Typo="Typo.h6">Lista de Ordenes de Compra</MudText>
+            
+            @if (ordenesCliente == null || ordenesCliente.Count() < 1)
+            {
+                <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Info" Style="margin-top:40px;">Sin Ordenes de Compra</MudText>
+            }
+            else
+            {
+                <RadzenTabs>
+                    <Tabs>
+                        <RadzenTabsItem Text="Ordenes de Compra">
+                            <RadzenGrid Data="@ordenesCliente" TItem="OrdenesCompraListado" RowSelect="@(args => orden = args)" AllowPaging="true" AllowSorting="true">
+                                <Columns>
+                                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="N° Orden" Width="75px"></RadzenGridColumn>
+                                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Estado" Title="Estado" Width="90px">
+                                        <Template Context="est">
+                                            @if(est.Estado == "Pendiente")
+                                            {
+                                                <div style="color:deepskyblue">@est.Estado</div>      
+                                            } 
+                                            else 
+                                            {
+                                                <div style="color:green;">@est.Estado</div>
+                                            }
+                                        </Template>
+                                    </RadzenGridColumn>
+                                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaOrden" Title="Fecha Orden" Width="105px">
+                                        <Template Context="fecha">
+                                            @string.Format("{0:d}", fecha.FechaOrden)
+                                        </Template>
+                                    </RadzenGridColumn>
+                                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaEntrega" Title="Fecha Ent." Width="90px">
+                                        <Template Context="fecha">
+                                            @if (fecha.FechaEntrega == null)
+                                            {
+                                                @string.Format("----")
+                                                ;
+                                            }
+                                            else
+                                            {
+                                                @string.Format("{0:d}", fecha.FechaEntrega)
+                                                ;
+                                            }
+                                        </Template>
+                                    </RadzenGridColumn>
+                                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Total" Title="Total" Width="120px">
+                                        <Template Context="total">
+                                            @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", total.Total)
+                                        </Template>
+                                    </RadzenGridColumn>
+                                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Pagado" Title="Pagado" Width="70px">
+                                        <Template Context="pagado">
+                                            @if (pagado.Pagado)
+                                            {
+                                                <MudIcon Icon="@Icons.Filled.Check" Color="Color.Success"></MudIcon>
+                                            }
+                                            else
+                                            {
+                                                <MudIcon Icon="@Icons.Filled.Dangerous" Color="Color.Error"></MudIcon>
+                                            }
+                                        </Template>
+                                    </RadzenGridColumn>
+                                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="CompGenerado" Title="Comp. Gen." Width="85px">
+                                        <Template Context="comp">
+                                            @if (comp.CompGenerado)
+                                            {
+                                                <MudIcon Icon="@Icons.Filled.Check" Color="Color.Success"></MudIcon>
+                                            }
+                                            else
+                                            {
+                                                <MudIcon Icon="@Icons.Filled.Dangerous" Color="Color.Error"></MudIcon>
+                                            }
+                                        </Template>
+                                    </RadzenGridColumn>
+                                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Observaciones" Title="Observaciones"></RadzenGridColumn>
+                                </Columns>
+                            </RadzenGrid>
+                        </RadzenTabsItem>
+                        <RadzenTabsItem Text="Detalles">
+                            @if (orden.DetallesCarro == null || orden.DetallesCarro.Count() < 1)
+                            {
+                                <MudText Align="Align.Center" Typo="Typo.h6">Sin Detalles</MudText>
+                            }
+                            else
+                            {
+                                <MudText Align="Align.Center" Typo="Typo.h6">Detalles Orden de Compra N° @orden.IdCarro</MudText>
+
+                                <RadzenGrid Data="@orden.DetallesCarro" TItem="DetalleCarroCompra" AllowPaging="true" AllowColumnResize="true">
+                                    <Columns>
+                                        <RadzenGridColumn TItem="DetalleCarroCompra" Property="IdDetalle" Title="#" Width="50px">
+                                            <Template Context="detalle">
+                                                @(orden.DetallesCarro.ToList().IndexOf(detalle) + 1)
+                                            </Template>
+                                        </RadzenGridColumn>
+                                        <RadzenGridColumn TItem="DetalleCarroCompra" Property="NombreProducto" Title="Prod.">
+                                            <Template Context="prod">
+                                                <RadzenImage Path="@prod.UrlImagen" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px; float: left;" />
+                                                <div style="margin-top:10px;">
+                                                    <a href="/verProducto/@prod.Producto">@prod.NombreProducto</a>
+                                                </div>
+                                            </Template>
+                                        </RadzenGridColumn>
+                                        <RadzenGridColumn TItem="DetalleCarroCompra" Property="Cantidad" Title="Cant." Width="80px"></RadzenGridColumn>
+                                        <RadzenGridColumn TItem="DetalleCarroCompra" Property="DescripcionUnidad" Title="U. Med." Width="110px"></RadzenGridColumn>
+                                        <RadzenGridColumn TItem="DetalleCarroCompra" Property="StockExistencia" Title="Stock" Width="80px"></RadzenGridColumn>
+                                        <RadzenGridColumn TItem="DetalleCarroCompra" Property="PrecioUnit" Title="Precio" Width="115px">
+                                            <Template Context="prec">
+                                                @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", prec.PrecioUnit)
+                                            </Template>
+                                        </RadzenGridColumn>
+                                        <RadzenGridColumn TItem="DetalleCarroCompra" Property="Bonificacion" Title="Bonif." Width="75px">
+                                            <Template Context="btot">
+                                                @btot.Bonificacion %
+                                            </Template>
+                                        </RadzenGridColumn>
+                                        <RadzenGridColumn TItem="DetalleCarroCompra" Property="BonificacionTotal" Title="Bonif. Tot." Width="95px">
+                                            <Template Context="btot">
+                                                @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", btot.BonificacionTotal)
+                                            </Template>
+                                        </RadzenGridColumn>
+                                        <RadzenGridColumn TItem="DetalleCarroCompra" Property="SubTotal" Title="Sub Total" Width="120px">
+                                            <Template Context="stot">
+                                                @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", stot.SubTotal)
+                                            </Template>
+                                        </RadzenGridColumn>
+                                    </Columns>
+                                </RadzenGrid>
+                            }
+                        </RadzenTabsItem>
+                    </Tabs>
+                </RadzenTabs>            
+            }
         </MudItem>
-        @*AGREGAR EL PRODUCTO*@
-        <MudItem xs="2">
-            <MudText Align="Align.Center" Typo="Typo.h6"><br /></MudText>
-            <MudStack Row="true" Justify="Justify.Center">
-                <MudStack Style="width:50%">
-                    <MudTextField Label="Cantidad" HelperText="Formato 9,99 ó 9" @bind-Value="cant"/>
-                </MudStack>
-                <MudStack>
-                    <MudTextField Label="% Bonificacion" HelperText="Formato 9,99 ó 9" @bind-Value="bonif"/>
-                </MudStack>
-            </MudStack>
-            <MudStack Justify="Justify.Center">
-                <MudButton StartIcon="@Icons.Material.Filled.AddCircle" Color="Color.Primary" Variant="Variant.Outlined" OnClick="AgregarProducto">Agregar Producto</MudButton>
-            </MudStack> 
+        @*DETALLES DEL COMPROBANTE Y GENERARLO*@
+        <MudItem xs="2">            
+            @if(orden.IdCarro > 0)
+            {
+                <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Primary">Orden Compra N° @orden.IdCarro</MudText>
+
+                @if(orden.CompGenerado)
+                {
+                    <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Info" Style="margin-top:30px;">La orden de compra N° @orden.IdCarro ya posee su comprobante generado. Si desea volver a generarlo, debe realizar un recibo por Baja de Comprobante.</MudText>
+                }
+                else
+                {
+                    <MudStack Justify="Justify.Center">
+                        <MudSelect T="int" @bind-Value="@tipoComp" Label="Tipo Comp." Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                            @foreach (var tp in tiposComp)
+                            {
+                                <MudSelectItem Value="@tp.IdTipoC">@(tiposComp.ToList().IndexOf(tp) + 1) - @tp.TipoComp</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudStack>
+                    <MudStack Justify="Justify.Center">
+                        <MudSelect T="int" @bind-Value="@tipoVta" Label="Tipo Venta" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                            <MudSelectItem Value="1">1 - Con Cuenta Corriente</MudSelectItem>
+                            <MudSelectItem Value="2">2 - Sin Cuenta Corriente</MudSelectItem>
+                        </MudSelect>
+                    </MudStack>
+                    <MudStack Justify="Justify.Center">
+                        <MudStack>
+                            <MudTextField T="string" Label="Observaciones" Variant="Variant.Outlined" @bind-Value="observ" Lines="5" />
+                        </MudStack>
+                        <MudStack>
+                            <MudDatePicker Label="Fecha" Editable="true" @bind-Date="fecha" Placeholder="Seleccionar Fecha" />
+                        </MudStack>
+                        <MudStack>
+                            <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success" Variant="Variant.Outlined" OnClick="GuardarComprobante">Generar Comprobante</MudButton>
+                        </MudStack>
+                    </MudStack>
+                }
+            }
         </MudItem>
     </MudGrid>
-}
-
-<MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:15px; margin-bottom:10px;">Detalles del Comprobante</MudText>
-
-@if(productosAgregados != null && productosAgregados.Count() > 0)
-{    
-    <MudGrid Justify="Justify.Center">
-        @*DETALLE DE LOS PRODUCTOS*@
-        <MudItem lg="8">
-            <MudSimpleTable Striped="true">
-                <thead>
-                    <tr>
-                        <td>Nombre Producto</td>
-                        @*<td>Descripcion</td>*@
-                        <td>Unidad Medida</td>
-                        <td>Precio Venta</td>
-                        <td>Cantidad</td>
-                        <td>% Bonificacion</td>
-                        <td>Bonificacion Total</td>
-                        <td>Sub Total</td>
-                        <td></td>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach(var pr in productosAgregados)
-                    {
-                        <tr>
-                            <td>@pr.NombreProd</td>
-                            @*<td>@pr.Descripcion</td>*@
-                            <td>@pr.DescripcionUnidad</td>
-                            <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pr.PrecioFinal)</td>
-                            <td>@pr.Cantidad</td>
-                            <td>@pr.Bonificacion %</td>
-                            <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pr.BonificacionTotal)</td>
-                            <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pr.SubTotal)</td>
-                            <td><MudIconButton Icon="@Icons.Material.Filled.RemoveCircle" OnClick="@(e => RemoverProducto(pr.IdProducto))" Color="Color.Error"/></td>
-                        </tr>
-                    }
-                    <tr>
-                        <td></td>
-                        @*<td></td>*@
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>TOTAL:</td>
-                        <td><b>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", productosAgregados.Sum(s => s.SubTotal))</b></td>
-                    </tr>
-                </tbody>
-            </MudSimpleTable>
-        </MudItem>
-        @*MODIFICACION DEL COMPROBANTE*@
-        <MudItem xs="2">
-            <MudSelect T="int" @bind-Value="@tipoComp" Label="Tipo Comp." Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                @foreach(var tp in tiposComp)
-                {
-                    <MudSelectItem Value="@tp.IdTipoC">@(tiposComp.ToList().IndexOf(tp) + 1) - @tp.TipoComp</MudSelectItem>
-                }
-            </MudSelect>
-            <MudSelect T="int" @bind-Value="@formaPago" Label="Forma Pago" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                @foreach(var fp in formasPago)
-                {
-                    <MudSelectItem Value="@fp.IdFormaP">@(formasPago.ToList().IndexOf(fp) + 1) - @fp.FormaP</MudSelectItem>
-                }
-            </MudSelect>
-            <MudSelect T="int" @bind-Value="@tipoVta" Label="Tipo Venta" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                <MudSelectItem Value="1">1 - Con Cuenta Corriente</MudSelectItem>
-                <MudSelectItem Value="2">2 - Sin Cuenta Corriente</MudSelectItem>
-            </MudSelect>
-        </MudItem>
-        @*GENERAR COMPROBANTE*@
-        <MudItem xs="2">
-            <MudStack Justify="Justify.Center">
-                <MudStack>
-                    <MudTextField T="string" Label="Observaciones" Variant="Variant.Outlined" @bind-Value="observ" Lines="5" />
-                </MudStack>
-                <MudStack>
-                    <MudDatePicker Label="Fecha" Editable="true" @bind-Date="fecha" Placeholder="Seleccionar Fecha" />
-                </MudStack>
-                <MudStack>
-                    <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success" Variant="Variant.Outlined" OnClick="GuardarComprobante">Generar Comprobante</MudButton>
-                </MudStack>
-            </MudStack>
-        </MudItem>
-    </MudGrid>
-}
-else
-{
-    <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Error">Todavía no se agregó ningún producto</MudText>
 }
 
 @code {
     //Para almacenar el ID del usuario actual
     private int idUsAct;
 
-    //Para ventas de cuenta corriente o sin ella
-    private int tipoVta = 1;
-
-    //PARA MOSTRAR LOS PRODUCTOS Y BUSCARLOS
-    IEnumerable<ProductoListado> productosDisponibles;
-    List<ProductoListado>? productosAgregados;
-    ProductoListado? prodSelect;
+    //Las ordenes de compra en estado Pendiente o Aprobado
+    IEnumerable<OrdenesCompraListado> ordenes = new List<OrdenesCompraListado>();
+    IEnumerable<OrdenesCompraListado> ordenesCliente;
+    OrdenesCompraListado orden = new OrdenesCompraListado();
 
     //PARA LOS CLIENTES
     IEnumerable<Cliente> clientes;
-    Cliente? cliente;
+    Cliente cliente = new Cliente();
 
     //Tipos de comprobantes
     IEnumerable<TipoComprobante> tiposComp;
 
-    //Formas de pago
-    IEnumerable<FormaPago> formasPago;
-
     //Para completar el formulario
-    private decimal cant = 1;
-    private decimal bonif = 0;
+    private int tipoVta = 1;  //Para ventas de cuenta corriente o sin ella
     private string observ = "";
     private int tipoComp = 3;
-    private int formaPago = 1;
     private DateTime? fecha;
 
     //Guardo el ID del usuario actual
@@ -201,161 +244,142 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        productosDisponibles = await ServProducto.ObtenerProductos();
-        productosAgregados = new List<ProductoListado>();
-
+        ordenes = await ServCarro.ObtenerOrdenesCompraComprobantes();
         clientes = await ServCliente.ObtenerClientes();
-
         tiposComp = await ServTipoComp.ObtenerTiposComp();
-
-        formasPago = await ServFormaPago.ObtenerFormasPago();
-
         fecha = DateTime.Today;
     }
 
     protected void Cancelar() => NavigationManager.NavigateTo("/listaComprobantes");
 
+    protected void CambioCliente(){  
+        ordenesCliente = ordenes.Where(x => x.Cliente == cliente.IdCliente);
+        orden = new OrdenesCompraListado();
+    }
+
     protected async Task GuardarComprobante()
     {
-        if(cliente == null)
-            Snackbar.Add($"Debe seleccionar un cliente", Severity.Error);
+        if(cliente.IdCliente < 1) Snackbar.Add($"Debe seleccionar un cliente", Severity.Error);
         else
         {
-            if(productosAgregados == null || productosAgregados.Count() < 1)
-                Snackbar.Add($"Debe agregar al menos 1 producto al comprobante", Severity.Error);
+            if (orden.IdCarro < 1) Snackbar.Add($"Debe seleccionar una orden de compra para generar el comprobante", Severity.Error);
+            else if (orden.CompGenerado)  Snackbar.Add($"La orden de compra que selecciono, ya posee un comprobante generado. Si desea generar nuevamente dicho comprobante, debe realizar un recibo de credito primero.", Severity.Error);
             else
             {
-                if(fecha == null)
-                    Snackbar.Add($"Debe seleccionar la fecha del comprobante", Severity.Error);
+                if(fecha == null) Snackbar.Add($"Debe seleccionar la fecha del comprobante", Severity.Error);
                 else
                 {
-                    //Verifico la accion del usuario
-                    var options = new DialogOptions { CloseOnEscapeKey = true };
-                    var dialog = DialogService.Show<DialogComprobante>("Confirmar Acción", options);
-                    var resultDialog = await dialog.Result;
+                    //Compruebo que exista stock de cada producto del detalle
+                    var stockSuficiente = true;
 
-                    if (!resultDialog.Cancelled)
+                    foreach (var det in orden.DetallesCarro)
                     {
-                        //Creo el objeto del encabezado del comprobante y asigno los valores
-                        EncabezadoComprobante enc = new EncabezadoComprobante();
-                        enc.Periodo = DateTime.Today.Year.ToString();
-                        enc.NumComp = "-";
-                        enc.TipoComprobante = tipoComp;
-                        enc.FechaComp = Convert.ToDateTime(fecha);
-                        enc.ClienteComp = cliente.IdCliente;
-                        enc.FormaPago = formaPago;
-                        enc.TipoVta = tipoVta;
-                        enc.ImporteFinal = productosAgregados.Sum(s => s.SubTotal);
-                        enc.SaldoRestante = enc.ImporteFinal;
-                        enc.Observaciones = observ;
-                        enc.UsuarioCrea = idUsAct;
-
-                        var idEnc = await ServComp.CrearEncabezado(enc);
-                        if(idEnc > 0)
+                        var cantidad = det.StockExistencia - det.Cantidad;
+                        if(cantidad < 0)
                         {
-                            //Al haberse creado el encabezado, se lo asigno a cada elemento a guardarse de la lista de detalles del comprobante
-                            //Voy a comprobar que se guarden todos los registros
-                            var cantProd = productosAgregados.Count();
-                            var cantProdGuard = 0;
-
-                            foreach (var prod in productosAgregados)
-                            {
-                                var detalle = new CuerpoComprobante();
-                                detalle.IdEncab = idEnc;
-                                detalle.ProductoCuerpo = prod.IdProducto;
-                                detalle.CantidadProdC = prod.Cantidad;
-                                detalle.PrecioUnitario = prod.PrecioFinal;
-                                detalle.Bonificacion = prod.Bonificacion;
-                                detalle.BonificacionTotal = prod.BonificacionTotal;
-                                detalle.Total = prod.SubTotal;
-
-                                //Guardo cada registro del detalle
-                                var detalleGuardado = await ServDetalleComp.CrearCuerpo(detalle);
-                                if (detalleGuardado)
-                                {
-                                    cantProdGuard++;
-                                    continue;
-                                }
-                                else
-                                {
-                                    Snackbar.Add($"No se pudo generar el comprobante correctamente. Problema en los detalles", Severity.Error);
-                                    break;                        
-                                }
-                            }
-
-                            if(cantProdGuard == cantProd)
-                            {
-                                //Si se guardaron todos los detalles de forma exitosa, navego hacia el listado de comprobantes
-                            NavigationManager.NavigateTo("/listaComprobantes");
-                            Snackbar.Add($"Comprobante Generado Correctamente", Severity.Success);
-                            }
-                            else
-                                Snackbar.Add($"No se pudo generar el comprobante", Severity.Error);
+                            stockSuficiente = false;
+                            Snackbar.Add($"Falta stock. Solo quedan {det.StockExistencia} {det.DescripcionUnidad} de {det.NombreProducto} y se solicitaron {det.Cantidad}.", Severity.Error);
+                            break;
                         }
-                        else
-                            Snackbar.Add($"No se pudo crear el comprobante, error en los datos principales", Severity.Error);
                     }
-                    else
-                        Snackbar.Add($"Operacion Cancelada", Severity.Warning);
-                }
-            }
-        }
-    }
 
-    protected void AgregarProducto()
-    {
-        if (prodSelect != null)
-        {
-            if(cant > 0)
-            {
-                if(bonif >= 0 && bonif <= 100)
-                {
-                    //Verifico que el producto no se encuentre en la lista agregada
-                    var prodYaAgregado = productosAgregados.Exists(a => a.IdProducto == prodSelect.IdProducto);
-                    if (!prodYaAgregado)
+                    if(stockSuficiente)
                     {
-                        //Realizo los calculos y asignaciones correspondientes
-                        prodSelect.Cantidad = cant;
-                        prodSelect.Bonificacion = bonif;
-                        var precioTotCant = prodSelect.Cantidad * prodSelect.PrecioFinal;
-                        var bonifUnit = (prodSelect.Bonificacion * prodSelect.PrecioFinal) / 100;
-                        prodSelect.BonificacionTotal = bonifUnit * cant;
-                        prodSelect.SubTotal = precioTotCant - prodSelect.BonificacionTotal;
+                        //Verifico la accion del usuario
+                        var options = new DialogOptions { CloseOnEscapeKey = true };
+                        var dialog = DialogService.Show<DialogComprobante>("Confirmar Acción", options);
+                        var resultDialog = await dialog.Result;
 
-                        //Agrego el producto al listado y reestablezco los controles
-                        productosAgregados.Add(prodSelect);
-                        prodSelect = null;
-                        cant = 1;
-                        bonif = 0;
+                        if (!resultDialog.Cancelled)
+                        {
+                            //Creo el objeto del encabezado del comprobante y asigno los valores
+                            EncabezadoComprobante enc = new EncabezadoComprobante();
+                            enc.Carro = orden.IdCarro;
+                            enc.Periodo = DateTime.Today.Year.ToString();
+                            enc.NumComp = "-";
+                            enc.TipoComprobante = tipoComp;
+                            enc.FechaComp = Convert.ToDateTime(fecha);
+                            enc.ClienteComp = cliente.IdCliente;
+                            enc.TipoVta = tipoVta;
+                            enc.ImporteFinal = orden.Total;
+                            enc.SaldoRestante = enc.ImporteFinal;
+                            enc.Observaciones = observ.Trim();
+                            enc.UsuarioCrea = idUsAct;
+                            enc.FormaPago = 7;
+
+                            var idEnc = await ServComp.CrearEncabezado(enc);
+                            if (idEnc > 0)
+                            {
+                                //Al haberse creado el encabezado, se lo asigno a cada elemento a guardarse de la lista de detalles del comprobante
+                                //Voy a comprobar que se guarden todos los registros
+                                var cantDetalles = orden.DetallesCarro.Count();
+                                var cantDetGuard = 0;
+                                //Para aprovechar el bucle foreach y de paso guardar la lista de stocks para ser usada luego
+                                var stockProds = new List<StockProducto>();
+
+                                foreach (var det in orden.DetallesCarro)
+                                {
+                                    var detalle = new CuerpoComprobante();
+                                    detalle.IdEncab = idEnc;
+                                    detalle.ProductoCuerpo = det.Producto;
+                                    detalle.CantidadProdC = det.Cantidad;
+                                    detalle.PrecioUnitario = det.PrecioUnit;
+                                    detalle.Bonificacion = det.Bonificacion;
+                                    detalle.BonificacionTotal = det.BonificacionTotal;
+                                    detalle.Total = det.SubTotal;
+
+                                    stockProds.Add(new StockProducto(det.Producto, det.StockExistencia - det.Cantidad));
+
+                                    //Guardo cada registro del detalle
+                                    var detalleGuardado = await ServDetalleComp.CrearCuerpo(detalle);
+                                    if (detalleGuardado)
+                                    {
+                                        cantDetGuard++;
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        Snackbar.Add($"No se pudo generar el comprobante correctamente. Problema en los detalles", Severity.Error);
+                                        break;
+                                    }
+                                }
+
+                                //Compruebo que se hayan guardado todos los detalles de forma exitosa
+                                if (cantDetGuard == cantDetalles)
+                                {
+                                    //Actualizo el stock de los productos guardados anteriormente
+                                    var stockActu = await ServProducto.ActualizarStockProductos(stockProds);
+
+                                    if(stockActu)
+                                    {
+                                        var carro = await ServCarro.ObtenerCarro(orden.IdCarro);
+                                        carro.CompGenerado = true;
+                                        var carroAct = await ServCarro.GuardarCarro(carro);
+
+                                        if(carroAct)
+                                        {
+                                            Snackbar.Add($"Comprobante Generado Correctamente", Severity.Success);
+                                            //Consulto si quiere seguir generando comprobantes o bien volver al menu de comprobantes
+                                            var result = await DialogService.ShowMessageBox(
+                                    "Comprobante Generado",
+                                    "El comprobante fue generado. ¿Generar más comprobantes?",
+                                    yesText: "Si", cancelText: "No");
+
+                                            if (result == true) NavigationManager.NavigateTo("/detallesComprobante", true);
+                                            else NavigationManager.NavigateTo("/listaComprobantes");  
+                                        }
+                                        else Snackbar.Add($"No se pudo actualizar el carro de compras.", Severity.Error);
+                                    }
+                                    else Snackbar.Add($"No se pudo actualizar el stock de los productos del comprobante.", Severity.Error);
+                                }
+                                else Snackbar.Add($"No se pudo generar el comprobante", Severity.Error);
+                            }
+                            else Snackbar.Add($"No se pudo crear el comprobante, error en los datos principales", Severity.Error);
+                        }
+                        else Snackbar.Add($"Operación Cancelada", Severity.Warning);
                     }
-                    else
-                        Snackbar.Add($"El producto que intenta agregar, ya se encuentra en el comprobante, debe seleccionar otro o bien remover el existente del comprobante", Severity.Error);
                 }
-                else
-                    Snackbar.Add($"La bonificacion no puede ser menor a 0 ó mayor que 100", Severity.Error);
             }
-            else
-                Snackbar.Add($"La cantidad debe ser mayor a 0", Severity.Error);
         }
-        else
-            Snackbar.Add($"Debe seleccionar el producto a agregar", Severity.Error);
-    }
-
-    protected string RemoverProducto(int id)
-    {
-        if(id > 0)
-        {
-            if(productosAgregados != null && productosAgregados.Count() > 1)
-            {
-                var producto = productosAgregados.Find(x => x.IdProducto == id);
-                productosAgregados.Remove(producto);
-                Snackbar.Add($"Producto Removido", Severity.Success);
-            }
-            else
-                productosAgregados.Clear();
-        }
-        else
-            Snackbar.Add($"Debe seleccionar el producto a remover", Severity.Error);
-        return "";
     }
 }

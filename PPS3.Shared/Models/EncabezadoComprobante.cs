@@ -5,6 +5,7 @@ namespace PPS3.Shared.Models
     public class EncabezadoComprobante
     {
         public int IdEncab { get; set; }
+        public int Carro { get; set; }
         public string Periodo { get; set; } = string.Empty;
         public string NumComp { get; set; } = string.Empty;
         public int TipoComprobante { get; set; }

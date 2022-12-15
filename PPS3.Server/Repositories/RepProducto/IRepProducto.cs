@@ -13,6 +13,7 @@
         Task<Producto> ObtenerProducto(string nombreProd);
         Task<bool> InsertarProducto(Producto producto);
         Task<bool> ActualizarProducto(Producto producto);
+        Task<bool> ActualizarStockProductos(List<StockProducto> productos);
         Task<bool> BorrarProducto(int id, int idUsu);
         Task<int> UltimoProductoCreado(int idUsuario);
     }

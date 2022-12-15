@@ -5,6 +5,7 @@ namespace PPS3.Shared.InternalModels
     public class Comprobante
     {
         public int IdEncab { get; set; }
+        public int Carro { get; set; }
         public string Periodo { get; set; } = string.Empty;
         public string NumComp { get; set; } = string.Empty;
         public int ClienteComp { get; set; }

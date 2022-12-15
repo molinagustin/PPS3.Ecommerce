@@ -30,5 +30,9 @@ namespace PPS3.Shared.Models
         //Para guardar una imagen del producto
         public byte[]? ImagenDestacada { get; set; }
         public string UrlImagen { get; set; } = string.Empty;
+
+        //Stock del producto para generar el comprobante
+        [Column(TypeName = "decimal(8,2)")]
+        public decimal StockExistencia { get; set; } = 0;
     }
 }

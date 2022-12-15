@@ -1,4 +1,6 @@
-﻿namespace PPS3.Server.Repositories.RepCarroCompra
+﻿using PPS3.Shared.Models;
+
+namespace PPS3.Server.Repositories.RepCarroCompra
 {
     public class RepCarroCompra : IRepCarroCompra
     {
@@ -31,7 +33,8 @@
                             Pagado = @Pagado,
                             FechaPago = @FechaPago,
                             MetodoPago = @MetodoPago,
-                            Observaciones = @Observaciones
+                            Observaciones = @Observaciones,
+                            CompGenerado = @CompGenerado
                         WHERE IdCarro = @IdCarro
                         ";
 
@@ -50,7 +53,8 @@
                                                         carroCompra.FechaPago,
                                                         carroCompra.MetodoPago,
                                                         carroCompra.Observaciones,
-                                                        carroCompra.IdCarro
+                                                        carroCompra.CompGenerado,
+                                                        carroCompra.IdCarro    
                                                         });
             
 
@@ -215,6 +219,48 @@
                         ";
             var result = await db.QueryAsync<OrdenesCompraListado>(sql, new { UsuarioCarro = idUsuario});
             return result;
+        }
+
+        public async Task<IEnumerable<OrdenesCompraListado>> ObtenerOrdenesCompraComprobantes()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT cc.IdCarro, cce.Estado, u.NombreUs as UsuarioCrea, cc.FechaCrea, cc.FechaOrden, cc.FechaEntrega, cc.FechaUltModif, 
+                        cc.Total, cc.Pagado, cc.FechaPago, fp.FormaP, cc.Observaciones, cl.IdCliente as Cliente, cc.CompGenerado
+                        FROM carros_compras as cc
+                        INNER JOIN carros_compras_estados as cce ON cc.Estado = cce.IdEstado
+                        INNER JOIN usuarios as u ON cc.UsuarioCarro = u.IdUsuarioAct
+                        INNER JOIN formas_pago as fp ON cc.MetodoPago = fp.IdFormaP
+                        INNER JOIN clientes as cl ON cl.IdCliente = u.IdCliente
+                        WHERE cc.Estado in (2,3) AND cc.Pagado = 0;
+                        ";
+            var result = await db.QueryAsync<OrdenesCompraListado>(sql, new { });
+            return result;
+        }
+
+        public async Task<IEnumerable<DetalleCarroCompra>> ObtenerOCDetallesComprobantes(List<int> carros)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT ccd.IdDetalle, ccd.Carro, ccd.Producto, ccd.Cantidad, ccd.PrecioUnit, ccd.Bonificacion, ccd.BonificacionTotal, ccd.SubTotal, 
+                        p.NombreProd as NombreProducto, um.DescripcionUnidad, p.ImagenDestacada, p.StockExistencia
+                        FROM carros_compras_detalles as ccd
+                        INNER JOIN productos as p ON p.IdProducto = ccd.Producto
+                        INNER JOIN unidades_medida as um ON p.UnidadMedida = um.IdUnidad
+                        WHERE ccd.Carro IN @carros;
+                        ";
+            var result = await db.QueryAsync<DetalleCarroCompra>(sql, new { carros });
+            return result;
+        }
+
+        public async Task<bool> BajaComprobanteCarro(int id)
+        {
+            var db = dbConnection();
+            var sql = "UPDATE carros_compras SET CompGenerado=0 WHERE IdCarro=@id";
+            var result = await db.ExecuteAsync(sql, new { id });
+            return result > 0;
         }
     }
 }

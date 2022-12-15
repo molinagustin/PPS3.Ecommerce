@@ -74,6 +74,16 @@ namespace PPS3.Server.Controllers
                 return Problem();
         }
 
+        [HttpPut("{id}")]
+        public async Task<ActionResult> ActualizarStockProductos(int id)
+        {
+            if (id < 0) return BadRequest();
+
+            var response = await _repDetalleCarro.ActualizarStockProductos(id);
+            if (response != false) return Ok();
+            else return BadRequest();
+        }
+
         [HttpDelete("{id}")]
         public async Task<ActionResult> BorrarDetalleCarro(int id)
         {

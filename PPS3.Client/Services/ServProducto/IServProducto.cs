@@ -11,6 +11,7 @@
         Task<Producto> ObtenerProducto(int id);
         Task<ProductoListado> ObtenerProductoListado(int id);
         Task<Producto> ObtenerProducto(string nombreProd);
+        Task<bool> ActualizarStockProductos(List<StockProducto> productos);
         Task<bool> GuardarProducto(Producto producto);
         Task<bool> BorrarProducto(int id, int idUsu);
         Task<int> UltimoProductoCreado(int idUsuario);

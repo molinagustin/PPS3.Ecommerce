@@ -17,5 +17,6 @@ namespace PPS3.Shared.Models
         public DateTime? FechaPago { get; set; }
         public int MetodoPago { get; set; }
         public string Observaciones { get; set; } = string.Empty;
+        public bool CompGenerado { get; set; }
     }
 }

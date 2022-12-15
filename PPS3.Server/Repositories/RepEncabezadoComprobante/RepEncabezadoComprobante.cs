@@ -20,6 +20,7 @@ namespace PPS3.Server.Repositories.RepEncabezadoComprobante
             var sql = @"
                         INSERT INTO comprobantes_encabezados
                             (
+                            Carro,
                             Periodo,
                             NumComp,
                             TipoComprobante,
@@ -34,6 +35,7 @@ namespace PPS3.Server.Repositories.RepEncabezadoComprobante
                             )
                         VALUES 
                             (
+                            @Carro,
                             @Periodo,
                             @NumComp,
                             @TipoComprobante,
@@ -50,6 +52,7 @@ namespace PPS3.Server.Repositories.RepEncabezadoComprobante
 
             var result = await db.ExecuteAsync(sql, new 
                             { 
+                            encabezadoComp.Carro,
                             encabezadoComp.Periodo,
                             encabezadoComp.NumComp,
                             encabezadoComp.TipoComprobante,
@@ -64,10 +67,8 @@ namespace PPS3.Server.Repositories.RepEncabezadoComprobante
                             });
 
             //Si el resultado de la insecion es exitoso, busco el ID del comprobante ingresado
-            if (result > 0)
-                return await ObtenerUltimoID(encabezadoComp.ClienteComp);
-            else
-                return 0;
+            if (result > 0) return await ObtenerUltimoID(encabezadoComp.ClienteComp);
+            else return 0;
         }
 
         public async Task<EncabezadoComprobante> ObtenerEncabezadoComp(int id)
@@ -115,7 +116,7 @@ namespace PPS3.Server.Repositories.RepEncabezadoComprobante
             var db = dbConnection();
 
             var sql = @"
-                        SELECT ce.IdEncab, ce.Periodo, ce.NumComp, ce.ClienteComp, tc.TipoComp, ce.FechaComp, cl.NombreCompleto as Cliente, fp.FormaP, ce.ImporteFinal, 
+                        SELECT ce.IdEncab, ce.Carro, ce.Periodo, ce.NumComp, ce.ClienteComp, tc.TipoComp, ce.FechaComp, cl.NombreCompleto as Cliente, fp.FormaP, ce.ImporteFinal, 
                         ce.SaldoRestante, ce.Pagado, ce.Observaciones, us.NombreUs as UsuarioCrea, ce.FechaCrea
                         FROM comprobantes_encabezados as ce
                         INNER JOIN tipos_comprobantes as tc ON ce.TipoComprobante = tc.IdTipoC
@@ -150,7 +151,7 @@ namespace PPS3.Server.Repositories.RepEncabezadoComprobante
             var db = dbConnection();
 
             var sql = @"
-                        SELECT ce.IdEncab, ce.Periodo, ce.NumComp, ce.ClienteComp, tc.TipoComp, ce.FechaComp, cl.NombreCompleto as Cliente, fp.FormaP, ce.TipoVta, ce.ImporteFinal, 
+                        SELECT ce.IdEncab, ce.Carro, ce.Periodo, ce.NumComp, ce.ClienteComp, tc.TipoComp, ce.FechaComp, cl.NombreCompleto as Cliente, fp.FormaP, ce.TipoVta, ce.ImporteFinal, 
                         ce.SaldoRestante, ce.Pagado, ce.Observaciones, us.NombreUs as UsuarioCrea, ce.FechaCrea
                         FROM comprobantes_encabezados as ce
                         INNER JOIN tipos_comprobantes as tc ON ce.TipoComprobante = tc.IdTipoC

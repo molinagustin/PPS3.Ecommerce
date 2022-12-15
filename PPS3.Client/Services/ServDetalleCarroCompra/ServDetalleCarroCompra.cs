@@ -12,13 +12,27 @@
             _sessionStorage = sessionStorage;
         }
 
+        public async Task<bool> ActualizarStockProductos(int id)
+        {
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+            if (string.IsNullOrEmpty(token)) return false;
+
+            var request = new HttpRequestMessage(HttpMethod.Put, $"api/DetallesCarrosCompras/ActualizarStockProductos/{id}");
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            if (response.IsSuccessStatusCode) return true;
+            else return false;
+        }
+
         public async Task<bool> BorrarDetalle(int id)
         {
             //Obtengo el token de sesion del usuario
             var token = await _sessionStorage.GetItemAsync<string>("token");
 
             //Verifico que exista un token
-            if (String.IsNullOrEmpty(token))
+            if (string.IsNullOrEmpty(token))
                 return false;
 
             //Creo una solicitud Http de tipo delete

@@ -1,4 +1,6 @@
-﻿namespace PPS3.Server.Repositories.RepProducto
+﻿using System.Text;
+
+namespace PPS3.Server.Repositories.RepProducto
 {
     public class RepProducto : IRepProducto
     {
@@ -247,7 +249,7 @@
                         ";
 
             //El metodo QueryAsync va a devolver un IEnumerable con los datos del modelo que pasamos por parametro
-            var result = await db.QueryFirstOrDefaultAsync<ProductoListado>(sql, new { IdProducto = id });
+            var result = await db.QueryFirstOrDefaultAsync<ProductoListado>(sql, new { IdProducto = id });   
             return result;
         }
 
@@ -296,6 +298,22 @@
             //El metodo QueryAsync va a devolver un IEnumerable con los datos del modelo que pasamos por parametro
             var result = await db.QueryAsync<ProductoListado>(sql, new { });
             return result;
+        }
+
+        public async Task<bool> ActualizarStockProductos(List<StockProducto> productos)
+        {
+            var db = dbConnection();
+
+            var cantProd = productos.Count();
+            var cantProdAct = 0;
+
+            foreach (var prod in productos)
+            {
+                var sql = "UPDATE productos SET StockExistencia=@StockExistencia WHERE IdProducto=@IdProducto;";
+                cantProdAct += await db.ExecuteAsync(sql, new { prod.StockExistencia, prod.IdProducto});
+            }     
+
+            return (cantProd == cantProdAct);
         }
     }
 }

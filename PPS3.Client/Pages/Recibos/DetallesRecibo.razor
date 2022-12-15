@@ -1,5 +1,7 @@
 ﻿@page "/detallesRecibo"
 @inject IServEncabezadoCuentaCorriente ServCuentaCorr
+@inject IServCarroCompra ServCarroCompra
+@inject IServDetalleCarroCompra ServDetalleCarro
 @inject IServFormaPago ServFormaPago
 @inject IServTarjeta ServTarj
 @inject IServEncabezadoRecibo ServRecibo
@@ -130,7 +132,14 @@ else
         </MudItem>
         @*FECHA Y FORMA PAGO*@
         <MudItem xs="2">
-            <MudDatePicker Label="Fecha del Recibo" Editable="true" @bind-Date="fechaRecibo" Placeholder="Seleccionar Fecha" Required="true" Style="margin-bottom:5px;"/>
+            @if(formaPag == 9) //Baja Comprobante
+            {
+                fechaRecibo = DateTime.Today;
+            }
+            else
+            {
+                <MudDatePicker Label="Fecha del Recibo" Editable="true" @bind-Date="fechaRecibo" Placeholder="Seleccionar Fecha" Required="true" Style="margin-bottom:5px;" />
+            }
 
             <MudSelect T="int" @bind-Value="@formaPag" Label="Forma Pago" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                 @foreach(var fp in formasPago)
@@ -151,17 +160,25 @@ else
         @*IMPORTE A PAGAR Y OBSERVACIONES*@
         <MudItem xs="2">
             <MudStack Justify="Justify.Center">
-                <MudStack>
-                    <MudSwitch @bind-Checked="pagoCompleto" Label="Pago Completo" Color="Color.Success" Style="margin-bottom:5px;" />
-                    @if(!pagoCompleto)
-                    {                    
-                        <MudTextField Label="Importe A Abonar" HelperText="Formato 999,99 ó 999" @bind-Value="importe" For="@(() => recibo.ImporteTotal)" Required="true" AdornmentIcon="@Icons.Material.Filled.Money"/>
-                    }  
-                    else
-                    {
-                        importe = 0;
-                    }
-                </MudStack>
+                @if(formaPag == 9) //Baja Comprobante
+                {
+                    pagoCompleto = true;
+                    importe = 0;
+                }
+                else
+                {
+                    <MudStack>
+                        <MudSwitch @bind-Checked="pagoCompleto" Label="Pago Completo" Color="Color.Success" Style="margin-bottom:5px;" />
+                        @if(!pagoCompleto)
+                        {                    
+                            <MudTextField Label="Importe A Abonar" HelperText="Formato 999,99 ó 999" @bind-Value="importe" For="@(() => recibo.ImporteTotal)" Required="true" AdornmentIcon="@Icons.Material.Filled.Money"/>
+                        }  
+                        else
+                        {
+                            importe = 0;
+                        }
+                    </MudStack>
+                }
                 <MudStack>
                     <MudTextField T="string" Label="Observaciones" Variant="Variant.Outlined" @bind-Value="observ" Lines="5" />
                 </MudStack>
@@ -256,14 +273,19 @@ else
                 {
                     //Verifico que la forma de pago sea distinta a Sin Pagar (ID = 7)
                     if(formaPag != 7)
-                    {     
+                    {   
+                        //Verifico si es una Baja de Comprobante
+                        if(formaPag == 9 && observ.Trim().Length < 1)
+                        {
+                            Snackbar.Add($"Se debe colocar un motivo de la Baja del Comprobante.", Severity.Error);
+                            return;
+                        }
+
                         //Verifico que el importe a ingresar no sea mayor a la suma de los comprobantes
                         var importeComprobantes = comprobantesAgregados.Sum(s => s.SaldoRestante);
 
-                        if (pagoCompleto)
-                            recibo.ImporteTotal = importeComprobantes;
-                        else
-                            recibo.ImporteTotal = importe;
+                        if (pagoCompleto) recibo.ImporteTotal = importeComprobantes;
+                        else recibo.ImporteTotal = importe;
 
                         if(importeComprobantes >= recibo.ImporteTotal)
                         {
@@ -274,135 +296,213 @@ else
 
                             if (!resultDialog.Cancelled)
                             {
-
-                                //Ver cada comprobante, e irles restando a cada saldo restante correspondiente el importe del recibo hasta tanto sea 0, y en ese momento, actualizar dicho comprobante y pasar al siguiente, hasta tanto el importe del recibo sea 0, momento en el que dejo de actualizar los comprobantes aun si hubieran mas en cola
-                                //Se va a tomar el ID del cliente del primer comprobante como referencia para guardar en el recibo, ya que pueden utilizarse de varias personas pero solo hay uno por recibo
-
-                                //Actualizo los datos del recibo
-                                recibo.IdCliente = comprobantesAgregados.First().ClienteComp;
-                                recibo.FechaRecibo = Convert.ToDateTime(fechaRecibo);
-                                recibo.FormaPago = formaPag;
-                                recibo.Tarjeta = tarjeta;
-                                recibo.NumTarjeta = numTarj;
-                                recibo.Observaciones = observ;
-                                recibo.UsuarioCrea = idUsAct;
-
-                                //Guardo el recibo para obtener su ID y usarlo en los detalles
-                                var idRec = await ServRecibo.CrearEncabRec(recibo);
-
-                                if(idRec > 0)
+                                //Se trata de una Baja de Comprobante
+                                if(formaPag == 9)
                                 {
-                                    //Guardo el importe total del recibo para irlo restando de los comprobantes
-                                    var saldoReciboRest = recibo.ImporteTotal;                                   
+                                    //Actualizo los datos del recibo
+                                    recibo.IdCliente = comprobantesAgregados.First().ClienteComp;
+                                    recibo.FechaRecibo = Convert.ToDateTime(fechaRecibo);
+                                    recibo.FormaPago = formaPag;
+                                    recibo.Tarjeta = tarjeta;
+                                    recibo.NumTarjeta = numTarj;
+                                    recibo.Observaciones = observ;
+                                    recibo.UsuarioCrea = idUsAct;
 
-                                    //Veo cada comprobante y le voy restando el importe restante del recibo
-                                    foreach (var comp in comprobantesAgregados)
+                                    //Guardo el recibo para obtener su ID y usarlo en los detalles
+                                    var idRec = await ServRecibo.CrearEncabRec(recibo);
+
+                                    if (idRec > 0)
                                     {
-                                        //En cada iteracion, se analiza si el saldo restante del recibo es mayor a 0, queriendo decir que todavia se puede quitar importe de los comprobantes siguientes
-                                        if (saldoReciboRest > 0)
+                                        //Genero los detalles del recibo y actualizo los comprobantes
+                                        foreach (var comp in comprobantesAgregados)
                                         {
-                                            //Lo primero que hay es analizar si el saldo final que me da entre el importe del comprobante y lo que restaba del recibo, es mayor que 0. Si es mayor, quiere decir que el saldo del recibo no alcanza para cubrir la totalidad del comprobante por lo que solo se restara una parte del saldo restante de ese comprobante. En cambio si es =0 o <0 quiere decir que el saldo restante del recibo alcanza para cubrir el saldo restante del comprobante, y si queda mas saldo del recibo, se puede seguir restando a los siguientes comprobantes
-                                            //             2500                6000 = -3500
-                                            //             6000                2500 = 3500
-                                            var saldo = comp.SaldoRestante - saldoReciboRest;
+                                            DetalleRecibo detalle = new DetalleRecibo();
+                                            detalle.IdComprobante = comp.IdEncab;
+                                            detalle.IdRecibo = idRec;
+                                            detalle.Importe = comp.ImporteFinal;
+                                            var detalleCreado = await ServDetRecibo.CrearDetalleRecibo(detalle);
 
-                                            if(saldo > 0)
+                                            //Si se crea el detalle correctamente, procedo a actualizar los comprobantes
+                                            if (detalleCreado)
                                             {
-                                                //Saldo positivo quiere decir que va a quedar un restante en el saldo pendiente dle comprobante
-                                                DetalleRecibo detalle = new DetalleRecibo();
+                                                //Se actualiza el comprobante correspondiente
+                                                comp.SaldoRestante = 0;
+                                                comp.Pagado = true;
+                                                var compAct = await ServComp.ActualizarComprobante(comp);
 
-                                                detalle.IdComprobante = comp.IdEncab;
-                                                detalle.IdRecibo = idRec;
-                                                detalle.Importe = saldoReciboRest;
-
-                                                var detalleCreado = await ServDetRecibo.CrearDetalleRecibo(detalle);
-
-                                                //Si se inserta correctamente el detalle, continuo con el comprobante apropiado
-                                                if(detalleCreado)
+                                                if (compAct)
                                                 {
-                                                    //Se actualiza el comprobante correspondiente
-                                                    comp.SaldoRestante -= saldoReciboRest;
-                                                    comp.Pagado = false;
-
-                                                    var compAct = await ServComp.ActualizarComprobante(comp);
-
-                                                    if (compAct)
-                                                        break;                              
-                                                    else
+                                                    //Actualizo el carro de compras del comprobante
+                                                    var carroAct = await ServCarroCompra.BajaComprobanteCarro(comp.Carro);
+                                                    if(!carroAct)
                                                     {
-                                                        Snackbar.Add($"No se pudo actualizar el comprobante del recibo por un error. Se descontinua la operacion.", Severity.Error);                   
+                                                        Snackbar.Add($"No se pudo actualizar el carro y dar de baja su comprobante.", Severity.Error);
                                                         break;
-                                                    }    
-                                                }
-                                                else
-                                                {
-                                                    Snackbar.Add($"No se pudo insertar el detalle del recibo por un error.", Severity.Error);
-                                                    break;
-                                                }   
-                                            }
-                                            else
-                                            {
-                                                //Saldo negativo (quiere decir que queda saldo para seguir restando a los comprobantes siguientes)
-                                                //Actualizo el saldo restante (Obtengo el valor absoluto porque llegaria un valor negativo, indicando que todavia queda salgo para restar)
-                                                saldoReciboRest = Math.Abs(saldo);
+                                                    }
 
-                                                DetalleRecibo detalle = new DetalleRecibo();    
+                                                    //Busco los detalles para saber que productos actualizar
+                                                    var prodsAct = await ServDetalleCarro.ActualizarStockProductos(comp.Carro);
 
-                                                //Guardo los valores del detalle del recibo
-                                                detalle.IdComprobante = comp.IdEncab;
-                                                detalle.IdRecibo = idRec;
-                                                detalle.Importe = comp.SaldoRestante;
-
-                                                var detalleCreado = await ServDetRecibo.CrearDetalleRecibo(detalle);
-
-                                                //Si se inserta correctamente el detalle, continuo con el comprobante apropiado
-                                                if(detalleCreado)
-                                                {
-                                                    //Se actualiza el comprobante correspondiente
-                                                    comp.SaldoRestante = 0;
-                                                    comp.Pagado = true;
-
-                                                    var compAct = await ServComp.ActualizarComprobante(comp);
-
-                                                    if (!compAct)
+                                                    if (!prodsAct)
                                                     {
-                                                        Snackbar.Add($"No se pudo actualizar el comprobante del recibo por un error. Se descontinua la operacion.", Severity.Error);
+                                                        Snackbar.Add($"No se pudo actualizar el stock de los productos del detalle del carro.", Severity.Error);
                                                         break;
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    Snackbar.Add($"No se pudo insertar el detalle del recibo por un error.", Severity.Error);
+                                                    Snackbar.Add($"No se pudo actualizar el comprobante del recibo por un error. Se descontinua la operacion.", Severity.Error);
                                                     break;
-                                                }                                             
+                                                }
                                             }
-                                        }
-                                        else
-                                            break;
-                                    }
+                                            else
+                                            {
+                                                Snackbar.Add($"No se pudo insertar el detalle del recibo por un error.", Severity.Error);
+                                                break;
+                                            }
+                                        }     
 
-                                    //Navego a la pagina de inicio
-                                    NavigationManager.NavigateTo("/detallesRecibo", forceLoad:true);
+                                        //Navego a la pagina de inicio
+                                        NavigationManager.NavigateTo("/detallesRecibo", forceLoad: true);
+                                    }
+                                    else Snackbar.Add($"No se pudo generar el recibo (encabezado). Error de insercion.", Severity.Error);
                                 }
                                 else
-                                    Snackbar.Add($"No se pudo generar el recibo (encabezado). Error de insercion.", Severity.Error);   
+                                {
+                                    //Ver cada comprobante, e irles restando a cada saldo restante correspondiente el importe del recibo hasta tanto sea 0, y en ese momento, actualizar dicho comprobante y pasar al siguiente, hasta tanto el importe del recibo sea 0, momento en el que dejo de actualizar los comprobantes aun si hubieran mas en cola
+                                    //Se va a tomar el ID del cliente del primer comprobante como referencia para guardar en el recibo, ya que pueden utilizarse de varias personas pero solo hay uno por recibo
+
+                                    //Actualizo los datos del recibo
+                                    recibo.IdCliente = comprobantesAgregados.First().ClienteComp;
+                                    recibo.FechaRecibo = Convert.ToDateTime(fechaRecibo);
+                                    recibo.FormaPago = formaPag;
+                                    recibo.Tarjeta = tarjeta;
+                                    recibo.NumTarjeta = numTarj;
+                                    recibo.Observaciones = observ;
+                                    recibo.UsuarioCrea = idUsAct;
+
+                                    //Guardo el recibo para obtener su ID y usarlo en los detalles
+                                    var idRec = await ServRecibo.CrearEncabRec(recibo);
+
+                                    if (idRec > 0)
+                                    {
+                                        //Guardo el importe total del recibo para irlo restando de los comprobantes
+                                        var saldoReciboRest = recibo.ImporteTotal;
+
+                                        //Veo cada comprobante y le voy restando el importe restante del recibo
+                                        foreach (var comp in comprobantesAgregados)
+                                        {
+                                            //En cada iteracion, se analiza si el saldo restante del recibo es mayor a 0, queriendo decir que todavia se puede quitar importe de los comprobantes siguientes
+                                            if (saldoReciboRest > 0)
+                                            {
+                                                //Lo primero que hay es analizar si el saldo final que me da entre el importe del comprobante y lo que restaba del recibo, es mayor que 0. Si es mayor, quiere decir que el saldo del recibo no alcanza para cubrir la totalidad del comprobante por lo que solo se restara una parte del saldo restante de ese comprobante. En cambio si es =0 o <0 quiere decir que el saldo restante del recibo alcanza para cubrir el saldo restante del comprobante, y si queda mas saldo del recibo, se puede seguir restando a los siguientes comprobantes
+                                                //             2500                6000 = -3500
+                                                //             6000                2500 = 3500
+                                                var saldo = comp.SaldoRestante - saldoReciboRest;
+
+                                                if (saldo > 0)
+                                                {
+                                                    //Saldo positivo quiere decir que va a quedar un restante en el saldo pendiente dle comprobante
+                                                    DetalleRecibo detalle = new DetalleRecibo();
+
+                                                    detalle.IdComprobante = comp.IdEncab;
+                                                    detalle.IdRecibo = idRec;
+                                                    detalle.Importe = saldoReciboRest;
+
+                                                    var detalleCreado = await ServDetRecibo.CrearDetalleRecibo(detalle);
+
+                                                    //Si se inserta correctamente el detalle, continuo con el comprobante apropiado
+                                                    if (detalleCreado)
+                                                    {
+                                                        //Se actualiza el comprobante correspondiente
+                                                        comp.SaldoRestante -= saldoReciboRest;
+                                                        comp.Pagado = false;
+
+                                                        var compAct = await ServComp.ActualizarComprobante(comp);
+
+                                                        if (compAct)
+                                                            break;
+                                                        else
+                                                        {
+                                                            Snackbar.Add($"No se pudo actualizar el comprobante del recibo por un error. Se descontinua la operacion.", Severity.Error);
+                                                            break;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        Snackbar.Add($"No se pudo insertar el detalle del recibo por un error.", Severity.Error);
+                                                        break;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    //Saldo negativo (quiere decir que queda saldo para seguir restando a los comprobantes siguientes)
+                                                    //Actualizo el saldo restante (Obtengo el valor absoluto porque llegaria un valor negativo, indicando que todavia queda salgo para restar)
+                                                    saldoReciboRest = Math.Abs(saldo);
+
+                                                    DetalleRecibo detalle = new DetalleRecibo();
+
+                                                    //Guardo los valores del detalle del recibo
+                                                    detalle.IdComprobante = comp.IdEncab;
+                                                    detalle.IdRecibo = idRec;
+                                                    detalle.Importe = comp.SaldoRestante;
+
+                                                    var detalleCreado = await ServDetRecibo.CrearDetalleRecibo(detalle);
+
+                                                    //Si se inserta correctamente el detalle, continuo con el comprobante apropiado
+                                                    if (detalleCreado)
+                                                    {
+                                                        //Se actualiza el comprobante correspondiente
+                                                        comp.SaldoRestante = 0;
+                                                        comp.Pagado = true;
+
+                                                        var compAct = await ServComp.ActualizarComprobante(comp);
+
+                                                        if (!compAct)
+                                                        {
+                                                            Snackbar.Add($"No se pudo actualizar el comprobante del recibo por un error. Se descontinua la operacion.", Severity.Error);
+                                                            break;
+                                                        }
+
+                                                        //Actualizo el carro (Orden compra) a estado Pagado
+                                                        var ordenActual = await ServCarroCompra.ObtenerCarro(comp.Carro);
+                                                        ordenActual.Pagado = true;
+                                                        ordenActual.FechaPago = fechaRecibo;
+                                                        ordenActual.MetodoPago = formaPag;
+
+                                                        var ordenActualizada = await ServCarroCompra.GuardarCarro(ordenActual);
+                                                        if(!ordenActualizada)
+                                                        {
+                                                            Snackbar.Add($"No se pudo actualizar la orden de compra a Pagada.", Severity.Error);
+                                                            break;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        Snackbar.Add($"No se pudo insertar el detalle del recibo por un error.", Severity.Error);
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            else break;
+                                        }
+
+                                        //Navego a la pagina de inicio
+                                        NavigationManager.NavigateTo("/detallesRecibo", forceLoad: true);
+                                    }
+                                    else Snackbar.Add($"No se pudo generar el recibo (encabezado). Error de insercion.", Severity.Error);
+                                }                          
                             }
-                            else
-                                Snackbar.Add($"Operacion Cancelada", Severity.Warning);
+                            else Snackbar.Add($"Operacion Cancelada", Severity.Warning);
                         }
-                        else
-                            Snackbar.Add($"El importe del recibo no puede superar la suma a ingresar de los comprobantes", Severity.Error);
+                        else Snackbar.Add($"El importe del recibo no puede superar la suma a ingresar de los comprobantes", Severity.Error);
                     }
-                    else
-                        Snackbar.Add($"La forma de pago debe ser distinta de Sin Pagar", Severity.Error);
+                    else Snackbar.Add($"La forma de pago debe ser distinta de Sin Pagar", Severity.Error);
                 }
-                else
-                    Snackbar.Add($"La fecha es incorrecta", Severity.Error);
+                else Snackbar.Add($"La fecha es incorrecta", Severity.Error);
             }
-            else
-                Snackbar.Add($"El importe del recibo debe ser mayor a 0", Severity.Error);
+            else Snackbar.Add($"El importe del recibo debe ser mayor a 0", Severity.Error);
         }
-        else
-            Snackbar.Add($"No se puede generar el recibo porque el listado de comprobantes es incorrecto", Severity.Error);
+        else Snackbar.Add($"No se puede generar el recibo porque el listado de comprobantes es incorrecto", Severity.Error);
     }
 }

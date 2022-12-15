@@ -1,4 +1,6 @@
-﻿namespace PPS3.Client.Services.ServProducto
+﻿using PPS3.Shared.Models;
+
+namespace PPS3.Client.Services.ServProducto
 {
     public class ServProducto : IServProducto
     {
@@ -11,15 +13,39 @@
         {
             _httpClient = httpClient;
             _sessionStorage = sessionStorage;
-        } 
-        
+        }
+
+        public async Task<bool> ActualizarStockProductos(List<StockProducto> productos)
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (string.IsNullOrEmpty(token)) return false;
+
+            //Se procede a Serializar el contenido del producto por parametro
+            var productosJson = new StringContent(JsonSerializer.Serialize(productos), Encoding.UTF8, "application/json");
+                        
+            //Creo una solicitud Http de tipo POST
+            var request = new HttpRequestMessage(HttpMethod.Post, $"api/Productos/ActualizarStockProductos");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+            //Agrego el JSON al BODY
+            request.Content = productosJson;
+            //Envio la solicitud HTTP
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            if (response.IsSuccessStatusCode) return true;
+            else return false;
+        }
+
         public async Task<bool> BorrarProducto(int id, int idUsu)
         {
             //Obtengo el token de sesion del usuario
             var token = await _sessionStorage.GetItemAsync<string>("token");
 
             //Verifico que exista un token
-            if (String.IsNullOrEmpty(token))
+            if (string.IsNullOrEmpty(token))
                 return false;
 
             //Creo una solicitud Http de tipo delete

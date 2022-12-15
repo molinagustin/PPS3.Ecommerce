@@ -1,7 +1,5 @@
-﻿using Org.BouncyCastle.Crypto;
-using PPS3.Shared.Models;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
-using static Org.BouncyCastle.Bcpg.Attr.ImageAttrib;
+﻿
+using static MudBlazor.CategoryTypes;
 
 namespace PPS3.Client.Services.ServCarroCompra
 {
@@ -17,14 +15,30 @@ namespace PPS3.Client.Services.ServCarroCompra
             _sessionStorage = sessionStorage;
         }
 
+        public async Task<bool> BajaComprobanteCarro(int id)
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (string.IsNullOrEmpty(token)) return false;
+
+            var request = new HttpRequestMessage(HttpMethod.Put, $"api/CarrosCompras/BajaComprobanteCarro/{id}");
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            if (response.IsSuccessStatusCode) return true;
+            else return false;
+        }
+
         public async Task<bool> GuardarCarro(CarroCompra carro)
         {
             //Obtengo el token de sesion del usuario
             var token = await _sessionStorage.GetItemAsync<string>("token");
 
             //Verifico que exista un token
-            if (String.IsNullOrEmpty(token))
-                return false;
+            if (string.IsNullOrEmpty(token)) return false;
 
             //Se procede a Serializar el contenido del producto por parametro
             var carroJson = new StringContent(JsonSerializer.Serialize(carro), Encoding.UTF8, "application/json");
@@ -265,6 +279,75 @@ namespace PPS3.Client.Services.ServCarroCompra
             }
             else
                 return null;
+        }
+
+        public async Task<IEnumerable<OrdenesCompraListado>> ObtenerOrdenesCompraComprobantes()
+        {
+            //Obtengo el token de sesion del usuario
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+
+            //Verifico que exista un token
+            if (String.IsNullOrEmpty(token))
+                return null;
+
+            //Creo una solicitud Http de tipo GET
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/CarrosCompras/ObtenerOrdenesCompraComprobantes");
+            //Agrego el token al Encabezado Http
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            //Envio la solicitud y guardo la respuesta
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            //Si la respuesta es exitosa, leo el contenido como STREAM (flujo de bits) y lo deserializo en un objeto apropiado
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var ordenes = await JsonSerializer.DeserializeAsync<IEnumerable<OrdenesCompraListado>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+                if (ordenes != null && ordenes.Count() > 0)
+                {
+                    //Voy a realizar una consulta para traer solo los detalles de los carros devueltos
+                    var carros = new List<int>();
+                    foreach (var od in ordenes)
+                        carros.Add(od.IdCarro);
+
+                    //Solicito los detalles al controlador
+                    var carrosJson = new StringContent(JsonSerializer.Serialize(carros), Encoding.UTF8, "application/json");
+
+                    var requestPost = new HttpRequestMessage(HttpMethod.Post, $"api/CarrosCompras/ObtenerOCDetallesComprobantes"); 
+                    requestPost.Headers.Add("Authorization", "Bearer " + token);
+                    requestPost.Content = carrosJson;
+
+                    var responsePost = await _httpClient.SendAsync(requestPost, HttpCompletionOption.ResponseContentRead);
+
+                    if (responsePost.IsSuccessStatusCode)
+                    {
+                        //Formateo si es posible cada imagen destacada de los detalles
+                        var streamDetalles = await responsePost.Content.ReadAsStreamAsync();
+
+                        var detalles = await JsonSerializer.DeserializeAsync<IEnumerable<DetalleCarroCompra>>(streamDetalles, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                        if (detalles != null)
+                        {
+                            foreach (var det in detalles)
+                            {
+                                if (det.ImagenDestacada != null)
+                                    det.UrlImagen = $"data:{format};base64,{Convert.ToBase64String(det.ImagenDestacada)}";
+                            }
+
+                            //Guardo cada detalle en la orden correspondiente
+                            foreach (var ord in ordenes)
+                                ord.DetallesCarro = detalles.Where(x => x.Carro == ord.IdCarro).ToList();
+
+                            return ordenes;
+                        }
+                        else return null;
+                    }
+                    else return null;
+                }
+                else return new List<OrdenesCompraListado>();
+            }
+            else return null;
         }
 
         public async Task<IEnumerable<OrdenesCompraListado>> ObtenerOrdenesCompraUsuario(int idUsuario)

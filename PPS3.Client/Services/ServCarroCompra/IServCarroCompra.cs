@@ -6,11 +6,13 @@ namespace PPS3.Client.Services.ServCarroCompra
     {
         Task<IEnumerable<CarroCompra>> ObtenerCarros();
         Task<IEnumerable<OrdenesCompraListado>> ObtenerOrdenesCompra();
+        Task<IEnumerable<OrdenesCompraListado>> ObtenerOrdenesCompraComprobantes();
         Task<IEnumerable<OrdenesCompraListado>> ObtenerOrdenesCompraUsuario(int idUsuario);
         Task<OrdenesCompraListado> ObtenerOCDetalle(int NumOrden);
         Task<IEnumerable<DetalleCarroCompra>> ObtenerOCDetalles(int NumOrden);
         Task<CarroCompra> ObtenerCarro(int id);
         Task<CarroCompra> ObtenerCarroActivoUsuario(int idUsuario);
         Task<bool> GuardarCarro(CarroCompra carro);
+        Task<bool> BajaComprobanteCarro(int id);
     }
 }
