@@ -86,6 +86,22 @@ else
 
         <MudItem xs="4">
             <MudStack>
+                <MudSwitch @bind-Checked="pgdo" Label="Pagado" Color="Color.Success" ReadOnly="true" />
+            </MudStack>
+
+            @if (ordenListado.Pagado)
+            {
+                <MudStack>
+                    <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Pago: <b>@string.Format("{0:d}", ordenListado.FechaPago)</b></MudText>
+                </MudStack>
+                <MudStack>
+                    <MudText Align="Align.Left" Typo="Typo.body1">Forma de Pago: <b>@ordenListado.FormaP</b></MudText>
+                </MudStack>
+            }                      
+        </MudItem>
+
+        <MudItem xs="4">
+            <MudStack>
                 @if(ordenListado.Estado == "Cancelado" || ordenListado.Estado == "Finalizado")
                 {
                     <MudDatePicker Label="Fecha de Entrega" @bind-Date="ordenListado.FechaEntrega" Placeholder="Seleccionar Fecha" ReadOnly="true"/>
@@ -95,48 +111,6 @@ else
                     <MudDatePicker Label="Fecha de Entrega" Editable="true" @bind-Date="ordenListado.FechaEntrega" Placeholder="Seleccionar Fecha" />
                 }                
             </MudStack>
-
-            <MudStack>
-                @if(ordenListado.Pagado || ordenListado.Estado == "Cancelado" || ordenListado.Estado == "Finalizado")
-                {
-                    <MudDatePicker Label="Fecha de Pago" @bind-Date="ordenListado.FechaPago" Placeholder="Seleccionar Fecha" ReadOnly="true"/>
-                }
-                else
-                {
-                    <MudDatePicker Label="Fecha de Pago" Editable="true" @bind-Date="ordenListado.FechaPago" Placeholder="Seleccionar Fecha"/>
-                }
-            </MudStack>
-        </MudItem>
-
-        <MudItem xs="4">
-            @if (ordenListado.Pagado || ordenListado.Estado == "Cancelado" || ordenListado.Estado == "Finalizado")
-            {
-                <MudStack>
-                    <MudSwitch @bind-Checked="pgdo" Label="Pagado" Color="Color.Success" ReadOnly="true"/>
-                </MudStack>
-                <MudStack>
-                    <MudSelect T="int" @bind-Value="@formaP" Label="Forma de Pago" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" ReadOnly="true">
-                        @foreach(var fp in formaPago)
-                        {
-                            <MudSelectItem Value="@fp.IdFormaP">@(formaPago.ToList().IndexOf(fp) + 1) - @fp.FormaP</MudSelectItem>
-                        }
-                    </MudSelect>
-                </MudStack>
-            }
-            else
-            {
-                <MudStack>
-                    <MudSwitch @bind-Checked="pgdo" Label="Pagado" Color="Color.Success"/>
-                </MudStack>
-                <MudStack>
-                    <MudSelect T="int" @bind-Value="@formaP" Label="Forma de Pago" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                        @foreach(var fp in formaPago)
-                        {
-                            <MudSelectItem Value="@fp.IdFormaP">@(formaPago.ToList().IndexOf(fp) + 1) - @fp.FormaP</MudSelectItem>
-                        }
-                    </MudSelect>
-                </MudStack>
-            }
         </MudItem>
     </MudGrid>
 
@@ -232,7 +206,6 @@ else
     private int formaP;
     private int estado;
     private bool pgdo;
-    private bool pgdoInicial = false;
 
     //Para guardar la orden solicitada
     OrdenesCompraListado ordenListado;
@@ -265,84 +238,34 @@ else
             formaP = 1;
 
         pgdo = ordenListado.Pagado;
-        pgdoInicial = ordenListado.Pagado;
     }
 
     private async Task GuardarOrden()
     {
-        if(pgdo != pgdoInicial)
+        //Si la orden va a ser CANCELADA o FINALIZADA, alerto al usuario
+        if (estado == 4 || estado == 5)
         {
-            var resultDialog = await DialogService.ShowMessageBox(
-                    "¡Atencion!",
-                    "Una vez guardada la confirmacion de pago, no se puede modificar. ¿Desea continuar?",
-                    yesText: "Continuar", cancelText: "Cancelar");
+            var options = new DialogOptions { CloseOnEscapeKey = true };
+            var dialog = DialogService.Show<DialogModifyOrder>("Confirmar Modificación", options);
+            var result = await dialog.Result;
 
-            if (resultDialog == true)
-            {
-                //Si la orden va a ser CANCELADA o FINALIZADA, alerto al usuario
-                if (estado == 4 || estado == 5)
-                {
-                    var options = new DialogOptions { CloseOnEscapeKey = true };
-                    var dialog = DialogService.Show<DialogModifyOrder>("Confirmar Modificacion", options);
-                    var result = await dialog.Result;
-
-                    if (!result.Cancelled)
-                        await ModificarOrden();
-                    else
-                        Snackbar.Add($"Se cancela la modificacion", Severity.Warning);
-                }
-                else
-                    await ModificarOrden();
-            }
-            else
-                Snackbar.Add($"Se cancela la modificacion", Severity.Warning);
+            if (!result.Cancelled) await ModificarOrden();
+            else Snackbar.Add($"Se cancela la modificación", Severity.Warning);
         }
-        else
-        {
-            //Si la orden va a ser CANCELADA o FINALIZADA, alerto al usuario
-            if (estado == 4 || estado == 5)
-            {
-                var options = new DialogOptions { CloseOnEscapeKey = true };
-                var dialog = DialogService.Show<DialogModifyOrder>("Confirmar Modificacion", options);
-                var result = await dialog.Result;
-
-                if (!result.Cancelled)
-                    await ModificarOrden();
-                else
-                    Snackbar.Add($"Se cancela la modificacion", Severity.Warning);
-            }
-            else
-                await ModificarOrden();
-        }        
+        else await ModificarOrden();        
     }
 
     private void Cancelar() => NavigationManager.NavigateTo("/listaOrdenesCompra");
 
     private async Task ModificarOrden()
     {
-        //Asigno los valores cambiados la carro
-        carro.Estado = estado;
-        if(pgdo)
-            carro.MetodoPago = formaP;
-        else
-            carro.MetodoPago = 7; //Sin pagar
+        //Asigno los valores cambiados al carro
+        carro.Estado = estado;       
 
-        if (ordenListado.FechaEntrega != null)
-            carro.FechaEntrega = Convert.ToDateTime(ordenListado.FechaEntrega);
-        else
-            carro.FechaEntrega = null;
+        if (ordenListado.FechaEntrega != null) carro.FechaEntrega = Convert.ToDateTime(ordenListado.FechaEntrega);
+        else carro.FechaEntrega = null;
 
-        if (ordenListado.FechaPago != null)
-            carro.FechaPago = Convert.ToDateTime(ordenListado.FechaPago);
-        else
-            carro.FechaPago = null;
-
-        if (ordenListado.FechaPago == null && pgdo)
-            carro.FechaPago = Convert.ToDateTime(DateTime.Today);
-
-        carro.Pagado = pgdo;
-        if (!string.IsNullOrEmpty(ordenListado.Observaciones))
-            carro.Observaciones = ordenListado.Observaciones;
+        if (!string.IsNullOrEmpty(ordenListado.Observaciones)) carro.Observaciones = ordenListado.Observaciones.Trim();
 
         //Procedo a guardar los cambios
         var result = await ServCarro.GuardarCarro(carro);
@@ -355,13 +278,11 @@ else
             movimiento.Usuario = idUsAct;
 
             var movimientoCreado = await ServMovCarro.CrearMovimiento(movimiento);
-            if (!movimientoCreado)
-                Snackbar.Add($"No se creo el movimiento", Severity.Error);
+            if (!movimientoCreado) Snackbar.Add($"No se creo el movimiento", Severity.Error);
 
             NavigationManager.NavigateTo("/listaOrdenesCompra");
-            Snackbar.Add($"Orden de compra modificada exitosamente", Severity.Success);
+            Snackbar.Add($"Orden de compra N° {ordenListado.IdCarro} modificada exitosamente", Severity.Success);
         }
-        else
-            Snackbar.Add($"No se pudo modificar la Orden de Compra", Severity.Error);
+        else Snackbar.Add($"No se pudo modificar la Orden de Compra", Severity.Error);
     }
 }
