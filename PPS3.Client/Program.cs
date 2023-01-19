@@ -78,7 +78,9 @@ builder.Services.AddAuthorizationCore(); //
 builder.Services.AddMudBlazorSnackbar();
 
 //URL de la API para la inyeccion de los servicios HTTPS
-var API_URL = new Uri("https://localhost:7022");
+//var API_URL = new Uri("https://localhost:7022");
+var API_URL = new Uri("http://localhost:7022");
+
 
 //Se inyectan los servicios HTTP del servicio creado (Producto) y se asigna la direccion URL a la que debe solicitar los request
 builder.Services.AddHttpClient<IServProducto, ServProducto>( client => { client.BaseAddress = API_URL; });

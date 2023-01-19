@@ -28,7 +28,7 @@
 
     <MudPaper Width="25em;">
         <EditForm Model="@ValorBuscado" OnValidSubmit="Buscar">
-            <MudTextField @bind-Value="@ValorBuscado" Label="Buscar Producto" Variant="Variant.Text" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search"/>
+            <MudTextField @bind-Value="@ValorBuscado" Label="Buscar Producto" Variant="Variant.Text" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Search" />
         </EditForm>        
     </MudPaper>
 
@@ -110,7 +110,11 @@
 
     private void VerCompras() => NavigationManager.NavigateTo($"/verCompras");
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) => await ProductosCarro();
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {        
+        await ProductosCarro();
+        firstRender = false;
+    }
 
     private async Task CambiarEstadoIz()
     {        

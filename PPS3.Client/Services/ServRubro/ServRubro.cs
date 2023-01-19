@@ -135,7 +135,7 @@ namespace PPS3.Client.Services.ServRubro
         }
 
         public async Task<IEnumerable<RubroCategoria>> ObtenerRubrosCategorias()
-        {
+        {        
             var response = await _httpClient.GetStreamAsync($"api/Rubros/ObtenerRubrosCategorias");
 
             var rubros = await JsonSerializer.DeserializeAsync<IEnumerable<RubroCategoria>>(response, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });

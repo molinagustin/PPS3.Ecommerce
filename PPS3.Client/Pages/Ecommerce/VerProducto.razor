@@ -65,7 +65,9 @@ else
             <AuthorizeView Context="usCont">
                 <Authorized>
                     <EditForm Model="producto" OnValidSubmit="AgregarProducto">
-                        <MudTextField Label="Cantidad" HelperText="Formato 999,99 ó 999" @bind-Value="cantidad" For="@(() => producto.Cantidad)" Required="true" Immediate=true OnBlur="CalculoSubTotal"/>
+                        <input @bind-value="strCant" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control">                    
+                        <MudTextField Label="Cantidad" HelperText="Formato 999,99 ó 999" @bind-Value="strCant"  Required="true" Immediate=true ReadOnly=true/>
+                        @*<MudTextField Label="Cantidad" HelperText="Formato 999,99 ó 999" @bind-Value="cantidad" For="@(() => producto.Cantidad)" Required="true" Immediate=true OnBlur="CalculoSubTotal" OnKeyDown="ProcessKeyPress"/>*@
                         <MudText @bind-Value="subTotal" ReadOnly=true>
                             Sub Total:
                             <b>
@@ -169,6 +171,7 @@ else
     private int idUsAct;
 
     private decimal cantidad = 1;
+    private string strCant = "1";
     private decimal stock = 0;
     private decimal subTotal = 0;
 
@@ -256,5 +259,51 @@ else
     private void CalculoSubTotal()
     {
         subTotal = producto.PrecioFinal * cantidad;
+    }
+
+    private static bool IsNumeric(string caracter)
+    {
+        int result;
+        return int.TryParse(caracter, out result);
+    }
+
+
+
+
+
+    //Declaro una pila (ultimo en entrar primero en salir) Dejo la pila o cola porque es mas facil acceder a los elementos
+    private Queue<Object> dato = new();
+
+    private void ProcessKeyPress(KeyboardEventArgs e)
+    {
+        dato.Clear();
+        var back = false;
+        foreach (var c in strCant)
+            dato.Enqueue(c.ToString());
+
+        switch (e.Key)
+        {
+            case ".":
+                if (!dato.Contains(","))
+                    dato.Enqueue(",");
+                break;
+            case ",":
+                if (!dato.Contains(","))
+                    dato.Enqueue(",");
+                break;
+            default:
+                if (IsNumeric(e.Key))
+                    dato.Enqueue(e.Key);
+                if (e.Code == "Backspace" && dato.Count() > 0)
+                    back = true;
+                break;
+        }
+        strCant = "";
+        var can = back ? dato.Count - 1 : dato.Count;
+        while (can > 0)
+        {
+            can--;
+            strCant += dato.Dequeue();
+        }            
     }
 }
