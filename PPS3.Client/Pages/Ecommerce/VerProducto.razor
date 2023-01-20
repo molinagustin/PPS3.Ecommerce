@@ -65,9 +65,9 @@ else
             <AuthorizeView Context="usCont">
                 <Authorized>
                     <EditForm Model="producto" OnValidSubmit="AgregarProducto">
-                        <input @bind-value="strCant" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control">                    
-                        <MudTextField Label="Cantidad" HelperText="Formato 999,99 ó 999" @bind-Value="strCant"  Required="true" Immediate=true ReadOnly=true/>
-                        @*<MudTextField Label="Cantidad" HelperText="Formato 999,99 ó 999" @bind-Value="cantidad" For="@(() => producto.Cantidad)" Required="true" Immediate=true OnBlur="CalculoSubTotal" OnKeyDown="ProcessKeyPress"/>*@
+                        <label for="CantProd">Cantidad</label>
+                        <input @bind-value="strCant" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" min="1" @onblur="CalculoSubTotal">
+                        @*<MudTextField Label="Cantidad" HelperText="Formato 999,99 ó 999" @bind-Value="cantidad" For="@(() => producto.Cantidad)" Required="true" Immediate=true OnBlur="CalculoSubTotal"/>*@
                         <MudText @bind-Value="subTotal" ReadOnly=true>
                             Sub Total:
                             <b>
@@ -258,6 +258,15 @@ else
 
     private void CalculoSubTotal()
     {
+        if (string.IsNullOrEmpty(strCant.Trim())) strCant = "1";
+        if (strCant.Trim().StartsWith(',')) strCant = "0" + strCant;
+        if (strCant.Contains(','))
+        {
+            var index = strCant.IndexOf(',');
+            try{strCant = strCant.Substring(0, index + 3);}
+            catch (Exception){strCant = strCant.Remove(index);}            
+        }
+        cantidad = Convert.ToDecimal(strCant);
         subTotal = producto.PrecioFinal * cantidad;
     }
 
@@ -266,10 +275,6 @@ else
         int result;
         return int.TryParse(caracter, out result);
     }
-
-
-
-
 
     //Declaro una pila (ultimo en entrar primero en salir) Dejo la pila o cola porque es mas facil acceder a los elementos
     private Queue<Object> dato = new();

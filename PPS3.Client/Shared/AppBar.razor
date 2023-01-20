@@ -110,11 +110,7 @@
 
     private void VerCompras() => NavigationManager.NavigateTo($"/verCompras");
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {        
-        await ProductosCarro();
-        firstRender = false;
-    }
+    protected override async Task OnAfterRenderAsync(bool firstRender){ await ProductosCarro(); }
 
     private async Task CambiarEstadoIz()
     {        
@@ -179,7 +175,7 @@
                 if(detalles != null)
                 {
                     BadgeContent = detalles.Count();
-                    StateHasChanged();
+                    //StateHasChanged();
                 }                
             }        
         }              
