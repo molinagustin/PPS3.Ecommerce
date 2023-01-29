@@ -33,6 +33,11 @@ else
             <RadzenGridColumn TItem="ProductoListado" Property="DescripcionUnidad" Title="Medido en" Width="100px"></RadzenGridColumn>
             @*<RadzenGridColumn TItem="ProductoListado" Property="CantMinAlerta" Title="Alerta de Cantidad"></RadzenGridColumn>*@
             <RadzenGridColumn TItem="ProductoListado" Property="StockExistencia" Title="Stock" Width="100px"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="Bonificacion" Title="Bonif." Width="100px">
+                <Template Context="bon">
+                    @bon.Bonificacion %
+                </Template>
+            </RadzenGridColumn>
             <RadzenGridColumn TItem="ProductoListado" Property="UsuarioCrea" Title="Creado por" Width="100px"></RadzenGridColumn>
             <RadzenGridColumn TItem="ProductoListado" Property="UsuarioModif" Title="Modificado por" Width="100px"></RadzenGridColumn>
             @*<RadzenGridColumn TItem="ProductoListado" Property="FechaCrea" Title="Fecha Creacion"></RadzenGridColumn>*@
@@ -75,6 +80,11 @@ else
             <RadzenGridColumn TItem="ProductoListado" Property="DescripcionUnidad" Title="Medido en" Width="100px"></RadzenGridColumn>
             @*<RadzenGridColumn TItem="ProductoListado" Property="CantMinAlerta" Title="Alerta de Cantidad"></RadzenGridColumn>*@
             <RadzenGridColumn TItem="ProductoListado" Property="StockExistencia" Title="Stock" Width="100px"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="Bonificacion" Title="Bonif." Width="100px">
+                <Template Context="bon">
+                    @bon.Bonificacion %
+                </Template>
+            </RadzenGridColumn>
             <RadzenGridColumn TItem="ProductoListado" Property="UsuarioCrea" Title="Creado por" Width="100px"></RadzenGridColumn>
             <RadzenGridColumn TItem="ProductoListado" Property="UsuarioModif" Title="Modificado por" Width="100px"></RadzenGridColumn>
             @*<RadzenGridColumn TItem="ProductoListado" Property="FechaCrea" Title="Fecha Creacion"></RadzenGridColumn>*@

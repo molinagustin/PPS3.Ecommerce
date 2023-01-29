@@ -65,14 +65,20 @@
                         @*<MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />*@
                     }
 
-                    <MudTextField Label="Precio de Costo" HelperText="Sin los adicionales. Formato 999,99 ó 999" @bind-Value="producto.PrecioCosto" For="@(() => producto.PrecioCosto)" Required="true"/>
+                    <label for="costo">Precio Costo (Precio sin ganancia)</label>
+                    <input @bind-value="strPCosto" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(1, ref strPCosto))" @onfocus="@(() => focusControl = 1)" name="costo">
 
-                    <MudTextField Label="Precio Final" HelperText="El precio a la venta. Formato 999,99 ó 999" @bind-Value="producto.PrecioFinal" For="@(() => producto.PrecioFinal)" Required="true"/>
+                    <label for="final">Precio Final (Precio a la venta)</label>
+                    <input @bind-value="strPFinal" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(2, ref strPFinal))" @onfocus="@(() => focusControl = 2)" name="final">
+
+                    @*<MudTextField Label="Precio de Costo" HelperText="Sin los adicionales. Formato 999,99 ó 999" @bind-Value="producto.PrecioCosto" For="@(() => producto.PrecioCosto)" Required="true"/>*@
+
+                    @*<MudTextField Label="Precio Final" HelperText="El precio a la venta. Formato 999,99 ó 999" @bind-Value="producto.PrecioFinal" For="@(() => producto.PrecioFinal)" Required="true"/>*@
 
                     @if (id > 0)
                     {
-                        <label for="bonif">Bonificación</label>
-                        <input @bind-value="strBonif" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="CalculoSubTotal" name="bonif">
+                        <label for="bonif">Bonificación (%)</label>
+                        <input @bind-value="strBonif" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(4, ref strBonif))" @onfocus="@(() => focusControl = 4)" name="bonif">
                     }
 
                     @if (provs != null)
@@ -105,7 +111,10 @@
 
                     @*<MudTextField Label="Cantidad Minima para Alerta" HelperText="El valor que se tomara para avisar de poco stock. Formato 999,99 ó 999" @bind-Value="producto.CantMinAlerta" For="@(() => producto.CantMinAlerta)"/>*@
 
-                    <MudTextField Label="Stock en Existencia" HelperText="Productos que quedan. Formato 999,99 ó 999" @bind-Value="producto.StockExistencia" For="@(() => producto.StockExistencia)"/>
+                    <label for="stock">Stock Existente</label>
+                    <input @bind-value="strStock" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(3, ref strStock))" @onfocus="@(() => focusControl = 3)" name="stock">
+
+                    @*<MudTextField Label="Stock en Existencia" HelperText="Productos que quedan. Formato 999,99 ó 999" @bind-Value="producto.StockExistencia" For="@(() => producto.StockExistencia)"/>*@
 
                     @if(id > 0)
                     {
@@ -159,6 +168,14 @@
     private string titulo = "Creacion de Nuevo Producto";
 
     private string strBonif = "0";
+    private decimal bonificacion = 0;
+    private string strPCosto = "0";
+    private decimal precioCosto = 0;
+    private string strPFinal = "0";
+    private decimal precioFinal = 0;
+    private string strStock = "0";
+    private decimal stock = 0;
+    private int focusControl = 0;
 
     //Se verifica si el formulario sera de insercion o de modificacion
     protected override async Task OnInitializedAsync()
@@ -180,6 +197,14 @@
             prov = producto.Proveedor;
             uni = producto.UnidadMedida;
             estadoActivoInicial = producto.Activo;
+            bonificacion = producto.Bonificacion;
+            precioCosto = producto.PrecioCosto;
+            precioFinal = producto.PrecioFinal;
+            stock = producto.StockExistencia;
+            strBonif = bonificacion.ToString();
+            strPCosto = precioCosto.ToString();
+            strPFinal = precioFinal.ToString();
+            strStock = stock.ToString();
             titulo = "Modificacion de Producto";            
         }  
         FiltrarTiposProductos();
@@ -189,18 +214,46 @@
     protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
 
 
-    private void CalculoSubTotal()
+    private void Procesar(int tipo, ref string strProces)
     {
-        if (string.IsNullOrEmpty(strCant.Trim())) strCant = "1";
-        if (strCant.Trim().StartsWith(',')) strCant = "0" + strCant;
-        if (strCant.Contains(','))
+        if (string.IsNullOrEmpty(strProces.Trim())) strProces = "0";
+        if (strProces.Trim().StartsWith(',')) strProces = "0" + strProces;
+        if (strProces.Contains(','))
         {
-            var index = strCant.IndexOf(',');
-            try { strCant = strCant.Substring(0, index + 3); }
-            catch (Exception) { strCant = strCant.Remove(index); }
+            var index = strProces.IndexOf(',');
+            try { strProces = strProces.Substring(0, index + 3); }
+            catch (Exception) { strProces = strProces.Remove(index); }
         }
-        cantidad = Convert.ToDecimal(strCant);
-        subTotal = producto.PrecioFinal * cantidad;
+
+        //1-Precio Costo 2-Precio Final 3-Bonificacion 4-Stock
+        switch (tipo)
+        {            
+            case 1:
+                precioCosto = Convert.ToDecimal(strProces);
+                strProces = precioCosto.ToString();
+                break;
+
+            case 2:
+                precioFinal = Convert.ToDecimal(strProces);
+                strProces = precioFinal.ToString();
+                break;
+
+            case 3:
+                stock = Convert.ToDecimal(strProces);
+                strProces = stock.ToString();
+                break;
+
+            case 4:                
+                bonificacion = Convert.ToDecimal(strProces);
+                strProces = bonificacion.ToString();
+                if(bonificacion > 100)
+                {
+                    strProces = "100";
+                    bonificacion = 100;
+                }
+                break;
+        }
+
     }
 
     private static bool IsNumeric(string caracter)
@@ -214,40 +267,67 @@
 
     private void ProcessKeyPress(KeyboardEventArgs e)
     {
-        dato.Clear();
-        var back = false;
-        foreach (var c in strBonif)
-            dato.Enqueue(c.ToString());
-
-        switch (e.Key)
+        switch (focusControl)
         {
-            case ".":
-                if (!dato.Contains(","))
-                    dato.Enqueue(",");
+            case 1:
+                ProcesoUnitario(ref strPCosto);
                 break;
-            case ",":
-                if (!dato.Contains(","))
-                    dato.Enqueue(",");
+
+            case 2:
+                ProcesoUnitario(ref strPFinal);
                 break;
-            default:
-                if (IsNumeric(e.Key))
-                    dato.Enqueue(e.Key);
-                if (e.Code == "Backspace" && dato.Count() > 0)
-                    back = true;
+
+            case 3:
+                ProcesoUnitario(ref strStock);
+                break;
+
+            case 4:
+                ProcesoUnitario(ref strBonif);
                 break;
         }
-        strBonif = "";
-        var can = back ? dato.Count - 1 : dato.Count;
-        while (can > 0)
+
+        void ProcesoUnitario(ref string str)
         {
-            can--;
-            strBonif += dato.Dequeue();
+            dato.Clear();
+            var back = false;
+            foreach (var c in str)
+                dato.Enqueue(c.ToString());
+
+            switch (e.Key)
+            {
+                case ".":
+                    if (!dato.Contains(","))
+                        dato.Enqueue(",");
+                    break;
+                case ",":
+                    if (!dato.Contains(","))
+                        dato.Enqueue(",");
+                    break;
+                default:
+                    if (IsNumeric(e.Key))
+                        dato.Enqueue(e.Key);
+                    if (e.Code == "Backspace" && dato.Count() > 0)
+                        back = true;
+                    break;
+            }
+            str = "";
+            var can = back ? dato.Count - 1 : dato.Count;
+            while (can > 0)
+            {
+                can--;
+                str += dato.Dequeue();
+            }
         }
     }
 
     //A traves de un metodo se va a guardar los cambios del producto
     protected async Task GuardarProducto()
     {
+        producto.PrecioCosto = precioCosto;
+        producto.PrecioFinal = precioFinal;
+        producto.Bonificacion = bonificacion;
+        producto.StockExistencia = stock;
+
         if(tiposProdsPorRubro != null && tiposProdsPorRubro.Count() > 0 && tipo != 9999)
         {
             //Asigno valores por si se cambiaron desde los CBO
@@ -282,6 +362,20 @@
 
             async Task EmpezarGuardado()
             {
+                if(producto.Bonificacion == 100)
+                {
+                    var resultDialog = await DialogService.ShowMessageBox(
+                        "¡Atencion!",
+                        "Está por guardar un producto con una bonificacion del 100%. ¿Desea continuar?",
+                        yesText: "Continuar", cancelText: "Cancelar");
+
+                    if (resultDialog == null)
+                    { 
+                        Snackbar.Add($"Se cancela la acción", Severity.Info);
+                        return;
+                    }
+                }
+
                 if (producto.StockExistencia == 0 && (producto.PrecioCosto == 0 || producto.PrecioFinal == 0))
                 {
                     var resultDialog = await DialogService.ShowMessageBox(

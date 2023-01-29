@@ -59,7 +59,8 @@ else
                     @if(producto.Bonificacion > 0)
                     {
 
-                        <MudText Align="Align.Left" Typo="Typo.h6"><b>Precio: </b><span style="text-decoration:line-through;">$@producto.PrecioFinal</span><span style="font-weight:bold;color:green;margin-left:10px;">@producto.Bonificacion% Bonif. = </span><b>
+                        <MudText Align="Align.Left" Typo="Typo.h6">
+                            <b>Precio: </b><span style="text-decoration:line-through;">$@precioOriginalProducto</span><span style="font-weight:bold;color:green;margin-left:10px;">@producto.Bonificacion% Bonif. = </span><b>
                                 @if (producto.Bonificacion < 100)
                                 {
                                     <b> @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", producto.PrecioFinal)</b>
