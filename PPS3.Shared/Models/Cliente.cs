@@ -25,5 +25,8 @@ namespace PPS3.Shared.Models
         public bool Activo { get; set; }
         public DateTime FechaCrea { get; set; }
         public DateTime FechaUltModif { get; set; }
+
+        //Propiedad para su cuenta corriente activa
+        public bool CCActiva { get; set; }
     }
 }

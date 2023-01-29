@@ -95,7 +95,31 @@
                 </MudCardHeader>
                 <MudImage Elevation="0" ObjectFit="ObjectFit.Fill" Src="@prod.UrlImagen" Style="width:100%; height:250px;" />
                 <MudCardContent>
-                    <MudText Typo="Typo.body1" Align="Align.Center">$@prod.PrecioFinal</MudText>
+                    @if(prod.Bonificacion > 0)
+                    {
+                        <MudGrid>
+                            <MudItem xs="4"></MudItem>
+                            <MudItem xs="4">
+                                <MudText Typo="Typo.body1" Align="Align.Center" Style="text-decoration:line-through;">$@prod.PrecioFinal</MudText>
+                            </MudItem>
+                            <MudItem xs="4">
+                                <MudText Color="Color.Success"><b>@prod.Bonificacion % Bonif.</b></MudText>
+                            </MudItem>
+                        </MudGrid>
+                        
+                        <MudText Typo="Typo.body1" Align="Align.Center">
+                            @if(prod.Bonificacion < 100)
+                            {
+                                <b> @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", prod.PrecioFinal * ((100 - prod.Bonificacion) / 100))</b>
+                            }
+                            else{<b>¡Gratis!</b>}
+                            
+                        </MudText>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.body1" Align="Align.Center">$@prod.PrecioFinal</MudText>
+                    }
                 </MudCardContent>
                 <MudCardActions>
                     <MudGrid>
@@ -123,7 +147,34 @@
                 </MudCardHeader>
                 <MudImage Elevation="0" ObjectFit="ObjectFit.Fill" Src="@prod.UrlImagen" Style="width:100%; height:250px;" />
                 <MudCardContent>
-                    <MudText Typo="Typo.body1" Align="Align.Center">$@prod.PrecioFinal</MudText>
+                    @if (prod.Bonificacion > 0)
+                    {
+                        <MudGrid>
+                            <MudItem xs="4"></MudItem>
+                            <MudItem xs="4">
+                                <MudText Typo="Typo.body1" Align="Align.Center" Style="text-decoration:line-through;">$@prod.PrecioFinal</MudText>
+                            </MudItem>
+                            <MudItem xs="4">
+                                <MudText Color="Color.Success"><b>@prod.Bonificacion % Bonif.</b></MudText>
+                            </MudItem>
+                        </MudGrid>
+
+                        <MudText Typo="Typo.body1" Align="Align.Center">
+                            @if (prod.Bonificacion < 100)
+                            {
+                                <b> @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", prod.PrecioFinal * ((100 - prod.Bonificacion) / 100))</b>
+                            }
+                            else
+                            {
+                                <b>¡Gratis!</b>
+                            }
+
+                        </MudText>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.body1" Align="Align.Center">$@prod.PrecioFinal</MudText>
+                    }
                 </MudCardContent>
                 <MudCardActions>
                     <MudGrid>

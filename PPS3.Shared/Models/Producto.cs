@@ -25,6 +25,8 @@ namespace PPS3.Shared.Models
         public int Proveedor { get; set; }
         [Required(ErrorMessage = "Se debe seleccionar la Unidad de Medida correspondiente.")]
         public int UnidadMedida { get; set; }
+        [Column(TypeName = "decimal(5,2)")]
+        public decimal Bonificacion { get; set; }
         [Column(TypeName = "decimal(11,2)")]
         public decimal CantMinAlerta { get; set; }
         [Required(ErrorMessage = "El stock es requerido. Al menos en 0")]

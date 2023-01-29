@@ -56,6 +56,16 @@ namespace PPS3.Server.Controllers
                 return BadRequest();
         }
 
+        [HttpGet("{NumOrden}")]
+        public async Task<ActionResult<IEnumerable<MovimientosPago>>> ObtenerMovimientosPago(int NumOrden)
+        {
+            var response = await _repCarroCompra.ObtenerMovimientosPago(NumOrden);
+            if (response != null)
+                return Ok(response);
+            else
+                return BadRequest();
+        }
+
         [HttpGet("{idUsuario}")]
         public async Task<ActionResult<IEnumerable<OrdenesCompraListado>>> ObtenerOrdenesCompraUsuario(int idUsuario)
         {

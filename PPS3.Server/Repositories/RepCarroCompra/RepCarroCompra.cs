@@ -1,4 +1,5 @@
-﻿using PPS3.Shared.Models;
+﻿using Dapper;
+using PPS3.Shared.Models;
 
 namespace PPS3.Server.Repositories.RepCarroCompra
 {
@@ -261,6 +262,22 @@ namespace PPS3.Server.Repositories.RepCarroCompra
             var sql = "UPDATE carros_compras SET CompGenerado=0 WHERE IdCarro=@id";
             var result = await db.ExecuteAsync(sql, new { id });
             return result > 0;
+        }
+
+        public async Task<IEnumerable<MovimientosPago>> ObtenerMovimientosPago(int NumOrden)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT re.FechaRecibo, rd.Importe AS ImporteTotal, fp.FormaP, ce.SaldoRestante FROM recibos_encabezado re
+                        INNER JOIN recibos_detalles rd ON rd.IdRecibo = re.IdRecibo
+                        INNER JOIN formas_pago fp ON re.FormaPago = fp.IdFormaP
+                        INNER JOIN comprobantes_encabezados ce ON ce.IdEncab = rd.IdComprobante
+                        WHERE re.FormaPago != 9 AND ce.Carro = @NumOrden
+                        ORDER BY re.FechaRecibo;
+                        ";
+            var result = await db.QueryAsync<MovimientosPago>(sql, new { NumOrden = NumOrden });
+            return result;
         }
     }
 }

@@ -56,7 +56,25 @@ else
                     {
                         <MudText Align="Align.Left" Typo="Typo.h6" Color="Color.Error"><b>Sin Stock Disponible</b></MudText>
                     }
-                    <MudText Align="Align.Left" Typo="Typo.h6"><b>Precio: </b>$@producto.PrecioFinal</MudText>
+                    @if(producto.Bonificacion > 0)
+                    {
+
+                        <MudText Align="Align.Left" Typo="Typo.h6"><b>Precio: </b><span style="text-decoration:line-through;">$@producto.PrecioFinal</span><span style="font-weight:bold;color:green;margin-left:10px;">@producto.Bonificacion% Bonif. = </span><b>
+                                @if (producto.Bonificacion < 100)
+                                {
+                                    <b> @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", producto.PrecioFinal)</b>
+                                }
+                                else
+                                {
+                                    <b>¡Gratis!</b>
+                                }
+
+                        </b></MudText>
+                    }
+                    else
+                    {
+                        <MudText Align="Align.Left" Typo="Typo.h6"><b>Precio: </b>$@producto.PrecioFinal</MudText>
+                    }
                     <MudText Align="Align.Left" Typo="Typo.h6"><b>Calificacion: </b> <MudRating ReadOnly=true SelectedValue="4"/></MudText>
                 </MudCardContent>
             </MudCard>            
@@ -174,6 +192,7 @@ else
     private string strCant = "1";
     private decimal stock = 0;
     private decimal subTotal = 0;
+    private decimal precioOriginalProducto = 0;
 
     //Guardo el ID del usuario actual
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -194,6 +213,12 @@ else
         producto = await ServProducto.ObtenerProductoListado(id);
         imagenesProducto = await ServImagen.ObtenerImagenes(id);
         stock = producto.StockExistencia;
+        precioOriginalProducto = producto.PrecioFinal;
+        if (producto.Bonificacion > 0)
+        {
+            if (producto.Bonificacion < 100) producto.PrecioFinal = (producto.PrecioFinal * ((100 - producto.Bonificacion) / 100));
+            else producto.PrecioFinal = 0;
+        }
         subTotal = producto.PrecioFinal;
     }
 
@@ -221,7 +246,13 @@ else
                     detalle.Carro = carro.IdCarro;
                     detalle.Producto = producto.IdProducto;
                     detalle.Cantidad = cantidad;
-                    detalle.PrecioUnit = producto.PrecioFinal;
+                    detalle.PrecioUnit = precioOriginalProducto;
+                    if (producto.Bonificacion > 0)
+                    {
+                        detalle.Bonificacion = producto.Bonificacion;
+                        if (producto.Bonificacion < 100) detalle.BonificacionTotal = cantidad * (precioOriginalProducto - producto.PrecioFinal);
+                        else detalle.BonificacionTotal = cantidad * precioOriginalProducto;
+                    }
                     detalle.SubTotal = subTotal;
 
                     var nuevoDetalle = await ServDetalleCarro.GuardarDetalle(detalle);

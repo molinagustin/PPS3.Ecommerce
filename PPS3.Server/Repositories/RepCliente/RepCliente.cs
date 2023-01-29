@@ -149,8 +149,9 @@
             var db = dbConnection();
 
             var sql = @"
-                        SELECT *
-                        FROM clientes
+                        SELECT c.*, cc.Activo AS CCActiva
+                        FROM clientes c
+                        INNER JOIN cuentas_corrientes cc ON c.IdCliente = cc.ClienteCC
                         ";
             var result = await db.QueryAsync<Cliente>(sql, new { });
             return result;

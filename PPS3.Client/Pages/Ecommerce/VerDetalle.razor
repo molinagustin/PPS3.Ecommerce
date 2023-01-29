@@ -108,25 +108,39 @@
                     <MudStack>
                         @if(ordenListado.FechaEntrega != null)
                         {
-                            <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Entrega: <b>@string.Format("{0:d}", ordenListado.FechaEntrega)</b></MudText>
+                            <MudText Align="Align.Left" Typo="Typo.body1">Entregado: <b>@string.Format("{0:d}", ordenListado.FechaEntrega)</b></MudText>
                         }
                         else
                         {
-                            <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Entrega: <b>----</b></MudText>
+                            <MudText Align="Align.Left" Typo="Typo.body1">Entregado: <b>Sin Entregar</b></MudText>
                         }
                     </MudStack>
                     <MudStack>
                         <MudSwitch @bind-Checked="ordenListado.Pagado" Label="¿Pagado?" Color="Color.Success" ReadOnly=true/>                  
                     </MudStack>
 
-                    @if(ordenListado.Pagado)
+                    @if(pagos != null && pagos.Count() > 0)
                     {
-                        <MudStack>
-                            <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Pago: <b>@string.Format("{0:d}", ordenListado.FechaPago)</b></MudText>
-                        </MudStack>
-                        <MudStack>
-                            <MudText Align="Align.Left" Typo="Typo.body1">Forma de Pago: <b>@ordenListado.FormaP</b></MudText>
-                        </MudStack>
+                        @foreach (var pago in pagos)
+                        {
+                            <MudStack Row=true>
+                                <MudStack Spacing="0" Class="mb-2">
+                                    <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Pago: <b>@string.Format("{0:d}", pago.FechaRecibo)</b></MudText>
+                                    <MudText Align="Align.Left" Typo="Typo.body1">Forma de Pago: <b>@pago.FormaP</b></MudText>
+                                </MudStack>
+                                <MudStack>
+                                    <MudText Align="Align.Left" Typo="Typo.body1">Importe: <b>$ @pago.ImporteTotal</b></MudText>
+                                </MudStack>
+                            </MudStack>
+                        }                        
+                        @if(!ordenListado.Pagado)
+                        {
+                            <MudText Align="Align.Left" Typo="Typo.body1">Saldo Restante: <b>$ @pagos.First().SaldoRestante</b></MudText>
+                        }
+                    }
+                    else
+                    {
+                        <MudText Align="Align.Left" Typo="Typo.body1"><b>Sin pagos realizados hasta el momento.</b></MudText>
                     }
                 </MudItem>
 
@@ -182,6 +196,7 @@
     //Para guardar la orden solicitada
     OrdenesCompraListado ordenListado;
     IEnumerable<HistorialMovimientoCarro> historial;
+    IEnumerable<MovimientosPago> pagos;
 
     //Guardo el ID del usuario actual
     protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
@@ -189,6 +204,7 @@
     protected override async Task OnInitializedAsync()
     {
         ordenListado = await ServCarro.ObtenerOCDetalle(idOrden);
+        pagos = await ServCarro.ObtenerMovimientosPago(idOrden);
         historial = await ServMovCarro.ObtenerHistorial(idOrden);
     }
 

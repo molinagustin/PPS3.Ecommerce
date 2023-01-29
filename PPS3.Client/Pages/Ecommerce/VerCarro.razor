@@ -37,10 +37,20 @@ else
                 </RadzenGridColumn>
                 <RadzenGridColumn TItem="DetalleCarroCompra" TextAlign="Radzen.TextAlign.Center" Property="Descripcion" Title="Descripcion" Width="50px"></RadzenGridColumn>
                 <RadzenGridColumn TItem="DetalleCarroCompra" Property="Cantidad" Title="Cantidad" Width="10px"></RadzenGridColumn>
-                <RadzenGridColumn TItem="DetalleCarroCompra" Property="DescripcionUnidad" Title="Unidad Medida" Width="15px"></RadzenGridColumn>
+                <RadzenGridColumn TItem="DetalleCarroCompra" Property="DescripcionUnidad" Title="Unidad Medida" Width="15px"></RadzenGridColumn>                
                 <RadzenGridColumn TItem="DetalleCarroCompra" Property="PrecioUnit" Title="Precio" Width="15px">
                     <Template Context="precio">
                         @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", precio.PrecioUnit)
+                    </Template>
+                </RadzenGridColumn>
+                <RadzenGridColumn TItem="DetalleCarroCompra" Property="Bonificacion" Title="Bonif." Width="10px">
+                    <Template Context="bon">
+                        @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0}", bon.Bonificacion)%
+                    </Template>
+                </RadzenGridColumn>
+                <RadzenGridColumn TItem="DetalleCarroCompra" Property="BonificacionTotal" Title="Bonif. Total" Width="15px">
+                    <Template Context="bonTot">
+                        @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", bonTot.BonificacionTotal)
                     </Template>
                     <FooterTemplate>
                         @string.Format("TOTAL: ")

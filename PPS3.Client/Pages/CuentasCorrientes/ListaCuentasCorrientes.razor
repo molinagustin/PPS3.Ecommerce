@@ -18,7 +18,7 @@ else
             <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NumCC" Title="N° Cuenta" Width="100px"></RadzenGridColumn>
             <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NombreCompleto" Title="Nombre Cliente"></RadzenGridColumn>
             <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NumDocumento" Title="N° Documento"></RadzenGridColumn>
-            <RadzenGridColumn TItem="CuentasCorrientesListado" Property="SaldoCCC" Title="Saldo de Compra Disponible">
+            @*<RadzenGridColumn TItem="CuentasCorrientesListado" Property="SaldoCCC" Title="Saldo de Compra Disponible">
                 <Template Context="saldo">
                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", saldo.SaldoCCC)
                 </Template>
@@ -27,7 +27,7 @@ else
                 <Template Context="limite">
                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", limite.LimiteSaldo)
                 </Template>
-            </RadzenGridColumn>
+        </RadzenGridColumn>*@
             <RadzenGridColumn TItem="CuentasCorrientesListado" Property="Activo" Title="Cuenta Activa" Width="120px">
                 <Template Context="act">
                     @if(act.Activo)

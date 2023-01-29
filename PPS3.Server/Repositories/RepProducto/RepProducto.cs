@@ -30,6 +30,7 @@ namespace PPS3.Server.Repositories.RepProducto
                             PrecioFinal=@PrecioFinal, 
                             Proveedor=@Proveedor, 
                             UnidadMedida=@UnidadMedida, 
+                            Bonificacion=@Bonificacion,
                             CantMinAlerta=@CantMinAlerta, 
                             StockExistencia=@StockExistencia,
                             Activo=@Activo,
@@ -47,7 +48,8 @@ namespace PPS3.Server.Repositories.RepProducto
                                                         producto.PrecioCosto, 
                                                         producto.PrecioFinal, 
                                                         producto.Proveedor, 
-                                                        producto.UnidadMedida, 
+                                                        producto.UnidadMedida,
+                                                        producto.Bonificacion,
                                                         producto.CantMinAlerta, 
                                                         producto.StockExistencia,
                                                         producto.Activo,
@@ -162,7 +164,7 @@ namespace PPS3.Server.Repositories.RepProducto
             //Se coloca el @ para que se pueda usar multiples lineas en la misma cadena, sino habria que concatenarla con +
             var sql = @"
                         SELECT  prod.IdProducto, prod.NombreProd, prod.Descripcion, r.DescRubro,                    tp.DescripcionTipo, prod.PrecioCosto, 
-                                prod.PrecioFinal, prov.NombreProv, um.DescripcionUnidad, prod.CantMinAlerta,      prod.StockExistencia, u.NombreUs as UsuarioCrea, u2.NombreUs as UsuarioModif, 
+                                prod.PrecioFinal, prov.NombreProv, um.DescripcionUnidad, prod.Bonificacion, prod.CantMinAlerta,      prod.StockExistencia, u.NombreUs as UsuarioCrea, u2.NombreUs as UsuarioModif, 
                                 prod.FechaCrea, prod.FechaUltModif
                         FROM productos as prod
                         INNER JOIN rubros as r ON prod.Rubro = r.IdRubro
@@ -199,7 +201,7 @@ namespace PPS3.Server.Repositories.RepProducto
             //Se coloca el @ para que se pueda usar multiples lineas en la misma cadena, sino habria que concatenarla con +
             var sql = @"
                         SELECT  prod.IdProducto, prod.NombreProd, prod.Descripcion, r.DescRubro,                    tp.DescripcionTipo, prod.PrecioCosto, 
-                                prod.PrecioFinal, prov.NombreProv, um.DescripcionUnidad, prod.CantMinAlerta,      prod.StockExistencia, u.NombreUs as UsuarioCrea, u2.NombreUs as UsuarioModif, 
+                                prod.PrecioFinal, prov.NombreProv, um.DescripcionUnidad, prod.Bonificacion, prod.CantMinAlerta,      prod.StockExistencia, u.NombreUs as UsuarioCrea, u2.NombreUs as UsuarioModif, 
                                 prod.FechaCrea, prod.FechaUltModif
                         FROM productos as prod
                         INNER JOIN rubros as r ON prod.Rubro = r.IdRubro
@@ -222,7 +224,7 @@ namespace PPS3.Server.Repositories.RepProducto
             var db = dbConnection();
             //Se coloca el @ para que se pueda usar multiples lineas en la misma cadena, sino habria que concatenarla con +
             var sql = @"
-                        SELECT TOP 8 prod.IdProducto, prod.NombreProd, prod.PrecioFinal, prod.FechaUltModif, prod.ImagenDestacada
+                        SELECT TOP 8 prod.IdProducto, prod.NombreProd, prod.PrecioFinal, prod.Bonificacion, prod.FechaUltModif, prod.ImagenDestacada
                         FROM productos as prod
                         WHERE prod.Activo = 1
                         ORDER BY prod.FechaUltModif DESC
@@ -239,7 +241,7 @@ namespace PPS3.Server.Repositories.RepProducto
             //Se coloca el @ para que se pueda usar multiples lineas en la misma cadena, sino habria que concatenarla con +
             var sql = @"
                         SELECT  prod.IdProducto, prod.NombreProd, prod.Descripcion, r.DescRubro,                    tp.DescripcionTipo, prod.PrecioCosto, 
-                                prod.PrecioFinal, prov.NombreProv, um.DescripcionUnidad, prod.StockExistencia
+                                prod.PrecioFinal, prov.NombreProv, um.DescripcionUnidad, prod.Bonificacion, prod.StockExistencia
                         FROM productos as prod
                         INNER JOIN rubros as r ON prod.Rubro = r.IdRubro
                         INNER JOIN productos_tipos as tp ON prod.TipoProd = tp.IdTipo
@@ -258,7 +260,7 @@ namespace PPS3.Server.Repositories.RepProducto
             var db = dbConnection();
 
             var sql = @"
-                        SELECT  prod.IdProducto, prod.NombreProd, prod.Descripcion, prod.PrecioFinal, um.DescripcionUnidad, prod.ImagenDestacada
+                        SELECT  prod.IdProducto, prod.NombreProd, prod.Descripcion, prod.PrecioFinal, um.DescripcionUnidad, prod.Bonificacion, prod.ImagenDestacada
                         FROM productos as prod
                         INNER JOIN unidades_medida as um ON prod.UnidadMedida = um.IdUnidad
                         INNER JOIN carros_compras_detalles as ccd ON ccd.Producto = prod.IdProducto
@@ -275,7 +277,7 @@ namespace PPS3.Server.Repositories.RepProducto
             var db = dbConnection();
 
             var sql = @"
-                        SELECT prod.IdProducto, prod.NombreProd, prod.Descripcion, prod.PrecioFinal, prod.ImagenDestacada
+                        SELECT prod.IdProducto, prod.NombreProd, prod.Descripcion, prod.PrecioFinal, prod.Bonificacion, prod.ImagenDestacada
                         FROM productos as prod
                         WHERE prod.Activo = 1 AND prod.TipoProd = @idTipoProd
                         ORDER BY prod.NombreProd
@@ -290,7 +292,7 @@ namespace PPS3.Server.Repositories.RepProducto
         {
             var db = dbConnection();
 
-            var sql = @"SELECT prod.IdProducto, prod.NombreProd, prod.Descripcion, prod.PrecioFinal,            prod.ImagenDestacada 
+            var sql = @"SELECT prod.IdProducto, prod.NombreProd, prod.Descripcion, prod.PrecioFinal, prod.Bonificacion,            prod.ImagenDestacada 
                         FROM productos as prod 
                         WHERE prod.Activo = 1 AND prod.NombreProd LIKE '%" + busqueda + @"%' 
                         ORDER BY prod.NombreProd";

@@ -69,6 +69,12 @@
 
                     <MudTextField Label="Precio Final" HelperText="El precio a la venta. Formato 999,99 ó 999" @bind-Value="producto.PrecioFinal" For="@(() => producto.PrecioFinal)" Required="true"/>
 
+                    @if (id > 0)
+                    {
+                        <label for="bonif">Bonificación</label>
+                        <input @bind-value="strBonif" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="CalculoSubTotal" name="bonif">
+                    }
+
                     @if (provs != null)
                     {
                         <MudSelect T="int" @bind-Value="@prov" Label="Proveedor" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
@@ -152,6 +158,8 @@
 
     private string titulo = "Creacion de Nuevo Producto";
 
+    private string strBonif = "0";
+
     //Se verifica si el formulario sera de insercion o de modificacion
     protected override async Task OnInitializedAsync()
     {
@@ -179,6 +187,63 @@
 
     //Guardo el ID del usuario actual
     protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+
+
+    private void CalculoSubTotal()
+    {
+        if (string.IsNullOrEmpty(strCant.Trim())) strCant = "1";
+        if (strCant.Trim().StartsWith(',')) strCant = "0" + strCant;
+        if (strCant.Contains(','))
+        {
+            var index = strCant.IndexOf(',');
+            try { strCant = strCant.Substring(0, index + 3); }
+            catch (Exception) { strCant = strCant.Remove(index); }
+        }
+        cantidad = Convert.ToDecimal(strCant);
+        subTotal = producto.PrecioFinal * cantidad;
+    }
+
+    private static bool IsNumeric(string caracter)
+    {
+        int result;
+        return int.TryParse(caracter, out result);
+    }
+
+    //Declaro una pila (ultimo en entrar primero en salir) Dejo la pila o cola porque es mas facil acceder a los elementos
+    private Queue<Object> dato = new();
+
+    private void ProcessKeyPress(KeyboardEventArgs e)
+    {
+        dato.Clear();
+        var back = false;
+        foreach (var c in strBonif)
+            dato.Enqueue(c.ToString());
+
+        switch (e.Key)
+        {
+            case ".":
+                if (!dato.Contains(","))
+                    dato.Enqueue(",");
+                break;
+            case ",":
+                if (!dato.Contains(","))
+                    dato.Enqueue(",");
+                break;
+            default:
+                if (IsNumeric(e.Key))
+                    dato.Enqueue(e.Key);
+                if (e.Code == "Backspace" && dato.Count() > 0)
+                    back = true;
+                break;
+        }
+        strBonif = "";
+        var can = back ? dato.Count - 1 : dato.Count;
+        while (can > 0)
+        {
+            can--;
+            strBonif += dato.Dequeue();
+        }
+    }
 
     //A traves de un metodo se va a guardar los cambios del producto
     protected async Task GuardarProducto()

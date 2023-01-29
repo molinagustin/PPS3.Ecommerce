@@ -182,7 +182,7 @@ else
 
                 @if(orden.CompGenerado)
                 {
-                    <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Info" Style="margin-top:30px;">La orden de compra N° @orden.IdCarro ya posee su comprobante generado. Si desea volver a generarlo, debe realizar un recibo por Baja de Comprobante.</MudText>
+                    <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Error" Style="margin-top:30px;">La orden de compra N° @orden.IdCarro ya posee su comprobante generado. Si desea volver a generarlo, debe realizar un recibo por Baja de Comprobante.</MudText>
                 }
                 else
                 {
@@ -205,7 +205,7 @@ else
                             <MudTextField T="string" Label="Observaciones" Variant="Variant.Outlined" @bind-Value="observ" Lines="5" />
                         </MudStack>
                         <MudStack>
-                            <MudDatePicker Label="Fecha" Editable="true" @bind-Date="fecha" Placeholder="Seleccionar Fecha" />
+                            @*<MudDatePicker Label="Fecha" Editable="true" @bind-Date="fecha" Placeholder="Seleccionar Fecha" />*@
                         </MudStack>
                         <MudStack>
                             <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success" Variant="Variant.Outlined" OnClick="GuardarComprobante">Generar Comprobante</MudButton>
@@ -262,6 +262,13 @@ else
         if(cliente.IdCliente < 1) Snackbar.Add($"Debe seleccionar un cliente", Severity.Error);
         else
         {
+            //Verifico que el cliente no tenga su Cuenta Corriente dada de baja si quiere una venta a CC
+            if (!cliente.CCActiva && tipoVta == 1)
+            {
+                Snackbar.Add($"La Cuenta Corriente de {cliente.NombreCompleto} se encuentra dada de baja, no se puede guardar el comprobante en la misma, solo una venta sin Cuenta Corriente.", Severity.Error);
+                return;
+            }
+
             if (orden.IdCarro < 1) Snackbar.Add($"Debe seleccionar una orden de compra para generar el comprobante", Severity.Error);
             else if (orden.CompGenerado)  Snackbar.Add($"La orden de compra que selecciono, ya posee un comprobante generado. Si desea generar nuevamente dicho comprobante, debe realizar un recibo de credito primero.", Severity.Error);
             else
