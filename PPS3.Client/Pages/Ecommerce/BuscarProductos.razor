@@ -54,11 +54,37 @@ else
                                         <MudText Typo="Typo.body1" Align="Align.Left">@prod.Descripcion</MudText>
                                     </MudItem>
                                     <MudItem xs="3">
-                                        <div style="margin-top:50%; margin-left:50%;">
-                                            <b>
-                                                <MudText Typo="Typo.h6">$@prod.PrecioFinal</MudText>    
-                                            </b>
-                                        </div>
+                                        @if(prod.Bonificacion > 0)
+                                        {
+                                            <div>
+                                                <div style="margin-top:50%; margin-left:50%;">
+                                                    <span style="text-decoration:line-through;">
+                                                        <h6>$@prod.PrecioFinal</h6>
+                                                    </span>
+                                                </div>
+
+                                                <span style="font-weight:bold;color:green;"><h5 style="text-align: -webkit-center;">@prod.Bonificacion% Bonif.</h5></span>
+
+                                                <div style="text-align: -webkit-center;">
+                                                @if (prod.Bonificacion < 100)
+                                                {
+                                                    <b><h5>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", prod.PrecioFinal * ((100 - prod.Bonificacion) / 100))</h5></b>
+                                                }
+                                                else
+                                                {
+                                                    <b><h5>¡Gratis!</h5></b>
+                                                }
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div style="margin-top:50%; margin-left:50%;">
+                                                <b>
+                                                    <MudText Typo="Typo.h6">$@prod.PrecioFinal</MudText>    
+                                                </b>
+                                            </div>
+                                        }
                                     </MudItem>
                                 </MudGrid>
                             </MudCardContent>
@@ -116,11 +142,37 @@ else
                                         <MudText Typo="Typo.body1" Align="Align.Left">@prod.Descripcion</MudText>
                                     </MudItem>
                                     <MudItem xs="3">
-                                        <div style="margin-top:50%; margin-left:50%;">
-                                            <b>
-                                                <MudText Typo="Typo.h6">$@prod.PrecioFinal</MudText>    
-                                            </b>
-                                        </div>
+                                        @if (prod.Bonificacion > 0)
+                                        {
+                                            <div>
+                                                <div style="margin-top:50%; margin-left:50%;">
+                                                    <span style="text-decoration:line-through;">
+                                                        <h6>$@prod.PrecioFinal</h6>
+                                                    </span>
+                                                </div>
+
+                                                <span style="font-weight:bold;color:green;"><h5 style="text-align: -webkit-center;">@prod.Bonificacion% Bonif.</h5></span>
+
+                                                <div style="text-align: -webkit-center;">
+                                                    @if (prod.Bonificacion < 100)
+                                                    {
+                                                        <b><h5>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", prod.PrecioFinal * ((100 - prod.Bonificacion) / 100))</h5></b>
+                                                    }
+                                                    else
+                                                    {
+                                                        <b><h5>¡Gratis!</h5></b>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div style="margin-top:50%; margin-left:50%;">
+                                                <b>
+                                                    <MudText Typo="Typo.h6">$@prod.PrecioFinal</MudText>
+                                                </b>
+                                            </div>
+                                        }
                                     </MudItem>
                                 </MudGrid>
                             </MudCardContent>
