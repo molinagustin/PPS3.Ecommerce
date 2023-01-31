@@ -50,10 +50,14 @@
 
         <MudStack Row="true" Justify="Justify.Center">
             <MudStack Style="width:50%">
-                <MudTextField Label="Cantidad" HelperText="Formato 9,99 ó 9" @bind-Value="cant"/>
+                <label for="cant">Cantidad</label>
+                <input @bind-value="strCant" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(1, ref strCant))" @onfocus="@(() => focusControl = 1)" name="cant" style="margin-bottom:10px;">
+                @*<MudTextField Label="Cantidad" HelperText="Formato 9,99 ó 9" @bind-Value="cant"/>*@
             </MudStack>
             <MudStack>
-                <MudTextField Label="% Bonificacion" HelperText="Formato 9,99 ó 9" @bind-Value="bonif"/>
+                <label for="bonif">% Bonificacion</label>
+                <input @bind-value="strBon" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(2, ref strBon))" @onfocus="@(() => focusControl = 2)" name="bonif" style="margin-bottom:10px;">
+                @*<MudTextField Label="% Bonificacion" HelperText="Formato 9,99 ó 9" @bind-Value="bonif"/>*@
             </MudStack>
         </MudStack>
         <MudStack Justify="Justify.Center">
@@ -140,6 +144,9 @@ else
     private decimal bonif = 0;
     private string observ = "";
     private string cliente = "";
+    private string strBon = "0";
+    private string strCant = "1";
+    private int focusControl = 0;
 
     //Para almacenar el ID del usuario actual
     private int idUsAct;
@@ -153,10 +160,118 @@ else
     //Guardo el ID del usuario actual
     protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));    
 
+    private void Procesar(int tipo, ref string strProces)
+    {
+        if (string.IsNullOrEmpty(strProces.Trim()))
+        {
+            if (tipo == 1) strProces = "1";
+            else strProces = "0";            
+        } 
+        if (strProces.Trim().StartsWith(',')) strProces = "0" + strProces;
+        if (strProces.Contains(','))
+        {
+            var index = strProces.IndexOf(',');
+            try { strProces = strProces.Substring(0, index + 3); }
+            catch (Exception) { strProces = strProces.Remove(index); }
+        }
+
+        //1-Cantidad 2-Bonificacion
+        switch (tipo)
+        {
+            case 1:
+                cant = Convert.ToDecimal(strProces);
+                strProces = cant.ToString();
+                break;
+
+            case 2:
+                bonif = Convert.ToDecimal(strProces);
+                strProces = bonif.ToString();
+                if (bonif > 100)
+                {
+                    strProces = "100";
+                    bonif = 100;
+                }
+                break;
+        }
+
+    }
+
+    private static bool IsNumeric(string caracter)
+    {
+        int result;
+        return int.TryParse(caracter, out result);
+    }
+
+    //Declaro una pila (ultimo en entrar primero en salir) Dejo la pila o cola porque es mas facil acceder a los elementos
+    private Queue<Object> dato = new();
+
+    private void ProcessKeyPress(KeyboardEventArgs e)
+    {
+        switch (focusControl)
+        {
+            case 1:
+                ProcesoUnitario(ref strCant);
+                break;
+
+            case 2:
+                ProcesoUnitario(ref strBon);
+                break;
+        }
+
+        void ProcesoUnitario(ref string str)
+        {
+            dato.Clear();
+            var back = false;
+            foreach (var c in str)
+                dato.Enqueue(c.ToString());
+
+            switch (e.Key)
+            {
+                case ".":
+                    if (!dato.Contains(","))
+                        dato.Enqueue(",");
+                    break;
+                case ",":
+                    if (!dato.Contains(","))
+                        dato.Enqueue(",");
+                    break;
+                default:
+                    if (IsNumeric(e.Key))
+                        dato.Enqueue(e.Key);
+                    if (e.Code == "Backspace" && dato.Count() > 0)
+                        back = true;
+                    break;
+            }
+            str = "";
+            var can = back ? dato.Count - 1 : dato.Count;
+            while (can > 0)
+            {
+                can--;
+                str += dato.Dequeue();
+            }
+        }
+    }
+
     protected void AgregarProducto()
     {
         if (prodSelect != null)
         {
+            if(prodSelect.PrecioCosto == 0 || prodSelect.PrecioFinal == 0)
+            {
+                Snackbar.Add($"El producto elegido no puede tener precio 0", Severity.Error);
+                return;
+            }
+            else if (prodSelect.StockExistencia == 0)
+            {
+                Snackbar.Add($"El producto elegido no posee stock en existencia", Severity.Error);
+                return;
+            }
+            else if (cant > prodSelect.StockExistencia)
+            {
+                Snackbar.Add($"El producto elegido no contiene suficiente stock para la cantidad solicitada", Severity.Error);
+                return;
+            }
+
             if(cant > 0)
             {
                 if(bonif >= 0 && bonif <= 100)
@@ -177,7 +292,9 @@ else
                         productosAgregados.Add(prodSelect);
                         prodSelect = null;
                         cant = 1;
+                        strCant = "1";
                         bonif = 0;
+                        strBon = "0";
                     }
                     else
                         Snackbar.Add($"El producto que intenta agregar, ya se encuentra en el presupuesto, debe seleccionar otro o bien remover el existente del listado del presupuesto", Severity.Error);

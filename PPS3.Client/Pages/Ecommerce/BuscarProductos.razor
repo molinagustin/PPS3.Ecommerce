@@ -211,8 +211,13 @@ else
     {
         if (id > 0)
         {
-            categoria = await ServTipoProducto.ObtenerTipoProd(id);
-            productos = await ServProducto.ObtenerProductosPorTipoProducto(id);
+            try
+            {
+                categoria = await ServTipoProducto.ObtenerTipoProd(id);
+                productos = await ServProducto.ObtenerProductosPorTipoProducto(id);
+            }
+            catch { NavigationManager.NavigateTo($"/"); }
+            
         }
         else
             productos = await ServProducto.ObtenerProductosPorBusqueda(nombreProducto);

@@ -170,12 +170,15 @@ else
                     <MudStack>
                         <MudSwitch @bind-Checked="pagoCompleto" Label="Pago Completo" Color="Color.Success" Style="margin-bottom:5px;" />
                         @if(!pagoCompleto)
-                        {                    
-                            <MudTextField Label="Importe A Abonar" HelperText="Formato 999,99 ó 999" @bind-Value="importe" For="@(() => recibo.ImporteTotal)" Required="true" AdornmentIcon="@Icons.Material.Filled.Money"/>
+                        {
+                            <label for="importe">Importe A Abonar</label>
+                            <input @bind-value="strImporte" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="Calculo" name="importe">
+                            @*<MudTextField Label="Importe A Abonar" HelperText="Formato 999,99 ó 999" @bind-Value="importe" For="@(() => recibo.ImporteTotal)" Required="true" AdornmentIcon="@Icons.Material.Filled.Money"/>*@
                         }  
                         else
                         {
                             importe = 0;
+                            strImporte = "0";
                         }
                     </MudStack>
                 }
@@ -210,7 +213,8 @@ else
     private string numTarj = "";
     private DateTime? fechaRecibo;
     private bool pagoCompleto = true;
-    private decimal importe;
+    private decimal importe = 0;
+    private string strImporte = "0";
 
     //Para almacenar el ID del usuario actual
     private int idUsAct;
@@ -261,6 +265,62 @@ else
         else
             Snackbar.Add($"Debe seleccionar el comprobante a remover", Severity.Error);
         return "";
+    }
+
+    private void Calculo()
+    {
+        if (string.IsNullOrEmpty(strImporte.Trim())) strImporte = "0";
+        if (strImporte.Trim().StartsWith(',')) strImporte = "0" + strImporte;
+        if (strImporte.Contains(','))
+        {
+            var index = strImporte.IndexOf(',');
+            try { strImporte = strImporte.Substring(0, index + 3); }
+            catch (Exception) { strImporte = strImporte.Remove(index); }
+        }
+        importe = Convert.ToDecimal(strImporte);
+        strImporte = importe.ToString();
+    }
+
+    private static bool IsNumeric(string caracter)
+    {
+        int result;
+        return int.TryParse(caracter, out result);
+    }
+
+    //Declaro una pila (ultimo en entrar primero en salir) Dejo la pila o cola porque es mas facil acceder a los elementos
+    private Queue<Object> dato = new();
+
+    private void ProcessKeyPress(KeyboardEventArgs e)
+    {
+        dato.Clear();
+        var back = false;
+        foreach (var c in strImporte)
+            dato.Enqueue(c.ToString());
+
+        switch (e.Key)
+        {
+            case ".":
+                if (!dato.Contains(","))
+                    dato.Enqueue(",");
+                break;
+            case ",":
+                if (!dato.Contains(","))
+                    dato.Enqueue(",");
+                break;
+            default:
+                if (IsNumeric(e.Key))
+                    dato.Enqueue(e.Key);
+                if (e.Code == "Backspace" && dato.Count() > 0)
+                    back = true;
+                break;
+        }
+        strImporte = "";
+        var can = back ? dato.Count - 1 : dato.Count;
+        while (can > 0)
+        {
+            can--;
+            strImporte += dato.Dequeue();
+        }
     }
 
     private async Task GenerarRecibo()
