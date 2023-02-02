@@ -1,12 +1,6 @@
-﻿using iText.Kernel.Pdf;
-using iText.Layout;
-using iText.Layout.Element;
-using iText.Layout.Properties;
-using System.IO;
-using System.Diagnostics;
-using iText.IO.Image;
-using iText.Kernel.Colors;
-using iText.Layout.Borders;
+﻿using Microsoft.JSInterop;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 
 namespace PPS3.Client.Data
 {
@@ -29,7 +23,7 @@ namespace PPS3.Client.Data
             return aleatorio;
         }
 
-        public bool GenerarPdfPresupuesto(Presupuesto presBase)
+        /*public bool GenerarPdfPresupuesto(Presupuesto presBase)
         {
             //Compruebo la existencia del objeto y sus detalles
             if (presBase == null || presBase.DetallePresupuesto == null || presBase.DetallePresupuesto.Count() < 1)
@@ -213,6 +207,81 @@ namespace PPS3.Client.Data
             Process.Start(new ProcessStartInfo { FileName = rutaCompleta, UseShellExecute = true });
 
             return true;
+        }*/
+
+        public void DescargarPDF(IJSRuntime js, string filename = "nombre.pdf")
+        {
+            js.InvokeVoidAsync("DescargarPDF", filename, Convert.ToBase64String(PDFReport()));
+        }
+
+        //Reporte de iTextSharp
+        private byte[] PDFReport()
+        {
+            var memoryStream = new MemoryStream();
+            float mLeft = (1.5f / 2.54f ) * 72; //Pasarlo a DPI
+            float mRight = (1.5f / 2.54f) * 72;
+            float mTop = (1.0f / 2.54f) * 72;
+            float mBottom = (1.0f / 2.54f) * 72;
+
+            var pdf = new Document(
+                PageSize.A4,
+                mLeft,
+                mRight,
+                mTop,
+                mBottom
+                );
+
+            pdf.AddTitle("Presupuesto n° XXX");
+            pdf.AddAuthor("ExpoCeramica");
+            pdf.AddCreationDate();
+            pdf.AddKeywords("Presupuesto");
+            pdf.AddSubject("PDF Generado por ExpoCeramica");
+
+            var writer = PdfWriter.GetInstance(pdf, memoryStream);
+
+            //Encabezado
+            var fontStyle = FontFactory.GetFont("Arial", 16, BaseColor.White);
+            var labelHeader = new Chunk("Presupuesto en CHUNK", fontStyle);
+
+            var header = new HeaderFooter(new Phrase(labelHeader), false)
+            {
+                BackgroundColor = new BaseColor(50, 20, 120),
+                Alignment = Element.ALIGN_CENTER,
+                Border = Rectangle.NO_BORDER
+            };
+
+            pdf.Header = header;
+
+            //Pie de Pagina
+            var labelFooter = new Chunk("Presupuesto en Footer CHUNK", fontStyle);
+
+            var footer = new HeaderFooter(new Phrase(labelFooter), false)
+            {
+                BackgroundColor = new BaseColor(120, 3, 120),
+                Alignment = Element.ALIGN_RIGHT,
+                Border = Rectangle.NO_BORDER
+            };
+
+            pdf.Footer = footer;
+
+            //Cuerpo
+
+            pdf.Open();
+
+            var titel = new Paragraph("REPORTE DE PRESUPUESTO", new Font(Font.HELVETICA, 20, Font.BOLD));
+            titel.SpacingAfter = 18f;
+
+            pdf.Add(titel);
+
+            var _fontStyle = FontFactory.GetFont("Tahoma", 12f, Font.NORMAL);
+
+            var _myText = "Texto en el centro o algun lugar del presupuesto";
+            var phrase = new Phrase(_myText, _fontStyle);
+            pdf.Add(phrase);
+
+            pdf.Close();
+
+            return memoryStream.ToArray();
         }
     }
 }

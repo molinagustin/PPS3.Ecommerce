@@ -1,7 +1,4 @@
-﻿using System.Net.Http;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
-
-namespace PPS3.Client.Services.ServMovimientoCarroCompra
+﻿namespace PPS3.Client.Services.ServMovimientoCarroCompra
 {
     public class ServMovCarro : IServMovCarro
     {

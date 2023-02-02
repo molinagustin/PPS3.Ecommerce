@@ -3,6 +3,7 @@
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment env
 @using Radzen.Blazor
+@inject IJSRuntime JS /*JS Interop*/
 @attribute [Authorize(Roles = "1, 2")]
 
 <MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Listado de Presupuestos</MudText>
@@ -86,12 +87,17 @@ else
     {
     @if(presu.NumPresu > 0)
         {
+            var pdf = new pdfPrinter(env);
+            pdf.DescargarPDF(JS);
+
+            /* FORMA VIEJA DE GENERAR PDF
             //Mando a imprimir el objeto
             var impresion = new pdfPrinter(env);
             var result = impresion.GenerarPdfPresupuesto(presu);
 
             if(!result)
                 Snackbar.Add($"No se pudo imprimir el pdf", Severity.Error);
+            */
         }
         else
             Snackbar.Add($"Debe seleccionar un presupuesto para imprimirlo", Severity.Error);
