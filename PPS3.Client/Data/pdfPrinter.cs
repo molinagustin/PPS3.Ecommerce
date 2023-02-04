@@ -209,75 +209,220 @@ namespace PPS3.Client.Data
             return true;
         }*/
 
-        public void DescargarPDF(IJSRuntime js, string filename = "nombre.pdf")
+        public string DescargarPDF(IJSRuntime js, int tipoReporte, object entidad)
         {
-            js.InvokeVoidAsync("DescargarPDF", filename, Convert.ToBase64String(PDFReport()));
+            var error = "";
+            var filename = GenerarCadenaAleatoria() + ".pdf";
+
+            switch (tipoReporte)
+            {
+                //Presupuestos
+                case 1:
+                    var pres = (Presupuesto)entidad;
+                    if (pres == null || pres.DetallePresupuesto == null || pres.DetallePresupuesto.Count() < 1)
+                    {
+                        error = "El presupuesto no tiene el formato correcto o se encuentra sin detalles.";
+                        break;
+                    }
+                    filename = "presupuesto_num_" + pres.NumPresu + "_" + filename;
+                    js.InvokeVoidAsync("DescargarPDF", filename, Convert.ToBase64String(PresupuestoReport(pres)));
+                    break;
+
+                //Comprobantes
+                case 2:
+                    break;
+
+                //Recibos
+                case 3:
+                    break;
+            }
+            return error;            
         }
 
+        //Configuraciones para el PDF
+        MemoryStream memoryStream;
+        float mLeft = (1.5f / 2.54f) * 72; //Pasarlo a DPI
+        float mRight = (1.5f / 2.54f) * 72;
+        float mTop = (1.0f / 2.54f) * 72;
+        float mBottom = (1.0f / 2.54f) * 72;
+
+        Font fontStyleEncabezado = FontFactory.GetFont("Helvetica", 20, BaseColor.White);
+        Font fontStyleFooter = FontFactory.GetFont("Helvetica", 12, BaseColor.White);
+        Font fontStyleBody = FontFactory.GetFont("Tahoma", 12f, Font.NORMAL);
+        Font fontTitleBody = new Font(Font.HELVETICA, 18, Font.BOLD);
+        Font fontSubTitleBody = new Font(Font.HELVETICA, 12, Font.BOLD);
+        Font fontEncabTabla = new Font(Font.HELVETICA, 12, Font.BOLD);
+        Font fontCuerpoTabla = new Font(Font.HELVETICA, 11, Font.NORMAL);
+
         //Reporte de iTextSharp
-        private byte[] PDFReport()
+        private byte[] PresupuestoReport(Presupuesto pres)
         {
-            var memoryStream = new MemoryStream();
-            float mLeft = (1.5f / 2.54f ) * 72; //Pasarlo a DPI
-            float mRight = (1.5f / 2.54f) * 72;
-            float mTop = (1.0f / 2.54f) * 72;
-            float mBottom = (1.0f / 2.54f) * 72;
+            //Datos para el presupuesto
+            var numPres = pres.NumPresu;
+            var cliente = pres.Cliente;
+            var observ = "NINGUNA";
+            if (!string.IsNullOrEmpty(pres.Observaciones))
+                observ = pres.Observaciones;
+            var fecha = pres.FechaCrea;
+            var usuario = pres.UsuarioCrea;
+            var totalPres = pres.DetallePresupuesto.Sum(s => s.SubTotal);
 
-            var pdf = new Document(
-                PageSize.A4,
-                mLeft,
-                mRight,
-                mTop,
-                mBottom
-                );
+            Paragraph espacioBlanco = new Paragraph("\n");
+            var rutaImg = _env.WebRootFileProvider.GetFileInfo("images/expo_ceramicas_logo.png").PhysicalPath;
+            Image logo = Image.GetInstance(rutaImg);
+            logo.ScalePercent(24);
 
-            pdf.AddTitle("Presupuesto n° XXX");
+            memoryStream = new MemoryStream();
+
+            var pdf = new Document(PageSize.A4, mLeft, mRight, mTop, mBottom);
+            pdf.AddTitle("Presupuesto");
             pdf.AddAuthor("ExpoCeramica");
             pdf.AddCreationDate();
             pdf.AddKeywords("Presupuesto");
-            pdf.AddSubject("PDF Generado por ExpoCeramica");
+            pdf.AddSubject("Presupuesto de ExpoCeramica");
 
+            //Si bien no se usa el objeto, es necesario el metodo GetInstance para comenzar la escritura interna del pdf
             var writer = PdfWriter.GetInstance(pdf, memoryStream);
 
-            //Encabezado
-            var fontStyle = FontFactory.GetFont("Arial", 16, BaseColor.White);
-            var labelHeader = new Chunk("Presupuesto en CHUNK", fontStyle);
-
+            //Encabezado            
+            var labelHeader = new Chunk("ExpoCeramica", fontStyleEncabezado);
             var header = new HeaderFooter(new Phrase(labelHeader), false)
             {
-                BackgroundColor = new BaseColor(50, 20, 120),
+                BackgroundColor = new BaseColor(89, 74, 226),
+                Alignment = Element.ALIGN_CENTER,
+                Border = Rectangle.NO_BORDER
+            };
+
+            //Pie de Pagina
+            var labelFooter = new Chunk("Contacto: Cel. +54 9 2266 656989 - Email. expoceramica@gmail.com", fontStyleFooter);
+            var footer = new HeaderFooter(new Phrase(labelFooter), false)
+            {
+                BackgroundColor = new BaseColor(89, 74, 226),
                 Alignment = Element.ALIGN_CENTER,
                 Border = Rectangle.NO_BORDER
             };
 
             pdf.Header = header;
-
-            //Pie de Pagina
-            var labelFooter = new Chunk("Presupuesto en Footer CHUNK", fontStyle);
-
-            var footer = new HeaderFooter(new Phrase(labelFooter), false)
-            {
-                BackgroundColor = new BaseColor(120, 3, 120),
-                Alignment = Element.ALIGN_RIGHT,
-                Border = Rectangle.NO_BORDER
-            };
-
             pdf.Footer = footer;
 
             //Cuerpo
-
             pdf.Open();
 
-            var titel = new Paragraph("REPORTE DE PRESUPUESTO", new Font(Font.HELVETICA, 20, Font.BOLD));
-            titel.SpacingAfter = 18f;
+            var titel = new Paragraph("PRESUPUESTO N° " + pres.NumPresu, fontTitleBody);
+            titel.SpacingAfter = 26f;
+            titel.SpacingBefore = -50f;
+            titel.Alignment = Element.ALIGN_CENTER;
 
+            var strLugar = new Paragraph("General Alvear, Mendoza", fontSubTitleBody);
+            var strFechaHoy = new Paragraph("Fecha Hoy: " + DateTime.Now, fontSubTitleBody);
+            var strFechaPres = new Paragraph("Fecha Presupuesto: " + fecha, fontSubTitleBody);
+            var strCliente = new Paragraph("Cliente: " + cliente, fontSubTitleBody);
+            var strEntregado = new Paragraph("Usuario Generador: " + usuario, fontSubTitleBody);
+
+            pdf.Add(logo);
             pdf.Add(titel);
+            pdf.Add(strLugar);
+            pdf.Add(strFechaHoy);
+            pdf.Add(strFechaPres);
+            pdf.Add(strCliente);
+            pdf.Add(strEntregado);
 
-            var _fontStyle = FontFactory.GetFont("Tahoma", 12f, Font.NORMAL);
 
-            var _myText = "Texto en el centro o algun lugar del presupuesto";
-            var phrase = new Phrase(_myText, _fontStyle);
-            pdf.Add(phrase);
+            //Comienzo a construir el detalle en la tabla
+            var tabla = new PdfPTable(6);
+            tabla.SpacingBefore = 20f;
+            tabla.SpacingAfter = 20f;
+            tabla.HorizontalAlignment = Element.ALIGN_CENTER;
+            tabla.WidthPercentage = 100;
+
+            var cellEnc1 = new PdfPCell(new Phrase("Producto", fontEncabTabla));
+            cellEnc1.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEnc1.PaddingBottom = 5;
+
+            var cellEnc2 = new PdfPCell(new Phrase("Cantidad", fontEncabTabla));
+            cellEnc2.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEnc2.PaddingBottom = 5;
+
+            var cellEnc3 = new PdfPCell(new Phrase("Precio", fontEncabTabla));
+            cellEnc3.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEnc3.PaddingBottom = 5;
+
+            var cellEnc4 = new PdfPCell(new Phrase("Bonif.", fontEncabTabla));
+            cellEnc4.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEnc4.PaddingBottom = 5;
+
+            var cellEnc5 = new PdfPCell(new Phrase("Bonif. Total", fontEncabTabla));
+            cellEnc5.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEnc5.PaddingBottom = 5;
+
+            var cellEnc6 = new PdfPCell(new Phrase("Sub Total", fontEncabTabla));
+            cellEnc6.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEnc6.PaddingBottom = 5;
+
+            tabla.AddCell(cellEnc1);
+            tabla.AddCell(cellEnc2);
+            tabla.AddCell(cellEnc3);
+            tabla.AddCell(cellEnc4);
+            tabla.AddCell(cellEnc5);
+            tabla.AddCell(cellEnc6);
+
+            foreach (var det in pres.DetallePresupuesto)
+            {
+                var cellDet1 = new PdfPCell(new Phrase(det.NombreProducto, fontCuerpoTabla));
+                cellDet1.HorizontalAlignment = Element.ALIGN_LEFT;
+                cellDet1.VerticalAlignment = Element.ALIGN_MIDDLE;
+                cellDet1.PaddingBottom = 7;
+                cellDet1.PaddingTop = 3;
+                cellDet1.PaddingLeft = 2;
+
+                var cellDet2 = new PdfPCell(new Phrase(det.Cantidad.ToString() + " " + det.DescripcionUnidad, fontCuerpoTabla));
+                cellDet2.HorizontalAlignment = Element.ALIGN_LEFT;
+                cellDet2.VerticalAlignment = Element.ALIGN_MIDDLE;
+                cellDet2.PaddingBottom = 7;
+                cellDet2.PaddingTop = 3;
+                cellDet2.PaddingLeft = 2;
+
+                var cellDet3 = new PdfPCell(new Phrase(string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", det.PrecioUnit), fontCuerpoTabla));
+                cellDet3.HorizontalAlignment = Element.ALIGN_RIGHT;
+                cellDet3.VerticalAlignment = Element.ALIGN_MIDDLE;
+                cellDet3.PaddingBottom = 7;
+                cellDet3.PaddingTop = 3;
+
+                var cellDet4 = new PdfPCell(new Phrase(det.Bonificacion.ToString() + "%", fontCuerpoTabla));
+                cellDet4.HorizontalAlignment = Element.ALIGN_CENTER;
+                cellDet4.VerticalAlignment = Element.ALIGN_MIDDLE;
+                cellDet4.PaddingBottom = 7;
+                cellDet4.PaddingTop = 3;
+
+                var cellDet5 = new PdfPCell(new Phrase(string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", det.BonificacionTotal), fontCuerpoTabla));
+                cellDet5.HorizontalAlignment = Element.ALIGN_RIGHT;
+                cellDet5.VerticalAlignment = Element.ALIGN_MIDDLE;
+                cellDet5.PaddingBottom = 7;
+                cellDet4.PaddingTop = 3;
+
+                var cellDet6 = new PdfPCell(new Phrase(string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", det.SubTotal), fontCuerpoTabla));
+                cellDet6.HorizontalAlignment = Element.ALIGN_RIGHT;
+                cellDet6.VerticalAlignment = Element.ALIGN_MIDDLE;
+                cellDet6.PaddingBottom = 7;
+                cellDet4.PaddingTop = 3;
+
+                tabla.AddCell(cellDet1);
+                tabla.AddCell(cellDet2);
+                tabla.AddCell(cellDet3);
+                tabla.AddCell(cellDet4);
+                tabla.AddCell(cellDet5);
+                tabla.AddCell(cellDet6);
+            }
+
+            pdf.Add(tabla);
+
+            var strTotal = new Paragraph("TOTAL: " + string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", totalPres), fontSubTitleBody);
+            strTotal.Alignment = Element.ALIGN_RIGHT;
+            strTotal.SpacingAfter = 20;
+            pdf.Add(strTotal);
+
+            var strObserv = new Paragraph("Observaciones: " + observ, fontStyleBody);
+            pdf.Add(strObserv);
 
             pdf.Close();
 

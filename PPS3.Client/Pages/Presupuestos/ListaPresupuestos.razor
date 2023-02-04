@@ -85,21 +85,22 @@ else
 
     protected void ImprimirPresupuesto()
     {
-    @if(presu.NumPresu > 0)
+        @if(presu.NumPresu > 0)
         {
             var pdf = new pdfPrinter(env);
-            pdf.DescargarPDF(JS);
+            var result = pdf.DescargarPDF(JS, 1, presu);
+            
+            if(result.Length != 0) Snackbar.Add(result, Severity.Error);
+            else Snackbar.Add($"Presupuesto impreso correctamente.", Severity.Success);
 
             /* FORMA VIEJA DE GENERAR PDF
             //Mando a imprimir el objeto
             var impresion = new pdfPrinter(env);
             var result = impresion.GenerarPdfPresupuesto(presu);
 
-            if(!result)
-                Snackbar.Add($"No se pudo imprimir el pdf", Severity.Error);
+            if(!result) Snackbar.Add($"No se pudo imprimir el pdf", Severity.Error);
             */
         }
-        else
-            Snackbar.Add($"Debe seleccionar un presupuesto para imprimirlo", Severity.Error);
+        else Snackbar.Add($"Debe seleccionar un presupuesto para imprimirlo", Severity.Error);
     }
 }
