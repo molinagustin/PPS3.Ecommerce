@@ -4,6 +4,8 @@
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @using Radzen.Blazor
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment env
+@inject IJSRuntime JS /*JS Interop*/
 @*Con el atributo Authorize se procede a regular el acceso a toda la pagina por usuarios autorizados solamente*@
 @attribute [Authorize(Roles = "1, 2")]
 
@@ -17,6 +19,8 @@
 }
 else
 {
+    <MudIconButton OnClick="ImprimirComprobante" Icon="@Icons.Material.Filled.Print" Color="Color.Primary" />
+
     @*LISTADO DE COMPROBANTE*@
     <RadzenGrid Data="@comprobantes" TItem="Comprobante" RowSelect="@(args => comprobante = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
         <Columns>
@@ -176,5 +180,18 @@ else
 
         //En base al comprobante seleccionado, filtro los recibos correspondientes
         recibosCompr = recibosCompletos.Where(x => x.IdComprobante == comprobante.IdEncab);
+    }
+
+    protected void ImprimirComprobante()
+    {
+        if (comprobante.IdEncab > 0)
+        {
+            var pdf = new pdfPrinter(env);
+            var result = pdf.DescargarPDF(JS, 2, comprobante);
+
+            if (result.Length != 0) Snackbar.Add(result, Severity.Error);
+            else Snackbar.Add($"Comprobante impreso correctamente.", Severity.Success);
+        }
+        else Snackbar.Add($"Debe seleccionar un comprobante para imprimirlo", Severity.Error);
     }
 }

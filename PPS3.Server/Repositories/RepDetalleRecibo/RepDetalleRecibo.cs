@@ -68,8 +68,9 @@ namespace PPS3.Server.Repositories.RepDetalleRecibo
             var db = dbConnection();
 
             var sql = @"
-                        SELECT *
-                        FROM recibos_detalles
+                        SELECT rd.*, ce.FechaComp, ce.Carro, ce.ImporteFinal, ce.SaldoRestante, ce.Pagado 
+                        FROM recibos_detalles rd
+                        INNER JOIN comprobantes_encabezados ce ON ce.IdEncab = rd.IdComprobante;
                         "
 ;
             var result = await db.QueryAsync<DetalleRecibo>(sql, new {  });

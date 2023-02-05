@@ -3,6 +3,8 @@
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @using Radzen.Blazor
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment env
+@inject IJSRuntime JS /*JS Interop*/
 @*Con el atributo Authorize se procede a regular el acceso a toda la pagina por usuarios autorizados solamente*@
 @attribute [Authorize(Roles = "1, 2")]
 
@@ -16,6 +18,8 @@
 }
 else
 {
+    <MudIconButton OnClick="ImprimirRecibo" Icon="@Icons.Material.Filled.Print" Color="Color.Primary" />
+
     <MudGrid Justify="Justify.Center">
         <MudItem lg="9">
             <RadzenGrid Data="@recibos" TItem="ReciboListado" RowSelect="@(args => recibo = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
@@ -72,4 +76,17 @@ else
     ReciboListado recibo = new ReciboListado();
 
     protected override async Task OnInitializedAsync() => recibos = await ServRecibo.ObtenerRecibosListado();
+
+    protected void ImprimirRecibo()
+    {
+        if (recibo.IdRecibo > 0)
+        {
+            var pdf = new pdfPrinter(env);
+            var result = pdf.DescargarPDF(JS, 3, recibo);
+
+            if (result.Length != 0) Snackbar.Add(result, Severity.Error);
+            else Snackbar.Add($"Recibo impreso correctamente.", Severity.Success);
+        }
+        else Snackbar.Add($"Debe seleccionar un recibo para imprimirlo", Severity.Error);
+    }
 }

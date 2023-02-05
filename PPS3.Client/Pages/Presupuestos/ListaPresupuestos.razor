@@ -1,4 +1,4 @@
-﻿@page "/listaPresupuestos"
+﻿@page "/listaCotizaciones"
 @inject IServEncabezadoPresupuesto ServEncabPres
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment env
@@ -6,21 +6,21 @@
 @inject IJSRuntime JS /*JS Interop*/
 @attribute [Authorize(Roles = "1, 2")]
 
-<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Listado de Presupuestos</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Listado de Cotizaciones</MudText>
 
 @if(presupuestos == null)
 {
     <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
 }
 else
-{        
-    <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Outlined" Href="/detallesPresupuesto">Agregar Nuevo</MudButton>
+{
+    <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Outlined" Href="/detallesCotiz">Agregar Nueva</MudButton>
     <MudIconButton OnClick="ImprimirPresupuesto" Icon="@Icons.Material.Filled.Print" Color="Color.Primary"/>
 
     @*LISTADO DE PRESUPUESTOS*@
     <RadzenGrid Data="@presupuestos" TItem="Presupuesto" RowSelect="@(args => presu = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;">
         <Columns>
-            <RadzenGridColumn TItem="Presupuesto" Property="NumPresu" Title="N° Presupuesto" Width="120px"></RadzenGridColumn>
+            <RadzenGridColumn TItem="Presupuesto" Property="NumPresu" Title="N° Cotización" Width="120px"></RadzenGridColumn>
             <RadzenGridColumn TItem="Presupuesto" Property="Cliente" Title="Cliente" Width="200px"></RadzenGridColumn>
             <RadzenGridColumn TItem="Presupuesto" Property="Observaciones" Title="Observaciones"></RadzenGridColumn>
             <RadzenGridColumn TItem="Presupuesto" Property="UsuarioCrea" Title="Emitido Por" Width="120px"></RadzenGridColumn>
@@ -35,7 +35,7 @@ else
     @*DETALLES DE CADA PRESUPUESTO*@
     <RadzenTabs>
         <Tabs>
-            <RadzenTabsItem Text="Detalles del Presupuesto">
+            <RadzenTabsItem Text="Detalles de la Cotización">
                 <RadzenGrid Data="@presu.DetallePresupuesto" TItem="DetallePresupuesto" AllowFiltering="true" AllowPaging="true" AllowSorting="true">
                     <Columns>
                         <RadzenGridColumn TItem="DetallePresupuesto" Property="NombreProducto" Title="Nombre del Producto"></RadzenGridColumn>
@@ -91,16 +91,8 @@ else
             var result = pdf.DescargarPDF(JS, 1, presu);
             
             if(result.Length != 0) Snackbar.Add(result, Severity.Error);
-            else Snackbar.Add($"Presupuesto impreso correctamente.", Severity.Success);
-
-            /* FORMA VIEJA DE GENERAR PDF
-            //Mando a imprimir el objeto
-            var impresion = new pdfPrinter(env);
-            var result = impresion.GenerarPdfPresupuesto(presu);
-
-            if(!result) Snackbar.Add($"No se pudo imprimir el pdf", Severity.Error);
-            */
+            else Snackbar.Add($"Cotización impresa correctamente.", Severity.Success);
         }
-        else Snackbar.Add($"Debe seleccionar un presupuesto para imprimirlo", Severity.Error);
+        else Snackbar.Add($"Debe seleccionar una cotización para imprimirla", Severity.Error);
     }
 }
