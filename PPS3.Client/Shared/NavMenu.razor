@@ -46,6 +46,13 @@
             <MudNavLink Href="/detallesCotiz" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
         </MudNavGroup>
 
+        <MudNavGroup Title="Reportes" Icon="@Icons.Filled.StackedBarChart">
+            <MudNavLink Href="/repGanancias" Match="NavLinkMatch.All" Icon="@Icons.Filled.Sell">Ganancias</MudNavLink>
+            <MudNavLink Href="/repMasProductos" Match="NavLinkMatch.All" Icon="@Icons.Filled.PieChart">Mas Vendidos</MudNavLink>
+            <MudNavLink Href="/repProdFecha" Match="NavLinkMatch.All" Icon="@Icons.Filled.BarChart">Productos Fecha</MudNavLink>
+            <MudNavLink Href="/repStockProd" Match="NavLinkMatch.All" Icon="@Icons.Filled.BubbleChart">Stock Productos</MudNavLink>
+        </MudNavGroup>
+
         <MudNavGroup Title="Proveedores" Icon="@Icons.Filled.ContactPhone">
             <MudNavLink Href="/listaProveedores" Match="NavLinkMatch.All" Icon="@Icons.Filled.ViewList">Consultar</MudNavLink>
             <MudNavLink Href="/detallesProveedor" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
@@ -55,11 +62,6 @@
                 <MudNavLink Href="/detallesContactosProv" Match="NavLinkMatch.All" Icon="@Icons.Filled.AddCircle">Agregar</MudNavLink>
             </MudNavGroup>
         </MudNavGroup>
-
-        @*<MudNavGroup Title="Informes" Icon="@Icons.Filled.PieChart">
-                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.Sell">Informe de Ventas</MudNavLink>
-                <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Filled.MoneyOff">Informe de Deudores</MudNavLink>
-        </MudNavGroup>*@
 
         <AuthorizeView Roles="1">
             <MudNavGroup Title="Consultas Varias" Icon="@Icons.Filled.Layers">

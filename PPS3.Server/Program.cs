@@ -5,6 +5,7 @@ global using Dapper; //Para que los repositorios usen Dapper
 global using Microsoft.AspNetCore.Authorization; //Libreria que permite decoradores [Authorize] y demas opciones de autorizacion
 global using PPS3.Shared.Models;
 global using PPS3.Shared.InternalModels;
+global using PPS3.Shared.ReportModels;
 global using PPS3.Server.ExternalServices.ServEmail; 
 global using PPS3.Server.Data; //Para poder instanciar en todos los repositorios la clase SqlConfiguration
 global using PPS3.Server.Repositories.RepProducto;
@@ -16,6 +17,7 @@ global using PPS3.Server.Repositories.RepUsuario;
 global using PPS3.Server.Repositories.RepPrivilegio;
 global using PPS3.Server.Repositories.RepCliente;
 global using PPS3.Server.Repositories.RepProvincia;
+global using PPS3.Server.Repositories.RepReporte;
 global using PPS3.Server.Repositories.RepLocalidad;
 global using PPS3.Server.Repositories.RepCondicionIVA;
 global using PPS3.Server.Repositories.RepTipoDocumento;
@@ -70,6 +72,7 @@ builder.Services.AddScoped<IRepUsuario, RepUsuario>();
 builder.Services.AddScoped<IRepPrivilegio, RepPrivilegio>();
 builder.Services.AddScoped<IRepCliente, RepCliente>();
 builder.Services.AddScoped<IRepProvincia, RepProvincia>();
+builder.Services.AddScoped<IRepReporte, RepReporte>();
 builder.Services.AddScoped<IRepLocalidad, RepLocalidad>();
 builder.Services.AddScoped<IRepCondicionIVA, RepCondicionIVA>();
 builder.Services.AddScoped<IRepTipoDocumento, RepTipoDocumento>();

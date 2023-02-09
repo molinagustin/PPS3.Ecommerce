@@ -8,6 +8,7 @@ global using PPS3.Client.Data;
 global using Microsoft.AspNetCore.Components.Authorization; //Libreria que permite utilizar el Estado de Autenticacion (Authentication State)
 global using PPS3.Shared.Models;
 global using PPS3.Shared.InternalModels;
+global using PPS3.Shared.ReportModels;
 global using PPS3.Client.Services;
 global using PPS3.Client.Services.ServProducto;
 global using PPS3.Client.Services.ServUsuario;
@@ -21,6 +22,7 @@ global using PPS3.Client.Services.ServTipoDocumento;
 global using PPS3.Client.Services.ServTipoComprobante;
 global using PPS3.Client.Services.ServTarjeta;
 global using PPS3.Client.Services.ServProvincia;
+global using PPS3.Client.Services.ServReporte;
 global using PPS3.Client.Services.ServPrivilegio;
 global using PPS3.Client.Services.ServLocalidad;
 global using PPS3.Client.Services.ServImagenProducto;
@@ -95,6 +97,7 @@ builder.Services.AddHttpClient<IServTipoDocumento, ServTipoDocumento>(client => 
 builder.Services.AddHttpClient<IServTipoComprobante, ServTipoComprobante>(client => { client.BaseAddress = API_URL; });
 builder.Services.AddHttpClient<IServTarjeta, ServTarjeta>(client => { client.BaseAddress = API_URL; });
 builder.Services.AddHttpClient<IServProvincia, ServProvincia>(client => { client.BaseAddress = API_URL; });
+builder.Services.AddHttpClient<IServReporte, ServReporte>(client => { client.BaseAddress = API_URL; });
 builder.Services.AddHttpClient<IServPrivilegio, ServPrivilegio>(client => { client.BaseAddress = API_URL; });
 builder.Services.AddHttpClient<IServLocalidad, ServLocalidad>(client => { client.BaseAddress = API_URL; });
 builder.Services.AddHttpClient<IServImagenProducto, ServImagenProducto>(client => { client.BaseAddress = API_URL; });
