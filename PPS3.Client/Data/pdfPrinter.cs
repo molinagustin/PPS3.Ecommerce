@@ -3,6 +3,7 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using PPS3.Shared.Models;
 using MudBlazor.Extensions;
+using PPS3.Client.Pages.Reportes;
 
 namespace PPS3.Client.Data
 {
@@ -211,7 +212,7 @@ namespace PPS3.Client.Data
             return true;
         }*/
 
-        public string DescargarPDF(IJSRuntime js, int tipoReporte, object entidad)
+        public string DescargarPDF(IJSRuntime js, int tipoReporte, object entidad, Parametros? parametros = null)
         {
             var error = "";
             var filename = GenerarCadenaAleatoria() + ".pdf";
@@ -252,6 +253,55 @@ namespace PPS3.Client.Data
                     }
                     filename = "rec_num_" + rec.IdRecibo + "_" + filename;
                     js.InvokeVoidAsync("DescargarPDF", filename, Convert.ToBase64String(ReciboReport(rec)));
+                    break;
+                
+                //REPORTES  
+                //Stock
+                case 4:
+                    var stock = (List<StockProd>)entidad;
+                    if(stock == null)
+                    {
+                        error = "El reporte a imprimir no es correcto.";
+                        break;
+                    }
+                    filename = "ReporteStock" + "_" + filename;
+                    js.InvokeVoidAsync("DescargarPDF", filename, Convert.ToBase64String(StockReport(stock)));
+                    break;
+
+                //Venta Productos
+                case 5:
+                    var prods = (List<ProductoFecha>)entidad;
+                    if (prods == null || parametros == null)
+                    {
+                        error = "El reporte a imprimir no es correcto.";
+                        break;
+                    }
+                    filename = "ReporteProductosVendidos" + "_" + filename;
+                    js.InvokeVoidAsync("DescargarPDF", filename, Convert.ToBase64String(ProductosFechaReport(prods, parametros)));
+                    break;
+
+                //Productos Mas Vendidos
+                case 6:
+                    var produs = (List<MasProducto>)entidad;
+                    if (produs == null || parametros == null)
+                    {
+                        error = "El reporte a imprimir no es correcto.";
+                        break;
+                    }
+                    filename = "ReporteMasProductosVendidos" + "_" + filename;
+                    js.InvokeVoidAsync("DescargarPDF", filename, Convert.ToBase64String(MasProductosReport(produs, parametros)));
+                    break;
+
+                //Ingresos
+                case 7:
+                    var ganancias = (List<Ganancia>)entidad;
+                    if (ganancias == null || parametros == null)
+                    {
+                        error = "El reporte a imprimir no es correcto.";
+                        break;
+                    }
+                    filename = "ReporteIngresos" + "_" + filename;
+                    js.InvokeVoidAsync("DescargarPDF", filename, Convert.ToBase64String(GananciasReport(ganancias, parametros)));
                     break;
             }
             return error;            
@@ -808,6 +858,498 @@ namespace PPS3.Client.Data
 
             var strObserv = new Paragraph("Observaciones: " + obs, fontStyleBody);
             pdf.Add(strObserv);
+
+            pdf.Close();
+
+            return memoryStream.ToArray();
+        }
+    
+        private byte[] StockReport(List<StockProd> stock)
+        {
+            memoryStream = new MemoryStream();
+
+            var rutaImg = _env.WebRootFileProvider.GetFileInfo("images/expo_ceramicas_logo.png").PhysicalPath;
+            Image logo = Image.GetInstance(rutaImg);
+            logo.ScalePercent(24);
+
+            var pdf = new Document(PageSize.A4, mLeft, mRight, mTop, mBottom);
+            pdf.AddTitle("Reporte");
+            pdf.AddAuthor("ExpoCeramica");
+            pdf.AddCreationDate();
+            pdf.AddKeywords("Reporte");
+            pdf.AddSubject("Reporte de ExpoCeramica");
+
+            //Si bien no se usa el objeto, es necesario el metodo GetInstance para comenzar la escritura interna del pdf
+            var writer = PdfWriter.GetInstance(pdf, memoryStream);
+
+            //Encabezado            
+            var labelHeader = new Chunk("ExpoCeramica", fontStyleEncabezado);
+            var header = new HeaderFooter(new Phrase(labelHeader), false)
+            {
+                BackgroundColor = new BaseColor(89, 74, 226),
+                Alignment = Element.ALIGN_CENTER,
+                Border = Rectangle.NO_BORDER
+            };
+
+            //Pie de Pagina
+            var labelFooter = new Chunk("Contacto: Cel. +54 9 2625 656989 - Email. expoceramica@gmail.com", fontStyleFooter);
+            var footer = new HeaderFooter(new Phrase(labelFooter), false)
+            {
+                BackgroundColor = new BaseColor(89, 74, 226),
+                Alignment = Element.ALIGN_CENTER,
+                Border = Rectangle.NO_BORDER
+            };
+
+            pdf.Header = header;
+            pdf.Footer = footer;
+
+            //Cuerpo
+            pdf.Open();
+
+            var titel = new Paragraph("REPORTE STOCK DE PRODUCTOS");
+            titel.SpacingAfter = 26f;
+            titel.SpacingBefore = -50f;
+            titel.Alignment = Element.ALIGN_CENTER;
+
+            var strLugar = new Paragraph("General Alvear, Mendoza", fontSubTitleBody);
+            var strFecha = new Paragraph("Fecha: " + DateTime.Today.ToShortDateString(), fontSubTitleBody);
+
+            pdf.Add(logo);
+            pdf.Add(titel);
+            pdf.Add(strLugar);
+            pdf.Add(strFecha);
+
+            //Comienzo a construir el detalle en la tabla
+            var tabla = new PdfPTable(2);
+            tabla.SpacingBefore = 20f;
+            tabla.SpacingAfter = 30f;
+            tabla.HorizontalAlignment = Element.ALIGN_CENTER;
+
+            var cellEncTitle = new PdfPCell(new Phrase("STOCK EXISTENTE", fontEncabTabla));
+            cellEncTitle.Colspan = 2;
+            cellEncTitle.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEncTitle.PaddingBottom = 5;
+
+            var cellEnc1 = new PdfPCell(new Phrase("Producto", fontEncabTabla));
+            cellEnc1.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEnc1.PaddingBottom = 5;
+
+            var cellEnc2 = new PdfPCell(new Phrase("Stock", fontEncabTabla));
+            cellEnc2.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEnc2.PaddingBottom = 5;
+
+            tabla.AddCell(cellEncTitle);
+            tabla.AddCell(cellEnc1);
+            tabla.AddCell(cellEnc2);
+
+            foreach (var sto in stock)
+            {
+                var cellDet1 = new PdfPCell(new Phrase(sto.NombreProd, fontCuerpoTabla));
+                cellDet1.HorizontalAlignment = Element.ALIGN_LEFT;
+                cellDet1.VerticalAlignment = Element.ALIGN_MIDDLE;
+                cellDet1.PaddingBottom = 7;
+                cellDet1.PaddingTop = 3;
+                cellDet1.PaddingLeft = 2;
+
+                var cellDet2 = new PdfPCell(new Phrase(sto.StockExistencia.ToString() + " " + sto.DescripcionUnidad, fontCuerpoTabla));
+                cellDet2.HorizontalAlignment = Element.ALIGN_LEFT;
+                cellDet2.VerticalAlignment = Element.ALIGN_MIDDLE;
+                cellDet2.PaddingBottom = 7;
+                cellDet2.PaddingTop = 3;
+                cellDet2.PaddingLeft = 2;
+
+                tabla.AddCell(cellDet1);
+                tabla.AddCell(cellDet2);
+            }
+
+            pdf.Add(tabla);
+
+            pdf.Close();
+
+            return memoryStream.ToArray();
+        }
+
+        private byte[] ProductosFechaReport(List<ProductoFecha> prods, Parametros parametros)
+        {
+            memoryStream = new MemoryStream();
+
+            var rutaImg = _env.WebRootFileProvider.GetFileInfo("images/expo_ceramicas_logo.png").PhysicalPath;
+            Image logo = Image.GetInstance(rutaImg);
+            logo.ScalePercent(24);
+
+            var pdf = new Document(PageSize.A4, mLeft, mRight, mTop, mBottom);
+            pdf.AddTitle("Reporte");
+            pdf.AddAuthor("ExpoCeramica");
+            pdf.AddCreationDate();
+            pdf.AddKeywords("Reporte");
+            pdf.AddSubject("Reporte de ExpoCeramica");
+
+            //Si bien no se usa el objeto, es necesario el metodo GetInstance para comenzar la escritura interna del pdf
+            var writer = PdfWriter.GetInstance(pdf, memoryStream);
+
+            //Encabezado            
+            var labelHeader = new Chunk("ExpoCeramica", fontStyleEncabezado);
+            var header = new HeaderFooter(new Phrase(labelHeader), false)
+            {
+                BackgroundColor = new BaseColor(89, 74, 226),
+                Alignment = Element.ALIGN_CENTER,
+                Border = Rectangle.NO_BORDER
+            };
+
+            //Pie de Pagina
+            var labelFooter = new Chunk("Contacto: Cel. +54 9 2625 656989 - Email. expoceramica@gmail.com", fontStyleFooter);
+            var footer = new HeaderFooter(new Phrase(labelFooter), false)
+            {
+                BackgroundColor = new BaseColor(89, 74, 226),
+                Alignment = Element.ALIGN_CENTER,
+                Border = Rectangle.NO_BORDER
+            };
+
+            pdf.Header = header;
+            pdf.Footer = footer;
+
+            //Cuerpo
+            pdf.Open();
+
+            var titel = new Paragraph("REPORTE PRODUCTOS VENDIDOS");
+            titel.SpacingAfter = 26f;
+            titel.SpacingBefore = -50f;
+            titel.Alignment = Element.ALIGN_CENTER;
+
+            var strLugar = new Paragraph("General Alvear, Mendoza", fontSubTitleBody);
+            var strFecha = new Paragraph("Fecha: " + DateTime.Today.ToShortDateString(), fontSubTitleBody);
+
+            pdf.Add(logo);
+            pdf.Add(titel);
+            pdf.Add(strLugar);
+            pdf.Add(strFecha);
+
+            if(parametros.CompPagos) pdf.Add(new Paragraph("Solo En Comprobantes Pagados", fontSubTitleBody));
+            if(parametros.CC)
+            {
+                if(parametros.TipoVta == 1) pdf.Add(new Paragraph("Con Venta a Cuenta Corriente", fontSubTitleBody));
+                else pdf.Add(new Paragraph("Sin Venta a Cuenta Corriente", fontSubTitleBody));
+            }
+            if (parametros.RangoFechas)
+            {
+                pdf.Add(new Paragraph("Rango Consulta: " + parametros.FechaDesde.ToShortDateString() + " -> " + parametros.FechaHasta.ToShortDateString(), fontSubTitleBody));
+            }
+
+            //Comienzo a construir el detalle en la tabla
+            var tabla = new PdfPTable(3);
+            tabla.SpacingBefore = 20f;
+            tabla.SpacingAfter = 30f;
+            tabla.HorizontalAlignment = Element.ALIGN_CENTER;
+
+            var cellEncTitle = new PdfPCell(new Phrase("PRODUCTOS VENDIDOS", fontEncabTabla));
+            cellEncTitle.Colspan = 3;
+            cellEncTitle.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEncTitle.PaddingBottom = 5;
+
+            var cellEnc0 = new PdfPCell(new Phrase("Fecha", fontEncabTabla));
+            cellEnc0.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEnc0.PaddingBottom = 5;
+
+            var cellEnc1 = new PdfPCell(new Phrase("Producto", fontEncabTabla));
+            cellEnc1.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEnc1.PaddingBottom = 5;
+
+            var cellEnc2 = new PdfPCell(new Phrase("Cantidad", fontEncabTabla));
+            cellEnc2.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEnc2.PaddingBottom = 5;
+
+            tabla.AddCell(cellEncTitle);
+            tabla.AddCell(cellEnc0);
+            tabla.AddCell(cellEnc1);
+            tabla.AddCell(cellEnc2);
+
+            foreach (var p in prods)
+            {
+                var cellDet0 = new PdfPCell(new Phrase(p.FechaComp.ToShortDateString(),fontCuerpoTabla));
+                cellDet0.HorizontalAlignment = Element.ALIGN_CENTER;
+                cellDet0.VerticalAlignment = Element.ALIGN_MIDDLE;
+                cellDet0.PaddingBottom = 7;
+                cellDet0.PaddingTop = 3;
+                cellDet0.PaddingLeft = 2;
+
+                var cellDet1 = new PdfPCell(new Phrase(p.NombreProd, fontCuerpoTabla));
+                cellDet1.HorizontalAlignment = Element.ALIGN_LEFT;
+                cellDet1.VerticalAlignment = Element.ALIGN_MIDDLE;
+                cellDet1.PaddingBottom = 7;
+                cellDet1.PaddingTop = 3;
+                cellDet1.PaddingLeft = 2;
+
+                var cellDet2 = new PdfPCell(new Phrase(p.Cantidad.ToString() + " " + p.DescripcionUnidad, fontCuerpoTabla));
+                cellDet2.HorizontalAlignment = Element.ALIGN_LEFT;
+                cellDet2.VerticalAlignment = Element.ALIGN_MIDDLE;
+                cellDet2.PaddingBottom = 7;
+                cellDet2.PaddingTop = 3;
+                cellDet2.PaddingLeft = 2;
+
+                tabla.AddCell(cellDet0);
+                tabla.AddCell(cellDet1);
+                tabla.AddCell(cellDet2);
+            }
+
+            pdf.Add(tabla);
+
+            pdf.Close();
+
+            return memoryStream.ToArray();
+        }
+
+        private byte[] MasProductosReport(List<MasProducto> prods, Parametros parametros)
+        {
+            memoryStream = new MemoryStream();
+
+            var rutaImg = _env.WebRootFileProvider.GetFileInfo("images/expo_ceramicas_logo.png").PhysicalPath;
+            Image logo = Image.GetInstance(rutaImg);
+            logo.ScalePercent(24);
+
+            var pdf = new Document(PageSize.A4, mLeft, mRight, mTop, mBottom);
+            pdf.AddTitle("Reporte");
+            pdf.AddAuthor("ExpoCeramica");
+            pdf.AddCreationDate();
+            pdf.AddKeywords("Reporte");
+            pdf.AddSubject("Reporte de ExpoCeramica");
+
+            //Si bien no se usa el objeto, es necesario el metodo GetInstance para comenzar la escritura interna del pdf
+            var writer = PdfWriter.GetInstance(pdf, memoryStream);
+
+            //Encabezado            
+            var labelHeader = new Chunk("ExpoCeramica", fontStyleEncabezado);
+            var header = new HeaderFooter(new Phrase(labelHeader), false)
+            {
+                BackgroundColor = new BaseColor(89, 74, 226),
+                Alignment = Element.ALIGN_CENTER,
+                Border = Rectangle.NO_BORDER
+            };
+
+            //Pie de Pagina
+            var labelFooter = new Chunk("Contacto: Cel. +54 9 2625 656989 - Email. expoceramica@gmail.com", fontStyleFooter);
+            var footer = new HeaderFooter(new Phrase(labelFooter), false)
+            {
+                BackgroundColor = new BaseColor(89, 74, 226),
+                Alignment = Element.ALIGN_CENTER,
+                Border = Rectangle.NO_BORDER
+            };
+
+            pdf.Header = header;
+            pdf.Footer = footer;
+
+            //Cuerpo
+            pdf.Open();
+
+            var titel = new Paragraph("REPORTE PRODUCTOS MAS VENDIDOS");
+            titel.SpacingAfter = 26f;
+            titel.SpacingBefore = -50f;
+            titel.Alignment = Element.ALIGN_CENTER;
+
+            var strLugar = new Paragraph("General Alvear, Mendoza", fontSubTitleBody);
+            var strFecha = new Paragraph("Fecha: " + DateTime.Today.ToShortDateString(), fontSubTitleBody);
+
+            pdf.Add(logo);
+            pdf.Add(titel);
+            pdf.Add(strLugar);
+            pdf.Add(strFecha);
+                        
+            if (parametros.CC)
+            {
+                if (parametros.TipoVta == 1) pdf.Add(new Paragraph("Con Venta a Cuenta Corriente", fontSubTitleBody));
+                else pdf.Add(new Paragraph("Sin Venta a Cuenta Corriente", fontSubTitleBody));
+            }
+            if (parametros.RangoFechas)
+            {
+                pdf.Add(new Paragraph("Rango Consulta: " + parametros.FechaDesde.ToShortDateString() + " -> " + parametros.FechaHasta.ToShortDateString(), fontSubTitleBody));
+            }
+
+            //Comienzo a construir el detalle en la tabla
+            var tabla = new PdfPTable(2);
+            tabla.SpacingBefore = 20f;
+            tabla.SpacingAfter = 30f;
+            tabla.HorizontalAlignment = Element.ALIGN_CENTER;
+
+            var cellEncTitle = new PdfPCell(new Phrase("PRODUCTOS VENDIDOS", fontEncabTabla));
+            cellEncTitle.Colspan = 2;
+            cellEncTitle.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEncTitle.PaddingBottom = 5;
+
+            var cellEnc1 = new PdfPCell(new Phrase("Producto", fontEncabTabla));
+            cellEnc1.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEnc1.PaddingBottom = 5;
+
+            var cellEnc2 = new PdfPCell(new Phrase("Cantidad", fontEncabTabla));
+            cellEnc2.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEnc2.PaddingBottom = 5;
+
+            tabla.AddCell(cellEncTitle);
+            tabla.AddCell(cellEnc1);
+            tabla.AddCell(cellEnc2);
+
+            foreach (var p in prods)
+            {
+                var cellDet1 = new PdfPCell(new Phrase(p.NombreProd, fontCuerpoTabla));
+                cellDet1.HorizontalAlignment = Element.ALIGN_LEFT;
+                cellDet1.VerticalAlignment = Element.ALIGN_MIDDLE;
+                cellDet1.PaddingBottom = 7;
+                cellDet1.PaddingTop = 3;
+                cellDet1.PaddingLeft = 2;
+
+                var cellDet2 = new PdfPCell(new Phrase(p.Cantidad.ToString() + " " + p.DescripcionUnidad, fontCuerpoTabla));
+                cellDet2.HorizontalAlignment = Element.ALIGN_LEFT;
+                cellDet2.VerticalAlignment = Element.ALIGN_MIDDLE;
+                cellDet2.PaddingBottom = 7;
+                cellDet2.PaddingTop = 3;
+                cellDet2.PaddingLeft = 2;
+
+                tabla.AddCell(cellDet1);
+                tabla.AddCell(cellDet2);
+            }
+
+            pdf.Add(tabla);
+
+            pdf.Close();
+
+            return memoryStream.ToArray();
+        }
+
+        private byte[] GananciasReport(List<Ganancia> ganancias, Parametros parametros)
+        {
+            memoryStream = new MemoryStream();
+
+            var rutaImg = _env.WebRootFileProvider.GetFileInfo("images/expo_ceramicas_logo.png").PhysicalPath;
+            Image logo = Image.GetInstance(rutaImg);
+            logo.ScalePercent(24);
+
+            var pdf = new Document(PageSize.A4, mLeft, mRight, mTop, mBottom);
+            pdf.AddTitle("Reporte");
+            pdf.AddAuthor("ExpoCeramica");
+            pdf.AddCreationDate();
+            pdf.AddKeywords("Reporte");
+            pdf.AddSubject("Reporte de ExpoCeramica");
+
+            //Si bien no se usa el objeto, es necesario el metodo GetInstance para comenzar la escritura interna del pdf
+            var writer = PdfWriter.GetInstance(pdf, memoryStream);
+
+            //Encabezado            
+            var labelHeader = new Chunk("ExpoCeramica", fontStyleEncabezado);
+            var header = new HeaderFooter(new Phrase(labelHeader), false)
+            {
+                BackgroundColor = new BaseColor(89, 74, 226),
+                Alignment = Element.ALIGN_CENTER,
+                Border = Rectangle.NO_BORDER
+            };
+
+            //Pie de Pagina
+            var labelFooter = new Chunk("Contacto: Cel. +54 9 2625 656989 - Email. expoceramica@gmail.com", fontStyleFooter);
+            var footer = new HeaderFooter(new Phrase(labelFooter), false)
+            {
+                BackgroundColor = new BaseColor(89, 74, 226),
+                Alignment = Element.ALIGN_CENTER,
+                Border = Rectangle.NO_BORDER
+            };
+
+            pdf.Header = header;
+            pdf.Footer = footer;
+
+            //Cuerpo
+            pdf.Open();
+
+            var titel = new Paragraph("REPORTE DE INGRESOS");
+            titel.SpacingAfter = 26f;
+            titel.SpacingBefore = -50f;
+            titel.Alignment = Element.ALIGN_CENTER;
+
+            var strLugar = new Paragraph("General Alvear, Mendoza", fontSubTitleBody);
+            var strFecha = new Paragraph("Fecha: " + DateTime.Today.ToShortDateString(), fontSubTitleBody);
+
+            pdf.Add(logo);
+            pdf.Add(titel);
+            pdf.Add(strLugar);
+            pdf.Add(strFecha);
+
+            if (parametros.CompPagos) pdf.Add(new Paragraph("Solo En Comprobantes Pagados", fontSubTitleBody));
+
+            if (parametros.CC)
+            {
+                if (parametros.TipoVta == 1) pdf.Add(new Paragraph("Con Venta a Cuenta Corriente", fontSubTitleBody));
+                else pdf.Add(new Paragraph("Sin Venta a Cuenta Corriente", fontSubTitleBody));
+            }
+
+            if (parametros.RangoFechas)
+            {
+                pdf.Add(new Paragraph("Rango Consulta: " + parametros.FechaDesde.ToShortDateString() + " -> " + parametros.FechaHasta.ToShortDateString(), fontSubTitleBody));
+            }
+
+            if(parametros.UsarBonif)
+            {
+                if (parametros.ConBonif) pdf.Add(new Paragraph("Comprobantes Con Bonificación", fontSubTitleBody));
+                else pdf.Add(new Paragraph("Comprobantes Sin Bonificación", fontSubTitleBody));
+            }
+
+            if(parametros.UsarFP) pdf.Add(new Paragraph("Forma Pago: " + parametros.FormaPagoStr, fontSubTitleBody));
+
+            //Comienzo a construir el detalle en la tabla
+            var tabla = new PdfPTable(2);
+            tabla.SpacingBefore = 20f;
+            tabla.SpacingAfter = 30f;
+            tabla.HorizontalAlignment = Element.ALIGN_CENTER;
+
+            var cellEncTitle = new PdfPCell(new Phrase("INGRESOS", fontEncabTabla));
+            cellEncTitle.Colspan = 2;
+            cellEncTitle.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEncTitle.PaddingBottom = 5;
+
+            var cellEnc1 = new PdfPCell(new Phrase("Día", fontEncabTabla));
+            cellEnc1.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEnc1.PaddingBottom = 5;
+
+            var cellEnc2 = new PdfPCell(new Phrase("Importe", fontEncabTabla));
+            cellEnc2.HorizontalAlignment = Element.ALIGN_CENTER;
+            cellEnc2.PaddingBottom = 5;
+
+            tabla.AddCell(cellEncTitle);
+            tabla.AddCell(cellEnc1);
+            tabla.AddCell(cellEnc2);
+
+            foreach (var g in ganancias)
+            {
+                var cellDet1 = new PdfPCell(new Phrase(g.FechaRecibo.ToShortDateString(), fontCuerpoTabla));
+                cellDet1.HorizontalAlignment = Element.ALIGN_CENTER;
+                cellDet1.VerticalAlignment = Element.ALIGN_MIDDLE;
+                cellDet1.PaddingBottom = 7;
+                cellDet1.PaddingTop = 3;
+                cellDet1.PaddingLeft = 2;
+
+                var cellDet2 = new PdfPCell(new Phrase(string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", g.TotalDia), fontCuerpoTabla));
+                cellDet2.HorizontalAlignment = Element.ALIGN_RIGHT;
+                cellDet2.VerticalAlignment = Element.ALIGN_MIDDLE;
+                cellDet2.PaddingBottom = 7;
+                cellDet2.PaddingTop = 3;
+                cellDet2.PaddingLeft = 2;
+
+                tabla.AddCell(cellDet1);
+                tabla.AddCell(cellDet2);
+            }
+
+            var cellDetTot1 = new PdfPCell(new Phrase("TOTAL:", fontCuerpoTabla));
+            cellDetTot1.HorizontalAlignment = Element.ALIGN_RIGHT;
+            cellDetTot1.VerticalAlignment = Element.ALIGN_MIDDLE;
+            cellDetTot1.PaddingBottom = 7;
+            cellDetTot1.PaddingTop = 3;
+            cellDetTot1.PaddingLeft = 2;
+
+            var cellDetTot2 = new PdfPCell(new Phrase(string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", ganancias.Sum(x=>x.TotalDia)), fontCuerpoTabla));
+            cellDetTot2.HorizontalAlignment = Element.ALIGN_RIGHT;
+            cellDetTot2.VerticalAlignment = Element.ALIGN_MIDDLE;
+            cellDetTot2.PaddingBottom = 7;
+            cellDetTot2.PaddingTop = 3;
+            cellDetTot2.PaddingLeft = 2;
+
+            tabla.AddCell(cellDetTot1);
+            tabla.AddCell(cellDetTot2);
+
+            pdf.Add(tabla);
 
             pdf.Close();
 

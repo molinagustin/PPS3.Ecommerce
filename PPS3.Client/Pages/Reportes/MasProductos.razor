@@ -1,7 +1,116 @@
 ﻿@page "/repMasProductos"
+@using Radzen.Blazor
+@inject IServReporte servReporte
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment env
+@inject IJSRuntime JS /*JS Interop*/
+@attribute [Authorize(Roles = "1, 2")]
 
-<h3>MasProductos</h3>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Reporte Productos Más Vendidos</MudText>
+
+<MudGrid>
+    <MudItem xs="3">
+        <MudStack>
+            <MudSelect T="int" @bind-Value="parametros.Top" Label="Cantidad Productos" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Immediate=true>
+                @foreach (var top in tops)
+                {
+                    <MudSelectItem Value="top">@top</MudSelectItem>
+                }
+            </MudSelect>
+        </MudStack>
+        <MudStack Row=true>
+            <MudStack>
+                <MudSwitch @bind-Checked="parametros.CC" Label="Cuenta Corriente" Color="Color.Success" />
+            </MudStack>
+            @if (parametros.CC)
+            {
+                <MudStack>
+                    <MudSelect T="int" @bind-Value="@parametros.TipoVta" Label="Tipo Venta" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Value="1">1 - Con Cuenta Corriente</MudSelectItem>
+                        <MudSelectItem Value="2">2 - Sin Cuenta Corriente</MudSelectItem>
+                    </MudSelect>
+                </MudStack>
+            }
+        </MudStack>
+        <MudStack Row=true>
+            <MudStack>
+                <MudSwitch @bind-Checked="parametros.RangoFechas" Label="Fecha" Color="Color.Success" />
+            </MudStack>
+            @if (parametros.RangoFechas)
+            {
+                <MudStack Row=true>
+                    <MudDatePicker Label="Desde" @bind-Date="fechaDes" MaxDate="DateTime.Today" Placeholder="Seleccionar Fecha" />
+                    <MudDatePicker Label="Hasta" @bind-Date="fechaHas" MaxDate="DateTime.Today" Placeholder="Seleccionar Fecha" />
+                </MudStack>
+            }
+        </MudStack>
+    </MudItem>
+
+    <MudItem xs="1">
+        <MudButton StartIcon="@Icons.Material.Filled.AdsClick" Color="Color.Primary" Variant="Variant.Filled" OnClick="ObtenerProductos">Generar</MudButton>
+    </MudItem>
+
+    <MudItem xs="1">
+        @if (productos.Count() > 0)
+        {
+            <MudButton StartIcon="@Icons.Material.Filled.Print" Color="Color.Primary" Variant="Variant.Outlined" OnClick="ImprimirReporte">Imprimir</MudButton>
+        }
+    </MudItem>
+</MudGrid>
+
+@if (productos.Count() > 0)
+{
+    <RadzenChart Style="height:600px;">
+        <RadzenPieSeries Data="@productos" Title="Productos Mas Vendidos" CategoryProperty="NombreProd" ValueProperty="Cantidad" />
+    </RadzenChart>
+}
+else if (generando)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+}
 
 @code {
+    Parametros parametros = new Parametros();
+    IEnumerable<MasProducto> productos = new List<MasProducto>();
+    bool generando = false;
+    private DateTime? fechaDes;
+    private DateTime? fechaHas;
+    int[] tops = new int[6] { 5, 10, 15, 20, 25, 30 };
 
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        fechaDes = fechaHas = DateTime.Today;
+    }
+
+    protected async void ObtenerProductos()
+    {
+        generando = true;
+        productos = new List<MasProducto>();
+        if (parametros.RangoFechas && fechaDes != null && fechaHas != null)
+        {
+            parametros.FechaDesde = fechaDes.Value;
+            parametros.FechaHasta = fechaHas.Value;
+        }
+        var result = await servReporte.ReporteMasProductos(parametros);
+
+        if (result != null) productos = result;
+        else Snackbar.Add($"No se encontraron resultados para el reporte.", Severity.Error);
+
+        generando = false;
+        StateHasChanged();
+    }
+
+    protected void ImprimirReporte()
+    {
+        @if (productos.Count() > 0)
+        {
+            var pdf = new pdfPrinter(env);
+            var result = pdf.DescargarPDF(JS, 6, productos, parametros);
+
+            if (result.Length != 0) Snackbar.Add(result, Severity.Error);
+            else Snackbar.Add($"Reporte impreso correctamente.", Severity.Success);
+        }
+        else Snackbar.Add($"El reporte a imprimir no es correcto.", Severity.Error);
+    }
 }

@@ -25,7 +25,7 @@
             var sqlAnd = "";
 
             if (parametros.RangoFechas)
-                sqlAnd += " AND re.FechaRecibo BETWEEN '" + parametros.FechaDesde.ToShortDateString() + "' AND '" + parametros.FechaHasta.ToShortDateString() + "' ";
+                sqlAnd += " AND re.FechaRecibo BETWEEN '" + parametros.FechaDesde.ToString("yyyyMMdd") + "' AND '" + parametros.FechaHasta.ToString("yyyyMMdd") + "' ";
 
             if (parametros.UsarBonif)
                 sqlAnd += (parametros.ConBonif) ? " AND ccue.Bonificacion > 0 " : " AND ccue.Bonificacion = 0 ";
@@ -72,7 +72,7 @@
                 sqlAnd += $" AND ce.TipoVta={parametros.TipoVta} ";
 
             if (parametros.RangoFechas)
-                sqlAnd += " AND re.FechaRecibo BETWEEN '" + parametros.FechaDesde.ToShortDateString() + "' AND '" + parametros.FechaHasta.ToShortDateString() + "' ";
+                sqlAnd += " AND re.FechaRecibo BETWEEN '" + parametros.FechaDesde.ToString("yyyyMMdd") + "' AND '" + parametros.FechaHasta.ToString("yyyyMMdd") + "' ";
 
             var db = dbConnection();
 
@@ -114,7 +114,7 @@
                 sqlAnd += " AND ce.Pagado = 1 AND cc.Pagado = 1 ";
 
             if (parametros.RangoFechas)
-                sqlAnd += " AND ce.FechaComp BETWEEN '" + parametros.FechaDesde.ToShortDateString() + "' AND '" + parametros.FechaHasta.ToShortDateString() + "' ";
+                sqlAnd += " AND ce.FechaComp BETWEEN '" + parametros.FechaDesde.ToString("yyyyMMdd") + "' AND '" + parametros.FechaHasta.ToString("yyyyMMdd") + "' ";
 
             var db = dbConnection();
 

@@ -1,7 +1,157 @@
-﻿@page "/repGanancias"
+﻿@page "/repIngresos"
+@using Radzen.Blazor
+@inject IServReporte servReporte
+@inject IServFormaPago ServFormaPago
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment env
+@inject IJSRuntime JS /*JS Interop*/
+@attribute [Authorize(Roles = "1, 2")]
 
-<h3>Ganancias</h3>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Reporte de Ingresos</MudText>
+
+<MudGrid>
+    <MudItem xs="3">
+        <MudStack>
+            <MudSwitch @bind-Checked="parametros.CompPagos" Label="Comprobantes Pagos" Color="Color.Success" />
+        </MudStack>
+        <MudStack Row=true>
+            <MudStack>
+                <MudSwitch @bind-Checked="parametros.CC" Label="Cuenta Corriente" Color="Color.Success" />
+            </MudStack>
+            @if (parametros.CC)
+            {
+                <MudStack>
+                    <MudSelect T="int" @bind-Value="@parametros.TipoVta" Label="Tipo Venta" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Value="1">1 - Con Cuenta Corriente</MudSelectItem>
+                        <MudSelectItem Value="2">2 - Sin Cuenta Corriente</MudSelectItem>
+                    </MudSelect>
+                </MudStack>
+            }
+        </MudStack>
+        <MudStack Row=true>
+            <MudStack>
+                <MudSwitch @bind-Checked="parametros.RangoFechas" Label="Fecha" Color="Color.Success" />
+            </MudStack>
+            @if (parametros.RangoFechas)
+            {
+                <MudStack Row=true>
+                    <MudDatePicker Label="Desde" @bind-Date="fechaDes" MaxDate="DateTime.Today" Placeholder="Seleccionar Fecha" />
+                    <MudDatePicker Label="Hasta" @bind-Date="fechaHas" MaxDate="DateTime.Today" Placeholder="Seleccionar Fecha" />
+                </MudStack>
+            }
+        </MudStack>
+        <MudStack Row=true>
+            <MudStack>
+                <MudSwitch @bind-Checked="parametros.UsarBonif" Label="Usar Bonif." Color="Color.Success" />
+            </MudStack>
+            @if(parametros.UsarBonif)
+            {
+                <MudStack>
+                    <MudSwitch @bind-Checked="parametros.ConBonif" Label="Bonificación" Color="Color.Success" />
+                </MudStack>                
+            }
+        </MudStack>
+        <MudStack Row=true>
+            <MudStack>
+                <MudSwitch @bind-Checked="parametros.UsarFP" Label="Forma Pago" Color="Color.Success" />
+            </MudStack>
+            @if(parametros.UsarFP)
+            {
+                <MudStack>
+                    <MudSelect T="int" @bind-Value="@parametros.FormaPago" Label="Forma Pago" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        @foreach (var fp in formasPago)
+                        {
+                            <MudSelectItem Value="@fp.IdFormaP">@(formasPago.ToList().IndexOf(fp) + 1) - @fp.FormaP</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudStack>
+            }
+        </MudStack>
+    </MudItem>
+
+    <MudItem xs="1">
+        <MudButton StartIcon="@Icons.Material.Filled.AdsClick" Color="Color.Primary" Variant="Variant.Filled" OnClick="ObtenerGanancias">Generar</MudButton>
+    </MudItem>
+
+    <MudItem xs="1">
+        @if (ganancias.Count() > 0)
+        {
+            <MudButton StartIcon="@Icons.Material.Filled.Print" Color="Color.Primary" Variant="Variant.Outlined" OnClick="ImprimirReporte">Imprimir</MudButton>
+        }
+    </MudItem>
+</MudGrid>
+
+@if (ganancias.Count() > 0)
+{
+    <RadzenChart>
+        <RadzenLineSeries Smooth="true" Data="@ganancias" CategoryProperty="FechaRecibo" Title="Ingresos" ValueProperty="TotalDia">
+            <RadzenMarkers MarkerType="MarkerType.Circle" />
+        </RadzenLineSeries>
+        <RadzenCategoryAxis Padding="20" />
+        <RadzenValueAxis>
+            <RadzenGridLines Visible="true" />
+        </RadzenValueAxis>
+    </RadzenChart>
+}
+else if (generando)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+}
 
 @code {
+    Parametros parametros = new Parametros();
+    IEnumerable<Ganancia> ganancias = new List<Ganancia>();
+    bool generando = false;
+    private DateTime? fechaDes;
+    private DateTime? fechaHas;
+    IEnumerable<FormaPago> formasPago;
 
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        fechaDes = fechaHas = DateTime.Today;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var fp = await ServFormaPago.ObtenerFormasPago();
+        formasPago = fp.Where(x=>x.IdFormaP!=9);
+    }
+
+    protected async void ObtenerGanancias()
+    {
+        generando = true;
+        ganancias = new List<Ganancia>();
+        if (parametros.RangoFechas && fechaDes != null && fechaHas != null)
+        {
+            parametros.FechaDesde = fechaDes.Value;
+            parametros.FechaHasta = fechaHas.Value;
+        }
+
+        if (parametros.UsarFP) parametros.FormaPagoStr = formasPago.First(x => x.IdFormaP == parametros.FormaPago).FormaP;
+
+        var result = await servReporte.ReporteGanancias(parametros);
+
+        if (result != null)
+        {
+            ganancias = result;
+        }
+        else Snackbar.Add($"No se encontraron resultados para el reporte.", Severity.Error);
+
+        generando = false;
+        StateHasChanged();
+    }
+
+    protected void ImprimirReporte()
+    {
+        @if (ganancias.Count() > 0)
+        {
+            var pdf = new pdfPrinter(env);
+            var result = pdf.DescargarPDF(JS, 7, ganancias, parametros);
+
+            if (result.Length != 0) Snackbar.Add(result, Severity.Error);
+            else Snackbar.Add($"Reporte impreso correctamente.", Severity.Success);
+        }
+        else Snackbar.Add($"El reporte a imprimir no es correcto.", Severity.Error);
+    }
 }
