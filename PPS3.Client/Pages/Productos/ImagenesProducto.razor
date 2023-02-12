@@ -96,12 +96,10 @@
                     var resisedFile = await imageFile.RequestImageFileAsync(format, 250, 170);
                     var buffer = new byte[resisedFile.Size];
 
-                    await resisedFile.OpenReadStream().ReadAsync(buffer);
-
-                    //var imageDataUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
-                    //var imageBytes = System.Convert.FromBase64String(Convert.ToBase64String(buffer));
-                    //var imageStrng = System.Convert.ToBase64String(imageBytes);
-                    //imagesDataUrls.Add(imageDataUrl);
+                    using (var stream = resisedFile.OpenReadStream())
+                    {
+                        await stream.ReadAsync(buffer);
+                    }         
 
                     var imagen = new ImagenProducto()
                         {
@@ -111,7 +109,7 @@
                             UsuarioModif = idUsAct
                         };
 
-                    await ServImagenProducto.GuardarImagen(imagen);
+                    await ServImagenProducto.GuardarImagen(imagen);             
                 }
 
                 NavigationManager.NavigateTo($"/detallesProducto/imagenes/{id}", forceLoad: true);
