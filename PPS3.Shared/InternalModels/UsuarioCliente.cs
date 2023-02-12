@@ -25,7 +25,7 @@ namespace PPS3.Shared.InternalModels
         [Required(ErrorMessage = "Se debe seleccionar un Tipo de Documento.")]
         public int TipoDocumento { get; set; }
         [Required(ErrorMessage = "Se debe introducir el Numero de Documento.")]
-        [RegularExpression(@"^[0-9]{8,8}$", ErrorMessage = "El numero de documento debe ser completo, de 8 caracteres.")]
+        [RegularExpression(@"^[0-9]{8,11}$", ErrorMessage = "El numero de documento debe ser completo.")]
         public string NumDocumento { get; set; } = string.Empty;
         [Required(ErrorMessage = "Se debe seleccionar la Condicion IVA del Cliente.")]
         public int CondIva { get; set; }
