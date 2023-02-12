@@ -3,18 +3,8 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS /*JS Interop*/
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
-@attribute [Authorize]
 
-<AuthorizeView>
-    <Authorized>
-        <input type="hidden" id="UsAct" value="@context.User.Claims.First().Value" />
-    </Authorized>
-    <NotAuthorized>
-        <input type="hidden" id="UsAct" value="0" />
-    </NotAuthorized>
-</AuthorizeView>
-
-@if (id > 0 && (id == idUsAct))
+@if (id > 0)
 {    
     <MudGrid Justify="Justify.Center">
         <MudItem xs="3"></MudItem>
@@ -30,48 +20,24 @@
     [Parameter]
     public int id { get; set; }
 
-    //Para almacenar el ID del usuario actual
-    private int idUsAct;
-
-    Usuario usuario = new Usuario();
-
-    //Guardo el ID del usuario actual
-    protected override async Task OnAfterRenderAsync(bool firstRender) 
+    protected override async Task OnInitializedAsync()
     {
-        idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
-
-        if(idUsAct > 0)
+        try
         {
-            usuario = await ServUsuario.ObtenerUsuario(idUsAct);
+            var idReal = ((id - 1) / 3) / 37;
+            var validado = await ServUsuario.ValidarEmailUsuario(idReal);
 
-            if(usuario.IdUsuarioAct == id)
+            if (validado)
             {
-                if(!usuario.EmailVerificado)
-                {
-                    StateHasChanged();
-                    usuario.EmailVerificado = true;
-                    var validado = await ServUsuario.ActualizarUsuario(usuario);
-                    if (validado)
-                    {
-                        NavigationManager.NavigateTo("/");
-                        Snackbar.Add($"Correo validado exitosamente", Severity.Success);
-                    }
-                    else
-                    {
-                        NavigationManager.NavigateTo("/");
-                        Snackbar.Add($"No se pudo validar el correo, compruebe los datos suministrados", Severity.Error);
-                    }
-                }
-                else
-                    NavigationManager.NavigateTo("/");
+                NavigationManager.NavigateTo("/");
+                Snackbar.Add($"Correo validado exitosamente", Severity.Success);
             }
             else
             {
                 NavigationManager.NavigateTo("/");
-                Snackbar.Add($"El usuario y la verificacion no coinciden", Severity.Error);
+                Snackbar.Add($"No se pudo validar el correo, comprobar el link.", Severity.Error);
             }
         }
-        else
-            NavigationManager.NavigateTo("/");
+        catch (Exception) { NavigationManager.NavigateTo("/"); }
     }
 }

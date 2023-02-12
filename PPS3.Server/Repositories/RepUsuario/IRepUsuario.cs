@@ -14,5 +14,6 @@
         bool ValidarHash(string pass, string salt, string hash);
         Task<bool> UsuarioExistente(string nombreUsuario);
         Task<bool> CambiarPassword(UsuarioCliente usuarioCliente);
+        Task<bool> ValidarEmailUsuario(int id);
     }
 }

@@ -45,5 +45,8 @@ namespace PPS3.Shared.InternalModels
         public string Password { get; set; } = string.Empty;
         [RegularExpression(@"^.{4,}$", ErrorMessage = "La contraseña debe ser de Minimo 4 caracteres")]
         public string CambioPassword { get; set; } = string.Empty;
+
+        //=======>>>    Envio Email Confirmacion    <<<=======
+        public string URL { get; set; } = string.Empty;
     }
 }

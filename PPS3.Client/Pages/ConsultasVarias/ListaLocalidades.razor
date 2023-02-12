@@ -14,6 +14,8 @@ else
         <ToolBarContent>
             <MudText Typo="Typo.h6">Localidades</MudText>
             <MudSpacer/>
+            <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Outlined" Href="/detallesLocalidad">Agregar Nueva</MudButton>
+            <MudSpacer />
             <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
         </ToolBarContent>
         <HeaderContent>
@@ -37,6 +39,7 @@ else
             <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
             @*<MudTd DataLabel="Usuario Ult. Modif.">@context.UsuarioModif</MudTd>*@
             <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>
+            <MudTd><a href="/detallesLocalidad/@context.IdLocalidad" class="btn-sm btn-warning">Editar</a></MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager/>

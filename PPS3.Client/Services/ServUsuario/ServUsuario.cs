@@ -260,5 +260,15 @@ namespace PPS3.Client.Services.ServUsuario
             else
                 return false;
         }
+
+        public async Task<bool> ValidarEmailUsuario(int id)
+        {
+            //Guardo el resultado
+            var response = await _httpClient.PostAsync($"api/Usuarios/ValidarEmailUsuario/{id}", null);
+
+            //Verifico la respuesta exitosa
+            if (response.IsSuccessStatusCode) return true;
+            else return false;
+        }
     }
 }

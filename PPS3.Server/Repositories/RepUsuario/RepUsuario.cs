@@ -342,5 +342,27 @@ namespace PPS3.Server.Repositories.RepUsuario
             });
             return result > 0;
         }
+
+        public async Task<bool> ValidarEmailUsuario(int id)
+        {
+            //Actualizo los datos del usuario
+            var db = dbConnection();
+
+            var sql = @"
+                        UPDATE usuarios
+                        SET
+                            EmailVerificado = 1,
+                            FechaUltModif = @FechaUltModif
+                        WHERE IdUsuarioAct = @id
+                        ";
+
+            var result = await db.ExecuteAsync(sql, new
+            {
+                FechaUltModif = DateTime.Now,
+                id
+            });
+
+            return result > 0;
+        }
     }
 }

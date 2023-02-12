@@ -4,6 +4,7 @@
 @inject IServCondicionIVA ServCondIVA
 @inject IServTipoDocumento ServTipoDoc
 @inject IServLocalidad ServLocalidad
+@inject IServProvincia ServProvincia
 @inject IServEmail ServEmail
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
@@ -148,32 +149,56 @@ else
 
                         <MudStack Row="true" Justify="Justify.Center">
                             <MudStack Style="width:50%">
-                                @if (loc != null)
+                                @if (provs != null)
                                 {
-                                    <MudSelect T="int" @bind-Value="@loca" Label="Localidad" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                                        @foreach(var local in loc)
+                                    <MudSelect T="int" @bind-Value="@prov" Label="Provincia" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="BuscarLocalidad">
+                                        @foreach (var provincia in provs)
                                         {
-                                            <MudSelectItem Value="@local.IdLocalidad">@(loc.ToList().IndexOf(local) + 1) - @local.NombreLoc</MudSelectItem>
+                                            <MudSelectItem Value="@provincia.IdProvincia">@(provs.ToList().IndexOf(provincia) + 1) - @provincia.NombreProv</MudSelectItem>
                                         }
                                     </MudSelect>
                                 }
                                 else
                                 {
                                     <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
-                                } 
+                                }
                             </MudStack>
                             <MudStack Style="width:50%">
-                                <MudTextField Label="Numero de Telefono" HelperText="Sin 15, 0 ni espacios o caracteres especiales."
-                                          @bind-Value="usuarioCliente.Telefono" For="@(() => usuarioCliente.Telefono)"/>
+                                @if (loc != null)
+                                {
+                                    @if (sinLocalidad)
+                                    {
+                                        <MudText Typo="Typo.body1" Align="Align.Center" Color="Color.Error">La provincia seleccionada no tiene una localidad habilitada. Contacte al administrador.</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudSelect T="int" @bind-Value="@loca" Label="Localidad" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                            @foreach (var local in loc)
+                                            {
+                                                <MudSelectItem Value="@local.IdLocalidad">@(loc.ToList().IndexOf(local) + 1) - @local.NombreLoc</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    }
+                                }
+                                else
+                                {
+                                    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                                }
                             </MudStack>
                         </MudStack>
 
-                        <MudTextField Label="Domicilio" HelperText="Mas detalle, mejor servicio."
-                                      @bind-Value="usuarioCliente.DomicilioC" For="@(() => usuarioCliente.DomicilioC)"/>
+                        <MudStack Row="true" Justify="Justify.Center">
+                            <MudStack Style="width:50%">
+                                <MudTextField Label="Numero de Telefono" HelperText="Sin 15, 0 ni espacios o caracteres especiales." @bind-Value="usuarioCliente.Telefono" For="@(() => usuarioCliente.Telefono)" />
+                            </MudStack>
+                            <MudStack Style="width:50%">
+                                <MudTextField Label="Domicilio" HelperText="Mas detalle, mejor servicio." @bind-Value="usuarioCliente.DomicilioC" For="@(() => usuarioCliente.DomicilioC)" />
+                            </MudStack>
+                        </MudStack>
 
                     </MudCardContent>
                     <MudCardActions>
-                        <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Save" Color="Color.Success" ButtonType="ButtonType.Submit" Style="margin-bottom:15%;" Disabled=enviandoEmail>Guardar Cambios</MudButton>
+                        <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Save" Color="Color.Success" ButtonType="ButtonType.Submit" Style="margin-bottom:60px;" Disabled=enviandoEmail>Guardar Cambios</MudButton>
                     </MudCardActions>
                 </MudCard>
             </MudItem>
@@ -194,12 +219,15 @@ else
     private IEnumerable<CondicionIVA> condIva;
     private IEnumerable<TipoDocumento> tipoDoc;
     private IEnumerable<Localidad> loc;
+    private IEnumerable<Localidad> locFiltradas = new List<Localidad>();
+    private IEnumerable<Provincia> provs;
 
     private string tipoCl = "Fisica";
     private string genero = "Masculino";
     private int cond = 3;
     private int tipoDocu = 3;
     private int loca = 1;
+    private int prov = 12;
 
     private string passActual = "";
     private string passNuevo = "";
@@ -207,6 +235,7 @@ else
 
     private bool actualizado = false;
     private bool enviandoEmail = false;
+    private bool sinLocalidad = false;
 
     //Guardo el ID del usuario actual
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -242,10 +271,32 @@ else
         condIva = await ServCondIVA.ObtenerCondiciones();
         tipoDoc = await ServTipoDoc.ObtenerTiposDocs();
         loc = await ServLocalidad.ObtenerLocalidades();
+        provs = await ServProvincia.ObtenerProvincias();
+    }
+
+    private void BuscarLocalidad()
+    {
+        locFiltradas = loc.Where(x => x.Provincia == prov);
+        if (locFiltradas == null || locFiltradas.Count() == 0)
+        {
+            sinLocalidad = true;
+            loca = -1;
+        }
+        else
+        {
+            sinLocalidad = false;
+            loca = locFiltradas.First().IdLocalidad;
+        }
     }
 
     protected async Task GuardarPerfil()
     {
+        if (sinLocalidad)
+        {
+            Snackbar.Add($"Debe seleccionar una provincia y localidad correcta.", Severity.Error);
+            return;
+        }
+
         if(!string.IsNullOrEmpty(usuarioCliente.Password))
         {
             enviandoEmail = true;
@@ -304,7 +355,7 @@ else
                 Snackbar.Add($"Los datos del perfil no se actualizaron correctamente. Compruebe la contraseña o los datos suministrados.", Severity.Error);
                 enviandoEmail = false;
             }
-                
+
         }
         else
             Snackbar.Add($"La contraseña actual no puede estar vacia", Severity.Error);
@@ -335,6 +386,7 @@ else
             cond = usuarioCliente.CondIva;
             tipoDocu = usuarioCliente.TipoDocumento;
             loca = usuarioCliente.LocalidadC;
+            prov = loc.Where(x=>x.IdLocalidad == loca).First().Provincia;
 
             //Masculino - Femenino - Otro
             if (usuarioCliente.Genero == 'M')
@@ -362,6 +414,7 @@ else
         EmailAutenticacion datosEmail = new EmailAutenticacion();
         datosEmail.Destinatario = usuarioCliente.Email;
         datosEmail.Usuario = idUsAct;
+        datosEmail.URL = NavigationManager.BaseUri;
 
         var emailEnviado = await ServEmail.EmailVerificacion(datosEmail);
         if(emailEnviado)

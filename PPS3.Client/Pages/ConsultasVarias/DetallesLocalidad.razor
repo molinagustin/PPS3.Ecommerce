@@ -1,0 +1,124 @@
+﻿@page "/detallesLocalidad"
+@page "/detallesLocalidad/{id:int}"
+@inject IServLocalidad servLocalidad
+@inject IServProvincia servProvincia
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
+@attribute [Authorize(Roles = "1, 2")]
+
+<AuthorizeView Context="usCont">
+    <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+</AuthorizeView>
+
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">@titulo</MudText>
+
+<EditForm Model="@localidad" OnValidSubmit="GuardarLocalidad" Context="conForm">
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="6">
+            <MudCard Elevation="1">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos de la Localidad</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTextField Label="Nombre de la Localidad" HelperText="Nombre Completo" @bind-Value="localidad.NombreLoc" For="@(() => localidad.NombreLoc)" AutoFocus = "true" Required="true"/>
+
+                    <MudTextField Label="Código Postal" HelperText="Solo números" @bind-Value="localidad.CP" For="@(() => localidad.CP)" Required="true"/>
+                    
+                    @if (provincias != null)
+                    {
+                        <MudSelect T="int" @bind-Value="@prov" Label="Provincia" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                            @foreach(var provi in provincias)
+                            {
+                                <MudSelectItem Value="@provi.IdProvincia">@(provincias.ToList().IndexOf(provi) + 1) - @provi.NombreProv</MudSelectItem>
+                            }
+                        </MudSelect>
+                    }
+                    else
+                    {
+                        <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                    }
+
+                    <AuthorizeView Roles="1">
+                        @if(id > 0)
+                        {
+                            <MudSwitch @bind-Checked="localidad.Activo" Label="Localidad Activa" Color="Color.Success"/>
+                        }
+                    </AuthorizeView>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.Save" Color="Color.Success" ButtonType="ButtonType.Submit">Guardar</MudButton>
+                    <MudDivider/>
+                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.ExitToApp" Color="Color.Error" OnClick="Cancelar">Cancelar</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    //Para almacenar el ID del usuario actual
+    private int idUsAct;
+
+    private Localidad localidad = new Localidad();
+    private IEnumerable<Provincia> provincias;
+
+    private int prov = 12;
+
+    private string titulo = "Creación de Localidad";
+
+    protected override async Task OnInitializedAsync()
+    {
+        provincias = await servProvincia.ObtenerProvincias();
+        if(id > 0)
+        {
+            localidad = await servLocalidad.ObtenerLocalidad(id);
+            if (localidad.IdLocalidad > 0)
+            {
+                prov = localidad.Provincia;
+                titulo = "Modificación de Localidad";
+            }            
+        }
+    }
+
+    //Guardo el ID del usuario actual
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+
+        if(id > 0)
+        {
+            localidad.UsuarioCrea = localidad.UsuarioModif = idUsAct;
+            prov = localidad.Provincia;
+        }
+        else localidad.UsuarioModif = idUsAct;
+    }
+
+    protected async Task GuardarLocalidad()
+    {
+        localidad.Provincia = prov;
+
+        if(localidad.NombreLoc.Trim().Length > 0)
+        {
+            if (localidad.CP.Trim().Length > 0)
+            {
+                var result = await servLocalidad.GuardarLocalidad(localidad);
+                if(result)
+                {
+                    NavigationManager.NavigateTo("/listaLocalidades");
+                    Snackbar.Add($"Localidad guardad correctamente.", Severity.Success);
+                }
+                else Snackbar.Add($"No se pudo guardar la localidad.", Severity.Error);
+            }
+            else Snackbar.Add($"La localidad debe contener un código postal.", Severity.Error);
+        }
+        else Snackbar.Add($"La localidad debe contener un nombre.", Severity.Error);
+    }
+
+    protected void Cancelar() => NavigationManager.NavigateTo("/listaLocalidades");
+}

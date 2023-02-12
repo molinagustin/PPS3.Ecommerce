@@ -21,6 +21,7 @@
                             NombreLoc=@NombreLoc,
                             Provincia=@Provincia,
                             CP=@CP,
+                            Activo=@Activo,
                             UsuarioModif=@UsuarioModif,
                             FechaUltModif=@FechaUltModif
                         WHERE IdLocalidad=@IdLocalidad
@@ -29,7 +30,8 @@
                                                         localidad.NombreLoc,
                                                         localidad.Provincia,
                                                         localidad.CP,
-                                                        UsuarioModif = 1,
+                                                        localidad.Activo,
+                                                        localidad.UsuarioModif,
                                                         FechaUltModif = DateTime.Now,
                                                         localidad.IdLocalidad
                                                         });
@@ -80,8 +82,8 @@
                                                         localidad.NombreLoc,
                                                         localidad.Provincia,
                                                         localidad.CP,
-                                                        UsuarioCrea = 1,
-                                                        UsuarioModif = 1
+                                                        localidad.UsuarioCrea,
+                                                        localidad.UsuarioModif
                                                         });
             return result > 0;
         }
@@ -119,6 +121,7 @@
             var sql = @"
                         SELECT *
                         FROM localidades
+                        WHERE Activo=1
                         ORDER BY NombreLoc
                         ";
             var result = await db.QueryAsync<Localidad>(sql, new { });

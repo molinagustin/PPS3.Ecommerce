@@ -15,7 +15,7 @@
     <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
 </AuthorizeView>
 
-<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Detalles de Producto</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">@titulo</MudText>
 
 <EditForm Model="@producto" OnValidSubmit="GuardarProducto" Context="conForm">
     <DataAnnotationsValidator/>
@@ -165,7 +165,7 @@
 
     private bool estadoActivoInicial = false;
 
-    private string titulo = "Creacion de Nuevo Producto";
+    private string titulo = "Creación de Producto";
 
     private string strBonif = "0";
     private decimal bonificacion = 0;

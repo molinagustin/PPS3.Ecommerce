@@ -12,5 +12,6 @@
         Task<bool> ActualizarPerfilUsuario(UsuarioCliente usuarioCl);
         Task<bool> BorrarUsuario(int id);
         Task<bool> CambiarPassword(UsuarioCliente usuarioCliente);
+        Task<bool> ValidarEmailUsuario(int id);
     }
 }

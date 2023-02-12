@@ -69,7 +69,7 @@ namespace PPS3.Server.Controllers
                 //Verifico que no existe otro usuario con el mismo nombre de usuario
                 var existe = await _repUsuario.UsuarioExistente(usuarioCliente.NombreUs);
                 if (existe)
-                    return BadRequest(new { message = "El nombre de usuario que intenta utlizar no esta disponible, por favor introduzca otro." });
+                    return BadRequest(new { message = "El nombre de usuario que intenta utilizar no esta disponible, por favor introduzca otro." });
 
                 //Luego de la verificacion del modelo valido y que el nombre de usuario este disponible, creo un nuevo cliente y traigo su id, el cual, si es mayor a 0 se lo asigno al usuario que estoy creando
                 var clienteResponse = await _repCliente.CrearCliente(usuarioCliente);
@@ -90,11 +90,12 @@ namespace PPS3.Server.Controllers
 
                         //Si fue creada correctamente, devuelvo OK
                         if(nuevaCuentaCreada)
-                        {
+                        {                            
                             //Envio un email para su verificacion
                             EmailAutenticacion datosEmail = new EmailAutenticacion();
                             datosEmail.Destinatario = usuarioCliente.Email;
                             datosEmail.Usuario = response;
+                            datosEmail.URL = usuarioCliente.URL;
                             _servEmail.EmailVerificacion(datosEmail);
                             return Ok();
                         }                            
@@ -177,6 +178,17 @@ namespace PPS3.Server.Controllers
                 return Ok();
             else
                 return BadRequest();
+        }
+
+        [AllowAnonymous]
+        [HttpPost("{id}")]
+        public async Task<ActionResult> ValidarEmailUsuario(int id)
+        {
+            if(id == 0) return BadRequest();
+
+            var response = await _repUsuario.ValidarEmailUsuario(id);
+            if(response) return Ok();
+            else return BadRequest();
         }
 
         [AllowAnonymous]

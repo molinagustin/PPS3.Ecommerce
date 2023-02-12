@@ -44,12 +44,15 @@ namespace PPS3.Server.ExternalServices.ServEmail
         {
             try
             {
+                //Una pequeña forma de encriptar su id
+                var usuario = (datosEmail.Usuario * 37 * 3) + 1;
+
                 // Creo el mensaje
-                var email = new MimeMessage();
+                var email = new MimeMessage();                
                 email.From.Add(MailboxAddress.Parse(_config.GetSection("EmailUsername").Value));
                 email.To.Add(MailboxAddress.Parse(datosEmail.Destinatario));
-                email.Subject = "Email de Verificacion";
-                email.Body = new TextPart(TextFormat.Html) { Text = $"Copiar el siguiente enlace y pegar en el navegador mientras se esta logueado en el sitio: https://localhost:7176/validacionEmail/{datosEmail.Usuario}" };
+                email.Subject = "Email de Verificacion";                
+                email.Body = new TextPart(TextFormat.Html) { Text = $"Copiar el siguiente enlace y pegar en el navegador mientras se esta logueado en el sitio: <a href='{datosEmail.URL}validacionEmail/{usuario}'>{datosEmail.URL}validacionEmail/{usuario}</a>" };
 
                 // Configuro el envio del correo
                 using var smtp = new SmtpClient();
