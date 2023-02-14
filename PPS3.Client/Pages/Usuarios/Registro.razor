@@ -125,7 +125,7 @@
                                 else
                                 {
                                     <MudSelect T="int" @bind-Value="@loca" Label="Localidad" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                                        @foreach (var local in loc)
+                                        @foreach (var local in locFiltradas)
                                         {
                                             <MudSelectItem Value="@local.IdLocalidad">@(loc.ToList().IndexOf(local) + 1) - @local.NombreLoc</MudSelectItem>
                                         }
@@ -186,10 +186,12 @@
         tipoDoc = await ServTipoDoc.ObtenerTiposDocs();
         loc = await ServLocalidad.ObtenerLocalidades();
         provs = await ServProvincia.ObtenerProvincias();
+        BuscarLocalidad();
     }
 
     private void BuscarLocalidad()
     {
+        locFiltradas = new List<Localidad>();
         locFiltradas = loc.Where(x => x.Provincia == prov);
         if(locFiltradas == null || locFiltradas.Count() == 0)
         {

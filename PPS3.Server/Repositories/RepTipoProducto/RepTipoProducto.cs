@@ -107,6 +107,7 @@
             var sql = @"
                         SELECT *
                         FROM productos_tipos
+                        WHERE Activo=1
                         ORDER BY DescripcionTipo
                         ";
 

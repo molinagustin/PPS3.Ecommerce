@@ -93,10 +93,10 @@
 
         if(id > 0)
         {
-            localidad.UsuarioCrea = localidad.UsuarioModif = idUsAct;
+            localidad.UsuarioModif = idUsAct;
             prov = localidad.Provincia;
         }
-        else localidad.UsuarioModif = idUsAct;
+        else localidad.UsuarioCrea = localidad.UsuarioModif = idUsAct;
     }
 
     protected async Task GuardarLocalidad()

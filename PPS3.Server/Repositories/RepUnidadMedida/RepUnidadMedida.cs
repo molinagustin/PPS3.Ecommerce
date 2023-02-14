@@ -90,6 +90,7 @@ namespace PPS3.Server.Repositories.RepUnidadMedida
             var sql = @"
                         SELECT *
                         FROM unidades_medida
+                        WHERE Activo = 1
                         ORDER BY DescripcionUnidad
                         ";
 

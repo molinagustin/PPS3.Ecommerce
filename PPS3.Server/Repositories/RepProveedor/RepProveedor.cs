@@ -114,6 +114,7 @@
             var sql = @"
                         SELECT *
                         FROM proveedores
+                        WHERE Activo = 1
                         ORDER BY NombreProv
                         ";
 

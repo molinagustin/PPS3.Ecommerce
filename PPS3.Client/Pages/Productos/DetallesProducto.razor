@@ -37,7 +37,7 @@
                 
                     @if (rubros != null)
                     {
-                        <MudSelect T="int" @bind-Value="@rub" Label="Rubro" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" onchange="@(()=>FiltrarTiposProductos)">
+                        <MudSelect T="int" @bind-Value="@rub" Label="Rubro" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="FiltrarTiposProductos">
                             @foreach(var rubro in rubros)
                             {
                                 <MudSelectItem Value="@rubro.IdRubro" >@(rubros.ToList().IndexOf(rubro) + 1) - @rubro.DescRubro</MudSelectItem>
@@ -49,20 +49,25 @@
                         <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
                     }
                 
-                    @if (tiposProdsPorRubro != null && tiposProdsPorRubro.Count() > 0)
+                    @if (tiposProdsPorRubro != null)
                     {
-                        <MudSelect T="int" @bind-Value="@tipo" Label="Tipo de Producto" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Immediate=true>
-                            @foreach (var tp in tiposProdsPorRubro)
-                            {
-                                <MudSelectItem Value="@tp.IdTipo">@(tiposProdsPorRubro.ToList().IndexOf(tp) + 1) - @tp.DescripcionTipo</MudSelectItem>
-                            }
-                        </MudSelect>
+                        @if(tiposProdsPorRubro.Count() > 0)
+                        {
+                            <MudSelect T="int" @bind-Value="@tipo" Label="Tipo de Producto" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Immediate=true>
+                                @foreach (var tp in tiposProdsPorRubro)
+                                {
+                                    <MudSelectItem Value="@tp.IdTipo">@(tiposProdsPorRubro.ToList().IndexOf(tp) + 1) - @tp.DescripcionTipo</MudSelectItem>
+                                }
+                            </MudSelect>
+                        }
+                        else
+                        {
+                            <MudText Align="Align.Center" Color="Color.Error" Typo="Typo.body1">Sin Tipos de Productos</MudText>
+                        }
                     }
                     else
-                    {
-                        tipo = 9999;
-                        <MudText Align="Align.Center" Color="Color.Info" Typo="Typo.body1">Sin Tipos de Productos</MudText>
-                        @*<MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />*@
+                    {         
+                        <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
                     }
 
                     <label for="costo">Precio Costo (Precio sin ganancia)</label>
@@ -83,12 +88,19 @@
 
                     @if (provs != null)
                     {
-                        <MudSelect T="int" @bind-Value="@prov" Label="Proveedor" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                            @foreach(var pv in provs)
-                            {
-                                <MudSelectItem Value="@pv.IdProveedor">@(provs.ToList().IndexOf(pv) + 1) - @pv.NombreProv</MudSelectItem>
-                            }
-                        </MudSelect>
+                        if(provs.Count() > 0)
+                        {
+                            <MudSelect T="int" @bind-Value="@prov" Label="Proveedor" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                @foreach(var pv in provs)
+                                {
+                                    <MudSelectItem Value="@pv.IdProveedor">@(provs.ToList().IndexOf(pv) + 1) - @pv.NombreProv</MudSelectItem>
+                                }
+                            </MudSelect>                            
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.body1" Align="Align.Center" Color="Color.Error">Sin Proveedores Para Seleccionar</MudText>
+                        }
                     }
                     else
                     {
@@ -176,6 +188,7 @@
     private string strStock = "0";
     private decimal stock = 0;
     private int focusControl = 0;
+    private bool firstStart = true;
 
     //Se verifica si el formulario sera de insercion o de modificacion
     protected override async Task OnInitializedAsync()
@@ -423,13 +436,20 @@
 
     protected void FiltrarTiposProductos()
     {
-        tiposProdsPorRubro = null;
+        tipo = 9999;
+        tiposProdsPorRubro = new List<TipoProducto>();
         tiposProdsPorRubro = tiposProds.Where(t => t.Rubro == rub).Where(t=> t.Activo = true);
-        if (tiposProdsPorRubro != null && tiposProdsPorRubro.Count() > 0)
-        {
-            tipo = 9999;
-            tipo = tiposProdsPorRubro.First().IdTipo;
-        }            
+        if (tiposProdsPorRubro.Count() > 0)
+        {            
+            if(id > 0 && firstStart)
+            {
+                firstStart = false;
+                tipo = producto.TipoProd;
+            }
+            else tipo = tiposProdsPorRubro.First().IdTipo;
+            
+            StateHasChanged();
+        }        
     }
 
     private async Task GuardandoRegistro()

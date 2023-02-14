@@ -173,7 +173,7 @@ else
                                     else
                                     {
                                         <MudSelect T="int" @bind-Value="@loca" Label="Localidad" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                                            @foreach (var local in loc)
+                                            @foreach (var local in locFiltradas)
                                             {
                                                 <MudSelectItem Value="@local.IdLocalidad">@(loc.ToList().IndexOf(local) + 1) - @local.NombreLoc</MudSelectItem>
                                             }
@@ -276,6 +276,7 @@ else
 
     private void BuscarLocalidad()
     {
+        locFiltradas = new List<Localidad>();
         locFiltradas = loc.Where(x => x.Provincia == prov);
         if (locFiltradas == null || locFiltradas.Count() == 0)
         {
@@ -287,6 +288,7 @@ else
             sinLocalidad = false;
             loca = locFiltradas.First().IdLocalidad;
         }
+        StateHasChanged();
     }
 
     protected async Task GuardarPerfil()
@@ -384,9 +386,11 @@ else
             usuarioCliente.LocalidadC = cliente.LocalidadC;
 
             cond = usuarioCliente.CondIva;
-            tipoDocu = usuarioCliente.TipoDocumento;
+            tipoDocu = usuarioCliente.TipoDocumento;     
+            
+            prov = loc.Where(x => x.IdLocalidad == usuarioCliente.LocalidadC).First().Provincia;
+            BuscarLocalidad();
             loca = usuarioCliente.LocalidadC;
-            prov = loc.Where(x=>x.IdLocalidad == loca).First().Provincia;
 
             //Masculino - Femenino - Otro
             if (usuarioCliente.Genero == 'M')

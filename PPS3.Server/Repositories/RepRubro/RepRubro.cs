@@ -111,6 +111,7 @@
             var sql = @"
                         SELECT * 
                         FROM rubros
+                        WHERE Activo=1
                         ORDER BY DescRubro
                         ";
 

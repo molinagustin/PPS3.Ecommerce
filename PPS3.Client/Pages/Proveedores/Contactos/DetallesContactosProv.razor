@@ -34,12 +34,19 @@
 
                     @if (proveedores != null)
                     {
-                        <MudSelect T="int" @bind-Value="@prov" Label="Proveedor" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                            @foreach(var pv in proveedores)
-                            {
-                                <MudSelectItem Value="@pv.IdProveedor">@(proveedores.ToList().IndexOf(pv) + 1) - @pv.NombreProv</MudSelectItem>
-                            }
-                        </MudSelect>
+                        @if(proveedores.Count() > 0)
+                        {
+                            <MudSelect T="int" @bind-Value="@prov" Label="Proveedor" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                @foreach(var pv in proveedores)
+                                {
+                                    <MudSelectItem Value="@pv.IdProveedor">@(proveedores.ToList().IndexOf(pv) + 1) - @pv.NombreProv</MudSelectItem>
+                                }
+                            </MudSelect>
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.body1" Align="Align.Center" Color="Color.Error">Sin Proveedores Para Seleccionar</MudText>
+                        }
                     }
                     else
                     {
