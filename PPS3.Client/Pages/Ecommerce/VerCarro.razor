@@ -32,7 +32,7 @@ else
                 <RadzenGridColumn TItem="DetalleCarroCompra" Width="40px" TextAlign="Radzen.TextAlign.Center" Property="NombreProducto" Title="Producto">
                     <Template Context="prod">
                         <RadzenImage Path="@prod.UrlImagen" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px; float: left;" />
-                        <h6 class="mt-1 mb-0">@prod.NombreProducto</h6>
+                        <h6 class="mt-1 mb-0"><a href="/verProducto/@prod.Producto">@prod.NombreProducto</a></h6>
                     </Template>
                 </RadzenGridColumn>
                 <RadzenGridColumn TItem="DetalleCarroCompra" TextAlign="Radzen.TextAlign.Center" Property="Descripcion" Title="Descripcion" Width="50px"></RadzenGridColumn>
