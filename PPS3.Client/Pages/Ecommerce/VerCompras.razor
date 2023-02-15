@@ -54,7 +54,7 @@
                                 }
                             </Template>
                         </RadzenGridColumn>
-                        <RadzenGridColumn TItem="OrdenesCompraListado" Width="40px" TextAlign="Radzen.TextAlign.Center" Property="FechaUltModif" Title="Ultima Modif."/>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Width="40px" TextAlign="Radzen.TextAlign.Center" Property="FechaUltModif" Title="Última Modif."/>
                         <RadzenGridColumn TItem="OrdenesCompraListado" Width="40px" TextAlign="Radzen.TextAlign.Left" Property="Total" Title="Importe Total">
                             <Template Context="importe">
                                 @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", importe.Total)
@@ -96,7 +96,7 @@
             }
             else
             {
-                <MudText Align="Align.Center" Typo="Typo.h5" Color="Color.Info">Todavia no has realizado ningun pedido. ¡Animate a realizar uno!</MudText>
+                <MudText Align="Align.Center" Typo="Typo.h5" Color="Color.Info">Todavía no has realizado ningún pedido. ¡Anímate a realizar uno!</MudText>
             }
         }
     </Authorized>
@@ -104,7 +104,7 @@
     <NotAuthorized>
         <input type="hidden" id="UsAct" value="0" />
 
-        <MudText Align="Align.Center" Typo="Typo.h4" Color="Color.Error">No esta autorizado a ver el contenido</MudText>
+        <MudText Align="Align.Center" Typo="Typo.h4" Color="Color.Error">No está autorizado a ver el contenido</MudText>
     </NotAuthorized>
 </AuthorizeView>
 

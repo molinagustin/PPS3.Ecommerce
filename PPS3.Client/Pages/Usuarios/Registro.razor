@@ -16,21 +16,21 @@
             <MudCard>
                 <MudCardHeader>
                     <CardHeaderContent>
-                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos de Sesion</MudText>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos de Sesión</MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent>
                     <MudTextField Label="Nombre Completo" HelperText="Apellido-Nombre para mejor servicio"
                               @bind-Value="usuarioCliente.NombreCompleto" For="@(() => usuarioCliente.NombreCompleto)"
                               AutoFocus = "true"/>
-                    <MudTextField Label="Nombre de Usuario" HelperText="Nombre para iniciar sesion"
+                    <MudTextField Label="Nombre de Usuario" HelperText="Nombre para iniciar sesión"
                               @bind-Value="usuarioCliente.NombreUs" For="@(() => usuarioCliente.NombreUs)"/>
-                    <MudTextField Label="Email" HelperText="Correo electronico"
+                    <MudTextField Label="Email" HelperText="Correo electrónico"
                               @bind-Value="usuarioCliente.Email" For="@(() => usuarioCliente.Email)"/>
-                    <MudTextField Label="Contraseña" HelperText="Minimo 4 caracteres" Class="mt-3"
+                    <MudTextField Label="Contraseña" HelperText="Mínimo 4 caracteres" Class="mt-3"
                                   @bind-Value="usuarioCliente.Password" For="@(() => usuarioCliente.Password)" 
                                   InputType="InputType.Password"/>
-                    <MudTextField Label="Repetir Contraseña" HelperText="Minimo 4 caracteres" Class="mt-3"
+                    <MudTextField Label="Repetir Contraseña" HelperText="Mínimo 4 caracteres" Class="mt-3"
                                   @bind-Value="password2" For="@(() => usuarioCliente.Password)" InputType="InputType.Password"/>
                 </MudCardContent>
             </MudCard>
@@ -47,14 +47,14 @@
                     <MudStack Row="true">
                         <MudStack Style="width:50%">
                             <MudSelect T="string" @bind-Value="@tipoCl" Label="Tipo de Cliente/Persona" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                                <MudSelectItem Value="@("Fisica")">@string.Format("1- Fisica")</MudSelectItem>
-                                <MudSelectItem Value="@("Juridica")">@string.Format("2- Juridica")</MudSelectItem>
+                                <MudSelectItem Value="@("Fisica")">@string.Format("1- Física")</MudSelectItem>
+                                <MudSelectItem Value="@("Juridica")">@string.Format("2- Jurídica")</MudSelectItem>
                             </MudSelect>
                         </MudStack>
                         <MudStack Style="width:50%">
                             @if (condIva != null)
                             {
-                                <MudSelect T="int" @bind-Value="@cond" Label="Condicion IVA" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                <MudSelect T="int" @bind-Value="@cond" Label="Condición IVA" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                                     @foreach(var condicion in condIva)
                                     {
                                         <MudSelectItem Value="@condicion.IdCondicion">@(condIva.ToList().IndexOf(condicion) + 1) - @condicion.DescripcionCond</MudSelectItem>
@@ -70,7 +70,7 @@
                     
                     @if(tipoCl == "Fisica")
                     {
-                        <MudSelect T="string" @bind-Value="@genero" Label="Genero" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelect T="string" @bind-Value="@genero" Label="Género" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                             <MudSelectItem Value="@("Masculino")">@string.Format("1- Masculino")</MudSelectItem>
                             <MudSelectItem Value="@("Femenino")">@string.Format("2- Femenino")</MudSelectItem>
                             <MudSelectItem Value="@("Otro")">@string.Format("3- Otro")</MudSelectItem>
@@ -94,7 +94,7 @@
                             }
                         </MudStack>
                         <MudStack Style="width:50%">
-                            <MudTextField Label="Numero de Documento" HelperText="Solo numeros."
+                            <MudTextField Label="Número de Documento" HelperText="Solo números."
                                       @bind-Value="usuarioCliente.NumDocumento" For="@(() => usuarioCliente.NumDocumento)"/>
                         </MudStack>
                     </MudStack>
@@ -127,7 +127,7 @@
                                     <MudSelect T="int" @bind-Value="@loca" Label="Localidad" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                                         @foreach (var local in locFiltradas)
                                         {
-                                            <MudSelectItem Value="@local.IdLocalidad">@(loc.ToList().IndexOf(local) + 1) - @local.NombreLoc</MudSelectItem>
+                                            <MudSelectItem Value="@local.IdLocalidad">@local.NombreLoc</MudSelectItem>
                                         }
                                     </MudSelect>                                    
                                 }
@@ -141,10 +141,10 @@
 
                     <MudStack Row="true" Justify="Justify.Center">
                         <MudStack Style="width:50%">
-                            <MudTextField Label="Numero de Telefono" HelperText="Sin 15, 0 ni espacios o caracteres especiales." @bind-Value="usuarioCliente.Telefono" For="@(() => usuarioCliente.Telefono)" />
+                            <MudTextField Label="Número de Teléfono" HelperText="Sin 15, 0 ni espacios o caracteres especiales." @bind-Value="usuarioCliente.Telefono" For="@(() => usuarioCliente.Telefono)" />
                         </MudStack>
                         <MudStack Style="width:50%">
-                            <MudTextField Label="Domicilio" HelperText="Mas detalle, mejor servicio." @bind-Value="usuarioCliente.DomicilioC" For="@(() => usuarioCliente.DomicilioC)"/>
+                            <MudTextField Label="Domicilio" HelperText="Más detalle, mejor servicio." @bind-Value="usuarioCliente.DomicilioC" For="@(() => usuarioCliente.DomicilioC)"/>
                         </MudStack>
                     </MudStack>
 
@@ -207,6 +207,23 @@
 
     private async Task Registrarse()
     {
+        if (tipoDocu == 1 || tipoDocu == 2)
+        {
+            if(usuarioCliente.NumDocumento.Trim().Length != 11)
+            {
+                Snackbar.Add($"El número de documento no es válido.", Severity.Error);
+                return;
+            }
+        }
+        else
+        {
+            if (usuarioCliente.NumDocumento.Trim().Length != 8)
+            {
+                Snackbar.Add($"El número de documento no es válido.", Severity.Error);
+                return;
+            }
+        }
+
         if(sinLocalidad)
         {
             Snackbar.Add($"Debe seleccionar una provincia y localidad correcta.", Severity.Error);
@@ -214,7 +231,7 @@
         }
 
         if(string.IsNullOrEmpty(usuarioCliente.Password) || string.IsNullOrEmpty(password2))
-            Snackbar.Add($"Las contraseñas no pueden estar vacias", Severity.Error);
+            Snackbar.Add($"Las contraseñas no pueden estar vacías", Severity.Error);
         else
             if (usuarioCliente.Password == password2)
             {
@@ -235,7 +252,7 @@
                 {
                     //Si se registro el usuario correctamente, le envio un email                    
                     NavigationManager.NavigateTo("/login");
-                    Snackbar.Add($"Registro exitoso, ahora puede iniciar sesion.", Severity.Success);
+                    Snackbar.Add($"Registro exitoso, ahora puede iniciar sesión.", Severity.Success);
                 }                    
                 else
                 {

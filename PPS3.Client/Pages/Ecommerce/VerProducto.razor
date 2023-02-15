@@ -41,7 +41,7 @@ else
             <MudCard Elevation="1">
                 <MudCardHeader>
                     <CardHeaderContent>
-                        <MudText Typo="Typo.h5" Align="Align.Center" Color="Color.Primary"><b>Informacion</b></MudText>
+                        <MudText Typo="Typo.h5" Align="Align.Center" Color="Color.Primary"><b>Información</b></MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent>
@@ -76,7 +76,7 @@ else
                     {
                         <MudText Align="Align.Left" Typo="Typo.h6"><b>Precio: </b>$@producto.PrecioFinal</MudText>
                     }
-                    <MudText Align="Align.Left" Typo="Typo.h6"><b>Calificacion: </b> <MudRating ReadOnly=true SelectedValue="4"/></MudText>
+                    <MudText Align="Align.Left" Typo="Typo.h6"><b>Calificación: </b> <MudRating ReadOnly=true SelectedValue="4"/></MudText>
                 </MudCardContent>
             </MudCard>            
         </MudItem>
@@ -105,7 +105,7 @@ else
                     </EditForm>                    
                 </Authorized>    
                 <NotAuthorized>
-                    <MudText Align="Align.Center" Typo="Typo.h6">Para agregar el producto al carro, debe loguearse o registrarse si todavia no tiene una cuenta.</MudText>
+                    <MudText Align="Align.Center" Typo="Typo.h6">Para agregar el producto al carro, debe loguearse o registrarse si todavía no tiene una cuenta.</MudText>
                     <MudTextField Label="Cantidad" HelperText="Formato 999,99 ó 999" @bind-Value="cantidad" Required="true" Disabled=true/>
                     <MudButton StartIcon="@Icons.Material.Filled.AddCircle" Color="Color.Success" Variant="Variant.Filled" Disabled=true>Agregar al Carro</MudButton>
                 </NotAuthorized>
@@ -120,7 +120,7 @@ else
             <MudCard Elevation="1">
                 <MudCardHeader>
                     <CardHeaderContent>
-                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary"><b>Descripcion del Producto</b></MudText>
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary"><b>Descripción del Producto</b></MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent>
@@ -141,33 +141,33 @@ else
                 <MudAvatar Color="Color.Transparent" Size="Size.Large" Image="images/avatar_hombre_1.jpg" />
                 <MudText Align="Align.Left" Typo="Typo.body1" Style="margin-bottom:5px; margin-top:15px;" Color="Color.Primary">Andres Martinez</MudText>
             </MudStack>
-            <MudText Align="Align.Left" Typo="Typo.body2" Style="margin-bottom:5px;" Color="Color.Default">"¡La atencion impecable, y su coordinacion para la entrega de productos fue muy buena!"</MudText>
+            <MudText Align="Align.Left" Typo="Typo.body2" Style="margin-bottom:5px;" Color="Color.Default">"¡La atención impecable, y su coordinación para la entrega de productos fue muy buena!"</MudText>
             <MudRating ReadOnly=true SelectedValue="4"></MudRating>
 
             <MudStack Row=true>
                 <MudAvatar Color="Color.Transparent" Size="Size.Large" Image="images/avatar_mujer.png" />
                 <MudText Align="Align.Left" Typo="Typo.body1" Style="margin-bottom:5px; margin-top:15px;" Color="Color.Primary">Fernanda Lopez</MudText>
             </MudStack>
-            <MudText Align="Align.Left" Typo="Typo.body2" Style="margin-bottom:5px;" Color="Color.Default">"Me gusto la facilidad con que pude ordenar mis productos, sin tantas vueltas, ¡solo un par de clicks y listo!"</MudText>
+            <MudText Align="Align.Left" Typo="Typo.body2" Style="margin-bottom:5px;" Color="Color.Default">"Me gustó la facilidad con que pude ordenar mis productos, sin tantas vueltas, ¡solo un par de clicks y listo!"</MudText>
             <MudRating ReadOnly=true SelectedValue="4"></MudRating>
         </MudItem>
 
         <MudItem xs="6">
-            <MudText Align="Align.Center" Typo="Typo.h6"><b>¡Tú opinion nos interesa!</b></MudText>
+            <MudText Align="Align.Center" Typo="Typo.h6"><b>¡Tú opinión nos interesa!</b></MudText>
 
-            <MudTextField T="string" Label="Que opinas del producto" Variant="Variant.Outlined" Lines="5" Style="margin-bottom:10px;"/>
+            <MudTextField T="string" Label="Qué opinas del producto" Variant="Variant.Outlined" Lines="5" Style="margin-bottom:10px;"/>
 
             <MudText Align="Align.Left" Typo="Typo.h6" Style="margin-bottom:25px;"><b>Tú Calificación: </b> <MudRating SelectedValue="0"/></MudText>
 
             <AuthorizeView Context="usCont">
                 <Authorized>
                     <MudGrid Justify="Justify.Center">
-                        <MudButton StartIcon="@Icons.Material.Filled.SavedSearch" Color="Color.Info" Variant="Variant.Filled">Guardar Opinion</MudButton>
+                        <MudButton StartIcon="@Icons.Material.Filled.SavedSearch" Color="Color.Info" Variant="Variant.Filled" Disabled=true>Guardar Opinión</MudButton>
                     </MudGrid>                    
                 </Authorized>
 
                 <NotAuthorized>
-                    <MudText Align="Align.Center" Typo="Typo.h6">Para dejar su opinion, le pedimos por favor que se loguee primero.</MudText>
+                    <MudText Align="Align.Center" Typo="Typo.h6">Para dejar su opinión, le pedimos por favor que se loguee primero.</MudText>
                 </NotAuthorized>
             </AuthorizeView>
         </MudItem>
@@ -263,7 +263,7 @@ else
                     {
                         //Consulto si quiere ver el carro o seguir comprando
                         var result = await DialogService.ShowMessageBox(
-                                    "Elegir Accion",
+                                    "Elegir Acción",
                                     "El producto fue agregado. ¿Ver carro de compra?",
                                     yesText: "Ver Carro", cancelText: "Seguir Viendo Productos");
 

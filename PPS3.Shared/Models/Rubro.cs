@@ -5,7 +5,7 @@ namespace PPS3.Shared.Models
     public class Rubro
     {
         public int IdRubro { get; set; }
-        [Required(ErrorMessage = "Se debe introducir una Descripcion del Rubro.")]
+        [Required(ErrorMessage = "Se debe introducir una Descripción del Rubro.")]
         public string DescRubro { get; set; } = string.Empty;
         public bool Activo { get; set; }
         public int UsuarioCrea { get; set; }

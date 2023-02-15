@@ -7,15 +7,15 @@ namespace PPS3.Shared.Models
         public int IdCliente { get; set; }
         [Required(ErrorMessage = "El Tipo de Cliente debe ser completado.")]
         public char TipoCliente { get; set; }
-        [Required(ErrorMessage = "El Genero del Cliente debe ser seleccionado.")]
+        [Required(ErrorMessage = "El Género del Cliente debe ser seleccionado.")]
         public char Genero { get; set; }
         [Required(ErrorMessage = "El Tipo de Documento del Cliente ha de ser seleccionado.")]
         public int TipoDocumento { get; set; }
-        [Required(ErrorMessage = "Se debe introducir el Numero de Documento del Cliente.")]
+        [Required(ErrorMessage = "Se debe introducir el Número de Documento del Cliente.")]
         public string NumDocumento { get; set; } = string.Empty;
         [Required(ErrorMessage = "Se debe cargar el Nombre Completo del Cliente.")]
         public string NombreCompleto { get; set; } = string.Empty ;
-        [Required(ErrorMessage = "Se debe seleccionar una Condicion de IVA del cliente.")]
+        [Required(ErrorMessage = "Se debe seleccionar una Condición de IVA del cliente.")]
         public int CondIva { get; set; }
         [Required(ErrorMessage = "Se debe cargar el Domicilio del Cliente.")]
         public string DomicilioC { get; set; } = string.Empty;

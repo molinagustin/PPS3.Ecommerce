@@ -61,7 +61,7 @@ else
                                     <MudGrid Justify="Justify.Center" Style="margin-top:20px;">
                                         @if(!enviandoEmail)
                                         {
-                                            <MudButton EndIcon="@Icons.Material.Filled.Send" Color="Color.Info" Variant="Variant.Outlined" OnClick="EnviarEmail" Disabled=enviandoEmail>Reenviar Email de Verificacion</MudButton>  
+                                            <MudButton EndIcon="@Icons.Material.Filled.Send" Color="Color.Info" Variant="Variant.Outlined" OnClick="EnviarEmail" Disabled=enviandoEmail>Reenviar Email de Verificación</MudButton>  
                                         }
                                         else
                                         {
@@ -75,11 +75,11 @@ else
                             </MudGrid>                                
                         }
 
-                        <MudTextField Label="Contraseña Actual" HelperText="Minimo 4 caracteres" @bind-Value="usuarioCliente.Password" For="@(() => usuarioCliente.Password)" InputType="InputType.Password" />
+                        <MudTextField Label="Contraseña Actual" HelperText="Mínimo 4 caracteres" @bind-Value="usuarioCliente.Password" For="@(() => usuarioCliente.Password)" InputType="InputType.Password" />
 
-                        <MudTextField Label="Nueva Contraseña" HelperText="Minimo 4 caracteres" Class="mt-3" @bind-Value="passNuevo" For="@(() => usuarioCliente.CambioPassword)" InputType="InputType.Password" />
+                        <MudTextField Label="Nueva Contraseña" HelperText="Mínimo 4 caracteres" Class="mt-3" @bind-Value="passNuevo" For="@(() => usuarioCliente.CambioPassword)" InputType="InputType.Password" />
 
-                        <MudTextField Label="Repetir Nueva Contraseña" HelperText="Minimo 4 caracteres" Class="mt-3" @bind-Value="passNuevo2" For="@(() => usuarioCliente.CambioPassword)" InputType="InputType.Password" />
+                        <MudTextField Label="Repetir Nueva Contraseña" HelperText="Mínimo 4 caracteres" Class="mt-3" @bind-Value="passNuevo2" For="@(() => usuarioCliente.CambioPassword)" InputType="InputType.Password" />
                     </MudCardContent>
                 </MudCard>
             </MudItem>
@@ -95,14 +95,14 @@ else
                         <MudStack Row="true">
                             <MudStack Style="width:50%">
                                 <MudSelect T="string" @bind-Value="@tipoCl" Label="Tipo de Cliente/Persona" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                                    <MudSelectItem Value="@("Fisica")">@string.Format("1- Fisica")</MudSelectItem>
-                                    <MudSelectItem Value="@("Juridica")">@string.Format("2- Juridica")</MudSelectItem>
+                                    <MudSelectItem Value="@("Fisica")">@string.Format("1- Física")</MudSelectItem>
+                                    <MudSelectItem Value="@("Juridica")">@string.Format("2- Jurídica")</MudSelectItem>
                                 </MudSelect>
                             </MudStack>
                             <MudStack Style="width:50%">
                                 @if (condIva != null)
                                 {
-                                    <MudSelect T="int" @bind-Value="@cond" Label="Condicion IVA" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                    <MudSelect T="int" @bind-Value="@cond" Label="Condición IVA" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                                         @foreach(var condicion in condIva)
                                         {
                                             <MudSelectItem Value="@condicion.IdCondicion">@(condIva.ToList().IndexOf(condicion) + 1) - @condicion.DescripcionCond</MudSelectItem>
@@ -118,7 +118,7 @@ else
                     
                         @if(tipoCl == "Fisica")
                         {
-                            <MudSelect T="string" @bind-Value="@genero" Label="Genero" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                            <MudSelect T="string" @bind-Value="@genero" Label="Género" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                                 <MudSelectItem Value="@("Masculino")">@string.Format("1- Masculino")</MudSelectItem>
                                 <MudSelectItem Value="@("Femenino")">@string.Format("2- Femenino")</MudSelectItem>
                                 <MudSelectItem Value="@("Otro")">@string.Format("3- Otro")</MudSelectItem>
@@ -142,7 +142,7 @@ else
                                 }
                             </MudStack>
                             <MudStack Style="width:50%">
-                                <MudTextField Label="Numero de Documento" HelperText="Solo numeros."
+                                <MudTextField Label="Número de Documento" HelperText="Solo números."
                                           @bind-Value="usuarioCliente.NumDocumento" For="@(() => usuarioCliente.NumDocumento)"/>
                             </MudStack>
                         </MudStack>
@@ -175,7 +175,7 @@ else
                                         <MudSelect T="int" @bind-Value="@loca" Label="Localidad" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                                             @foreach (var local in locFiltradas)
                                             {
-                                                <MudSelectItem Value="@local.IdLocalidad">@(loc.ToList().IndexOf(local) + 1) - @local.NombreLoc</MudSelectItem>
+                                                <MudSelectItem Value="@local.IdLocalidad">@local.NombreLoc</MudSelectItem>
                                             }
                                         </MudSelect>
                                     }
@@ -189,10 +189,10 @@ else
 
                         <MudStack Row="true" Justify="Justify.Center">
                             <MudStack Style="width:50%">
-                                <MudTextField Label="Numero de Telefono" HelperText="Sin 15, 0 ni espacios o caracteres especiales." @bind-Value="usuarioCliente.Telefono" For="@(() => usuarioCliente.Telefono)" />
+                                <MudTextField Label="Número de Teléfono" HelperText="Sin 15, 0 ni espacios o caracteres especiales." @bind-Value="usuarioCliente.Telefono" For="@(() => usuarioCliente.Telefono)" />
                             </MudStack>
                             <MudStack Style="width:50%">
-                                <MudTextField Label="Domicilio" HelperText="Mas detalle, mejor servicio." @bind-Value="usuarioCliente.DomicilioC" For="@(() => usuarioCliente.DomicilioC)" />
+                                <MudTextField Label="Domicilio" HelperText="Más detalle, mejor servicio." @bind-Value="usuarioCliente.DomicilioC" For="@(() => usuarioCliente.DomicilioC)" />
                             </MudStack>
                         </MudStack>
 
@@ -293,6 +293,23 @@ else
 
     protected async Task GuardarPerfil()
     {
+        if (tipoDocu == 1 || tipoDocu == 2)
+        {
+            if (usuarioCliente.NumDocumento.Trim().Length != 11)
+            {
+                Snackbar.Add($"El número de documento no es válido.", Severity.Error);
+                return;
+            }
+        }
+        else
+        {
+            if (usuarioCliente.NumDocumento.Trim().Length != 8)
+            {
+                Snackbar.Add($"El número de documento no es válido.", Severity.Error);
+                return;
+            }
+        }
+
         if (sinLocalidad)
         {
             Snackbar.Add($"Debe seleccionar una provincia y localidad correcta.", Severity.Error);
@@ -360,7 +377,7 @@ else
 
         }
         else
-            Snackbar.Add($"La contraseña actual no puede estar vacia", Severity.Error);
+            Snackbar.Add($"La contraseña actual no puede estar vacía", Severity.Error);
     }
 
     protected void Volver() => NavigationManager.NavigateTo("/");
@@ -430,12 +447,12 @@ else
             if(actualizado)
             {
                 NavigationManager.NavigateTo("/");
-                Snackbar.Add($"Email reenviado con exito. Recuerde estar logueado al momento de validar el email.", Severity.Success);
+                Snackbar.Add($"Email reenviado con éxito.", Severity.Success);
             }
             else
             {
                 NavigationManager.NavigateTo("/");
-                Snackbar.Add($"Se envio un email pero no se pudo actualizar los datos del usuario, compruebe los mismos.", Severity.Warning);
+                Snackbar.Add($"Se envió un email pero no se pudo actualizar los datos del usuario, compruebe los mismos.", Severity.Warning);
             }            
         }
         else

@@ -20,7 +20,7 @@
                 <MudCardContent>
                     <MudTextField Label="Nombre Real del Usuario" HelperText="Nombre Completo" @bind-Value="usuario.NombreCompleto" For="@(() => usuario.NombreCompleto)" AutoFocus = "true" Required="true"/>
 
-                    <MudTextField Label="Nombre de Usuario" HelperText="Nombre Inicio Sesion" @bind-Value="usuario.NombreUs" For="@(() => usuario.NombreUs)" Required="true"/>
+                    <MudTextField Label="Nombre de Usuario" HelperText="Nombre Inicio Sesión" @bind-Value="usuario.NombreUs" For="@(() => usuario.NombreUs)" Required="true"/>
 
                     @if(privilegios != null)
                     {
@@ -36,7 +36,7 @@
                         <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
                     }
 
-                    <MudTextField Label="Email" HelperText="Correo electronico"
+                    <MudTextField Label="Email" HelperText="Correo electrónico"
                                 @bind-Value="usuario.Email" For="@(() => usuario.Email)"/>
 
                     <MudSwitch @bind-Checked="emailChecked" Label="Email Confirmado" Color="Color.Success"/>

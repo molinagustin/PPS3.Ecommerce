@@ -35,7 +35,7 @@ else
                         <h6 class="mt-1 mb-0"><a href="/verProducto/@prod.Producto">@prod.NombreProducto</a></h6>
                     </Template>
                 </RadzenGridColumn>
-                <RadzenGridColumn TItem="DetalleCarroCompra" TextAlign="Radzen.TextAlign.Center" Property="Descripcion" Title="Descripcion" Width="50px"></RadzenGridColumn>
+                <RadzenGridColumn TItem="DetalleCarroCompra" TextAlign="Radzen.TextAlign.Center" Property="Descripcion" Title="Descripción" Width="50px"></RadzenGridColumn>
                 <RadzenGridColumn TItem="DetalleCarroCompra" Property="Cantidad" Title="Cantidad" Width="10px"></RadzenGridColumn>
                 <RadzenGridColumn TItem="DetalleCarroCompra" Property="DescripcionUnidad" Title="Unidad Medida" Width="15px"></RadzenGridColumn>                
                 <RadzenGridColumn TItem="DetalleCarroCompra" Property="PrecioUnit" Title="Precio" Width="15px">
@@ -81,7 +81,7 @@ else
     }
     else
     {
-        <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Info">No tienes ningun producto, ¡ve a comprar algo!</MudText>
+        <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Info">No tienes ningún producto, ¡ve a comprar algo!</MudText>
     }
 }
 
@@ -140,7 +140,7 @@ else
 
                 var movimientoCreado = await ServMovCarro.CrearMovimiento(movimiento);
                 if(!movimientoCreado)
-                    Snackbar.Add($"No se creo el movimiento", Severity.Error);                   
+                    Snackbar.Add($"No se creó el movimiento", Severity.Error);                   
 
                 //Le creo el nuevo carro en estado Activo y redirijo el usuario al listado de compras
                 CarroCompra nuevoCarro = new CarroCompra();

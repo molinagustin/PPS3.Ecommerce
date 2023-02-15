@@ -28,9 +28,9 @@
 
                     <MudTextField Label="Domicilio del Contacto" HelperText="Con detalles" @bind-Value="contacto.Domicilio" For="@(() => contacto.Domicilio)" />
 
-                    <MudTextField Label="Telefono del Contacto" HelperText="Solo numeros sin espacios o guiones" @bind-Value="contacto.Telefono" For="@(() => contacto.Telefono)" />
+                    <MudTextField Label="Teléfono del Contacto" HelperText="Solo números sin espacios o guiones" @bind-Value="contacto.Telefono" For="@(() => contacto.Telefono)" />
 
-                    <MudTextField Label="Email" HelperText="Correo electronico" @bind-Value="contacto.Email" For="@(() => contacto.Email)" />
+                    <MudTextField Label="Email" HelperText="Correo electrónico" @bind-Value="contacto.Email" For="@(() => contacto.Email)" />
 
                     @if (proveedores != null)
                     {
@@ -90,7 +90,7 @@
         {
             //Le doy la opcion al usuario de seguir creando registros o volver a la lista de contactos
             var resultDialog = await DialogService.ShowMessageBox(
-                                    "Elegir Accion",
+                                    "Elegir Acción",
                                     "Contacto de proveedor agregado. ¿Crear otro?",
                                     yesText: "Si", cancelText: "No");
 

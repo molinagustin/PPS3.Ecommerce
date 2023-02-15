@@ -111,7 +111,7 @@
 
                 //Si existen productos activos, no dejo dar de baja ese tipo de producto
                 if (cantProdActivos > 0)
-                    Snackbar.Add($"No se puede dar de baja el tipo de producto ya que todavia existen {cantProdActivos} productos activos en el mismo.", Severity.Error);
+                    Snackbar.Add($"No se puede dar de baja el tipo de producto ya que todavía existen {cantProdActivos} productos activos en el mismo.", Severity.Error);
                 else
                     await CodigoInterno();
             }

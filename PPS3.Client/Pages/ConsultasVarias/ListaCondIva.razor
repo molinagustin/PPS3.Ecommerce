@@ -17,20 +17,20 @@ else
             <MudTextField @bind-Value="nombreBuscar" Placeholder="Buscar" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh Style="width:25px;">Id Condicion</MudTh>
-            <MudTh>Descripcion</MudTh>
+            <MudTh Style="width:25px;">Id Condición</MudTh>
+            <MudTh>Descripción</MudTh>
             <MudTh>Activo</MudTh>
             @*<MudTh>Usuario Creacion</MudTh>*@
-            <MudTh>Fecha Creacion</MudTh>
+            <MudTh>Fecha Creación</MudTh>
             @*<MudTh>Usuario Ult. Modif.</MudTh>*@
             <MudTh>Fecha Ult. Modif.</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Id Condicion">@context.IdCondicion</MudTd>
-            <MudTd DataLabel="Descripcion">@context.DescripcionCond</MudTd>
+            <MudTd DataLabel="Id Condición">@context.IdCondicion</MudTd>
+            <MudTd DataLabel="Descripción">@context.DescripcionCond</MudTd>
             <MudTd DataLabel="Activo">@context.Activo</MudTd>
             @*<MudTd DataLabel="Usuario Creacion">@context.UsuarioCrea</MudTd>*@
-            <MudTd DataLabel="Fecha Creacion">@context.FechaCrea</MudTd>
+            <MudTd DataLabel="Fecha Creación">@context.FechaCrea</MudTd>
             @*<MudTd DataLabel="Usuario Ult. Modif.">@context.UsuarioModif</MudTd>*@
             <MudTd DataLabel="Fecha Ult. Modif.">@context.FechaUltModif</MudTd>
         </RowTemplate>

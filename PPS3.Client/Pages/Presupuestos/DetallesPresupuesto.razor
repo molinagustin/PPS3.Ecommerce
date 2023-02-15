@@ -30,7 +30,7 @@
             <RadzenGrid Data="@productosDisponibles" TItem="ProductoListado" RowSelect="@(args => prodSelect = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
                 <Columns>
                     <RadzenGridColumn TItem="ProductoListado" Property="NombreProd" Title="Nombre Producto"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripcion"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripción"></RadzenGridColumn>
                     <RadzenGridColumn TItem="ProductoListado" Property="DescRubro" Title="Rubro" Width="120px"></RadzenGridColumn>
                     <RadzenGridColumn TItem="ProductoListado" Property="DescripcionTipo" Title="Tipo Producto"></RadzenGridColumn>
                     <RadzenGridColumn TItem="ProductoListado" Property="PrecioFinal" Title="Precio Venta" Width="130px">
@@ -55,7 +55,7 @@
                 @*<MudTextField Label="Cantidad" HelperText="Formato 9,99 ó 9" @bind-Value="cant"/>*@
             </MudStack>
             <MudStack>
-                <label for="bonif">% Bonificacion</label>
+                <label for="bonif">% Bonificación</label>
                 <input @bind-value="strBon" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(2, ref strBon))" @onfocus="@(() => focusControl = 2)" name="bonif" style="margin-bottom:10px;">
                 @*<MudTextField Label="% Bonificacion" HelperText="Formato 9,99 ó 9" @bind-Value="bonif"/>*@
             </MudStack>
@@ -76,12 +76,12 @@
                 <thead>
                     <tr>
                         <td>Nombre Producto</td>
-                        <td>Descripcion</td>
+                        <td>Descripción</td>
                         <td>Unidad Medida</td>
                         <td>Precio Venta</td>
                         <td>Cantidad</td>
-                        <td>% Bonificacion</td>
-                        <td>Bonificacion Total</td>
+                        <td>% Bonificación</td>
+                        <td>Bonificación Total</td>
                         <td>Sub Total</td>
                         <td></td>
                     </tr>
@@ -300,7 +300,7 @@ else
                         Snackbar.Add($"El producto que intenta agregar, ya se encuentra en la cotización, debe seleccionar otro o bien remover el existente del listado.", Severity.Error);
                 }
                 else
-                    Snackbar.Add($"Bonificacion incorrecta", Severity.Error);                
+                    Snackbar.Add($"Bonificación incorrecta", Severity.Error);                
             }
             else
                 Snackbar.Add($"La cantidad debe ser mayor a 0", Severity.Error);

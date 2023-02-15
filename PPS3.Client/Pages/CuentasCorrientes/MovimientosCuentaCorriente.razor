@@ -25,7 +25,7 @@ else
 {
     @if(comprobantes == null || comprobantes.Count() == 0)
     {
-        <MudText Align="Align.Center" Typo="Typo.h5" Color="Color.Error" Style="margin-top:20px;">La cuenta no posee movimientos de comprobantes todavia</MudText>
+        <MudText Align="Align.Center" Typo="Typo.h5" Color="Color.Error" Style="margin-top:20px;">La cuenta no posee movimientos de comprobantes todavía</MudText>
     }
     else
     {
@@ -82,12 +82,12 @@ else
                                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", precio.PrecioUnitario)
                                 </Template>
                             </RadzenGridColumn>
-                            <RadzenGridColumn TItem="DetalleComprobante" Property="Bonificacion" Title="Bonificacion" Width="180px">
+                            <RadzenGridColumn TItem="DetalleComprobante" Property="Bonificacion" Title="Bonificación" Width="180px">
                                 <Template Context="precio">
                                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0} %", precio.Bonificacion)
                                 </Template>
                             </RadzenGridColumn>
-                            <RadzenGridColumn TItem="DetalleComprobante" Property="BonificacionTotal" Title="BonificacionTotal" Width="180px">
+                            <RadzenGridColumn TItem="DetalleComprobante" Property="BonificacionTotal" Title="Bonificación Total" Width="180px">
                                 <Template Context="boniftot">
                                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", boniftot.BonificacionTotal)
                                 </Template>

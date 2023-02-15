@@ -344,16 +344,16 @@ namespace PPS3.Client.Data
 
             var pdf = new Document(PageSize.A4, mLeft, mRight, mTop, mBottom);
             pdf.AddTitle("Cotización");
-            pdf.AddAuthor("ExpoCeramica");
+            pdf.AddAuthor("ExpoCerámica");
             pdf.AddCreationDate();
             pdf.AddKeywords("Cotización");
-            pdf.AddSubject("Cotización de ExpoCeramica");
+            pdf.AddSubject("Cotización de ExpoCerámica");
 
             //Si bien no se usa el objeto, es necesario el metodo GetInstance para comenzar la escritura interna del pdf
             var writer = PdfWriter.GetInstance(pdf, memoryStream);
 
             //Encabezado            
-            var labelHeader = new Chunk("ExpoCeramica", fontStyleEncabezado);
+            var labelHeader = new Chunk("ExpoCerámica", fontStyleEncabezado);
             var header = new HeaderFooter(new Phrase(labelHeader), false)
             {
                 BackgroundColor = new BaseColor(89, 74, 226),
@@ -517,16 +517,16 @@ namespace PPS3.Client.Data
 
             var pdf = new Document(PageSize.A4, mLeft, mRight, mTop, mBottom);
             pdf.AddTitle("Comprobante");
-            pdf.AddAuthor("ExpoCeramica");
+            pdf.AddAuthor("ExpoCerámica");
             pdf.AddCreationDate();
             pdf.AddKeywords("Comprobante");
-            pdf.AddSubject("Comprobante de ExpoCeramica");
+            pdf.AddSubject("Comprobante de ExpoCerámica");
 
             //Si bien no se usa el objeto, es necesario el metodo GetInstance para comenzar la escritura interna del pdf
             var writer = PdfWriter.GetInstance(pdf, memoryStream);
 
             //Encabezado            
-            var labelHeader = new Chunk("ExpoCeramica", fontStyleEncabezado);
+            var labelHeader = new Chunk("ExpoCerámica", fontStyleEncabezado);
             var header = new HeaderFooter(new Phrase(labelHeader), false)
             {
                 BackgroundColor = new BaseColor(89, 74, 226),
@@ -693,16 +693,16 @@ namespace PPS3.Client.Data
 
             var pdf = new Document(PageSize.A4, mLeft, mRight, mTop, mBottom);
             pdf.AddTitle("Recibo");
-            pdf.AddAuthor("ExpoCeramica");
+            pdf.AddAuthor("ExpoCerámica");
             pdf.AddCreationDate();
             pdf.AddKeywords("Recibo");
-            pdf.AddSubject("Recibo de ExpoCeramica");
+            pdf.AddSubject("Recibo de ExpoCerámica");
 
             //Si bien no se usa el objeto, es necesario el metodo GetInstance para comenzar la escritura interna del pdf
             var writer = PdfWriter.GetInstance(pdf, memoryStream);
 
             //Encabezado            
-            var labelHeader = new Chunk("ExpoCeramica", fontStyleEncabezado);
+            var labelHeader = new Chunk("ExpoCerámica", fontStyleEncabezado);
             var header = new HeaderFooter(new Phrase(labelHeader), false)
             {
                 BackgroundColor = new BaseColor(89, 74, 226),
@@ -874,16 +874,16 @@ namespace PPS3.Client.Data
 
             var pdf = new Document(PageSize.A4, mLeft, mRight, mTop, mBottom);
             pdf.AddTitle("Reporte");
-            pdf.AddAuthor("ExpoCeramica");
+            pdf.AddAuthor("ExpoCerámica");
             pdf.AddCreationDate();
             pdf.AddKeywords("Reporte");
-            pdf.AddSubject("Reporte de ExpoCeramica");
+            pdf.AddSubject("Reporte de ExpoCerámica");
 
             //Si bien no se usa el objeto, es necesario el metodo GetInstance para comenzar la escritura interna del pdf
             var writer = PdfWriter.GetInstance(pdf, memoryStream);
 
             //Encabezado            
-            var labelHeader = new Chunk("ExpoCeramica", fontStyleEncabezado);
+            var labelHeader = new Chunk("ExpoCerámica", fontStyleEncabezado);
             var header = new HeaderFooter(new Phrase(labelHeader), false)
             {
                 BackgroundColor = new BaseColor(89, 74, 226),
@@ -979,16 +979,16 @@ namespace PPS3.Client.Data
 
             var pdf = new Document(PageSize.A4, mLeft, mRight, mTop, mBottom);
             pdf.AddTitle("Reporte");
-            pdf.AddAuthor("ExpoCeramica");
+            pdf.AddAuthor("ExpoCerámica");
             pdf.AddCreationDate();
             pdf.AddKeywords("Reporte");
-            pdf.AddSubject("Reporte de ExpoCeramica");
+            pdf.AddSubject("Reporte de ExpoCerámica");
 
             //Si bien no se usa el objeto, es necesario el metodo GetInstance para comenzar la escritura interna del pdf
             var writer = PdfWriter.GetInstance(pdf, memoryStream);
 
             //Encabezado            
-            var labelHeader = new Chunk("ExpoCeramica", fontStyleEncabezado);
+            var labelHeader = new Chunk("ExpoCerámica", fontStyleEncabezado);
             var header = new HeaderFooter(new Phrase(labelHeader), false)
             {
                 BackgroundColor = new BaseColor(89, 74, 226),
@@ -1108,16 +1108,16 @@ namespace PPS3.Client.Data
 
             var pdf = new Document(PageSize.A4, mLeft, mRight, mTop, mBottom);
             pdf.AddTitle("Reporte");
-            pdf.AddAuthor("ExpoCeramica");
+            pdf.AddAuthor("ExpoCerámica");
             pdf.AddCreationDate();
             pdf.AddKeywords("Reporte");
-            pdf.AddSubject("Reporte de ExpoCeramica");
+            pdf.AddSubject("Reporte de ExpoCerámica");
 
             //Si bien no se usa el objeto, es necesario el metodo GetInstance para comenzar la escritura interna del pdf
             var writer = PdfWriter.GetInstance(pdf, memoryStream);
 
             //Encabezado            
-            var labelHeader = new Chunk("ExpoCeramica", fontStyleEncabezado);
+            var labelHeader = new Chunk("ExpoCerámica", fontStyleEncabezado);
             var header = new HeaderFooter(new Phrase(labelHeader), false)
             {
                 BackgroundColor = new BaseColor(89, 74, 226),
@@ -1140,7 +1140,7 @@ namespace PPS3.Client.Data
             //Cuerpo
             pdf.Open();
 
-            var titel = new Paragraph("REPORTE PRODUCTOS MAS VENDIDOS");
+            var titel = new Paragraph("REPORTE PRODUCTOS MÁS VENDIDOS");
             titel.SpacingAfter = 26f;
             titel.SpacingBefore = -50f;
             titel.Alignment = Element.ALIGN_CENTER;
@@ -1223,16 +1223,16 @@ namespace PPS3.Client.Data
 
             var pdf = new Document(PageSize.A4, mLeft, mRight, mTop, mBottom);
             pdf.AddTitle("Reporte");
-            pdf.AddAuthor("ExpoCeramica");
+            pdf.AddAuthor("ExpoCerámica");
             pdf.AddCreationDate();
             pdf.AddKeywords("Reporte");
-            pdf.AddSubject("Reporte de ExpoCeramica");
+            pdf.AddSubject("Reporte de ExpoCerámica");
 
             //Si bien no se usa el objeto, es necesario el metodo GetInstance para comenzar la escritura interna del pdf
             var writer = PdfWriter.GetInstance(pdf, memoryStream);
 
             //Encabezado            
-            var labelHeader = new Chunk("ExpoCeramica", fontStyleEncabezado);
+            var labelHeader = new Chunk("ExpoCerámica", fontStyleEncabezado);
             var header = new HeaderFooter(new Phrase(labelHeader), false)
             {
                 BackgroundColor = new BaseColor(89, 74, 226),

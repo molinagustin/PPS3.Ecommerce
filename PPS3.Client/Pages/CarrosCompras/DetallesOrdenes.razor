@@ -32,8 +32,8 @@ else
                         <td>Cantidad</td>
                         <td>Unidad Medida</td>
                         <td>Precio Venta</td>
-                        <td>% Bonificacion</td>
-                        <td>Bonificacion Total</td>
+                        <td>% Bonificación</td>
+                        <td>Bonificación Total</td>
                         <td>Sub Total</td>
                     </tr>
                 </thead>
@@ -80,7 +80,7 @@ else
                 <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Orden: <b>@ordenListado.FechaOrden</b></MudText>
             </MudStack>
             <MudStack>
-                <MudText Align="Align.Left" Typo="Typo.body1">Ultima Modificacion: <b>@ordenListado.FechaUltModif</b></MudText>
+                <MudText Align="Align.Left" Typo="Typo.body1">Última Modificación: <b>@ordenListado.FechaUltModif</b></MudText>
             </MudStack>
         </MudItem>
 
@@ -94,9 +94,9 @@ else
                 <MudStack>
                     <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Pago: <b>@string.Format("{0:d}", ordenListado.FechaPago)</b></MudText>
                 </MudStack>
-                <MudStack>
+                @*<MudStack>
                     <MudText Align="Align.Left" Typo="Typo.body1">Forma de Pago: <b>@ordenListado.FormaP</b></MudText>
-                </MudStack>
+                </MudStack>*@
             }                      
         </MudItem>
 
@@ -278,7 +278,7 @@ else
             movimiento.Usuario = idUsAct;
 
             var movimientoCreado = await ServMovCarro.CrearMovimiento(movimiento);
-            if (!movimientoCreado) Snackbar.Add($"No se creo el movimiento", Severity.Error);
+            if (!movimientoCreado) Snackbar.Add($"No se creó el movimiento", Severity.Error);
 
             NavigationManager.NavigateTo("/listaOrdenesCompra");
             Snackbar.Add($"Orden de compra N° {ordenListado.IdCarro} modificada exitosamente", Severity.Success);

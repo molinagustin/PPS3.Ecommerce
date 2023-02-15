@@ -33,7 +33,7 @@
                 <MudCardContent>
                     <MudTextField Label="Nombre del Producto" HelperText="Nombre Visible" @bind-Value="producto.NombreProd" For="@(() => producto.NombreProd)" AutoFocus = "true" Required="true"/>
                 
-                    <MudTextField Label="Descripcion del Producto" HelperText="Detalles para mejor entendimiento" @bind-Value="producto.Descripcion" For="@(() => producto.Descripcion)" Required="true"/>
+                    <MudTextField Label="Descripción del Producto" HelperText="Detalles para mejor comprensión" @bind-Value="producto.Descripcion" For="@(() => producto.Descripcion)" Required="true"/>
                 
                     @if (rubros != null)
                     {
@@ -145,7 +145,7 @@
         <MudItem xs="3">
             @if (id > 0)
             {   @*Si es un producto ya creado, recien ahi muestro sus imagenes*@
-                <MudButton StartIcon="@Icons.Material.Filled.Image" Color="Color.Primary" Variant="Variant.Outlined" OnClick="VerImagenes" Size="Size.Large">IMAGENES</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Image" Color="Color.Primary" Variant="Variant.Outlined" OnClick="VerImagenes" Size="Size.Large">IMÁGENES</MudButton>
             }
         </MudItem>
     </MudGrid>        
@@ -218,7 +218,7 @@
             strPCosto = precioCosto.ToString();
             strPFinal = precioFinal.ToString();
             strStock = stock.ToString();
-            titulo = "Modificacion de Producto";            
+            titulo = "Modificación de Producto";            
         }  
         FiltrarTiposProductos();
     }
@@ -362,13 +362,13 @@
             {
                 var resultDialog = await DialogService.ShowMessageBox(
                        "¡Atención!",
-                       "Esta intentado dar de baja un producto con stock > 0. ¿Continuar?",
+                       "Está intentado dar de baja un producto con stock > 0. ¿Continuar?",
                        yesText: "Continuar", cancelText: "Cancelar");
 
                 if (resultDialog == true)
                     await EmpezarGuardado();
                 else
-                    Snackbar.Add($"Se cancela la accion", Severity.Info);
+                    Snackbar.Add($"Se cancela la acción", Severity.Info);
             }
             else
                 await EmpezarGuardado();
@@ -378,8 +378,8 @@
                 if(producto.Bonificacion == 100)
                 {
                     var resultDialog = await DialogService.ShowMessageBox(
-                        "¡Atencion!",
-                        "Está por guardar un producto con una bonificacion del 100%. ¿Desea continuar?",
+                        "¡Atención!",
+                        "Está por guardar un producto con una bonificación del 100%. ¿Desea continuar?",
                         yesText: "Continuar", cancelText: "Cancelar");
 
                     if (resultDialog == null)
@@ -392,45 +392,45 @@
                 if (producto.StockExistencia == 0 && (producto.PrecioCosto == 0 || producto.PrecioFinal == 0))
                 {
                     var resultDialog = await DialogService.ShowMessageBox(
-                        "¡Atencion!",
-                        "Esta por guardar un producto con stock = 0 y precio = 0. ¿Desea continuar?",
+                        "¡Atención!",
+                        "Está por guardar un producto con stock = 0 y precio = 0. ¿Desea continuar?",
                         yesText: "Continuar", cancelText: "Cancelar");
 
                     if (resultDialog == true)
                         await GuardandoRegistro();
                     else
-                        Snackbar.Add($"Se cancela la accion", Severity.Info);
+                        Snackbar.Add($"Se cancela la acción", Severity.Info);
                 }
                 else if (producto.StockExistencia == 0)
                 {
                     var resultDialog = await DialogService.ShowMessageBox(
-                        "¡Atencion!",
-                        "Esta por guardar un producto con stock = 0. ¿Desea continuar?",
+                        "¡Atención!",
+                        "Está por guardar un producto con stock = 0. ¿Desea continuar?",
                         yesText: "Continuar", cancelText: "Cancelar");
 
                     if (resultDialog == true)
                         await GuardandoRegistro();
                     else
-                        Snackbar.Add($"Se cancela la accion", Severity.Info);
+                        Snackbar.Add($"Se cancela la acción", Severity.Info);
                 }
                 else if (producto.PrecioCosto == 0 || producto.PrecioFinal == 0)
                 {
                     var resultDialog = await DialogService.ShowMessageBox(
-                        "¡Atencion!",
-                        "Esta por guardar un producto con precio = 0. ¿Desea continuar?",
+                        "¡Atención!",
+                        "Está por guardar un producto con precio = 0. ¿Desea continuar?",
                         yesText: "Continuar", cancelText: "Cancelar");
 
                     if (resultDialog == true)
                         await GuardandoRegistro();
                     else
-                        Snackbar.Add($"Se cancela la accion", Severity.Info);
+                        Snackbar.Add($"Se cancela la acción", Severity.Info);
                 }
                 else
                     await GuardandoRegistro();
             }                       
         }
         else
-            Snackbar.Add($"Debe seleccionar un tipo de producto valido", Severity.Warning);       
+            Snackbar.Add($"Debe seleccionar un tipo de producto válido", Severity.Warning);       
     }
 
 

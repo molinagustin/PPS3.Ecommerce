@@ -149,7 +149,7 @@ else
             </MudSelect>
             @if(formaPag == 2 || formaPag == 3)
             {
-                <MudTextField Label="N° Tarjeta" HelperText="4 ultimos digitos" @bind-Value="numTarj" MaxLength="4"/>
+                <MudTextField Label="N° Tarjeta" HelperText="4 últimos dígitos" @bind-Value="numTarj" MaxLength="4"/>
             }
             else
             {
@@ -351,7 +351,7 @@ else
                         {
                             //Genero una alerta para que el usuario confirme la accion
                             var options = new DialogOptions { CloseOnEscapeKey = true };
-                            var dialog = DialogService.Show<DialogRecibo>("Confirmar Creacion de Recibo", options);
+                            var dialog = DialogService.Show<DialogRecibo>("Confirmar Creación de Recibo", options);
                             var resultDialog = await dialog.Result;
 
                             if (!resultDialog.Cancelled)
@@ -411,7 +411,7 @@ else
                                                 }
                                                 else
                                                 {
-                                                    Snackbar.Add($"No se pudo actualizar el comprobante del recibo por un error. Se descontinua la operacion.", Severity.Error);
+                                                    Snackbar.Add($"No se pudo actualizar el comprobante del recibo por un error. Se descontinua la operación.", Severity.Error);
                                                     break;
                                                 }
                                             }
@@ -425,7 +425,7 @@ else
                                         //Navego a la pagina de inicio
                                         NavigationManager.NavigateTo("/detallesRecibo", forceLoad: true);
                                     }
-                                    else Snackbar.Add($"No se pudo generar el recibo (encabezado). Error de insercion.", Severity.Error);
+                                    else Snackbar.Add($"No se pudo generar el recibo (encabezado). Error de inserción.", Severity.Error);
                                 }
                                 else
                                 {
@@ -484,7 +484,7 @@ else
                                                             break;
                                                         else
                                                         {
-                                                            Snackbar.Add($"No se pudo actualizar el comprobante del recibo por un error. Se descontinua la operacion.", Severity.Error);
+                                                            Snackbar.Add($"No se pudo actualizar el comprobante del recibo por un error. Se descontinua la operación.", Severity.Error);
                                                             break;
                                                         }
                                                     }
@@ -520,7 +520,7 @@ else
 
                                                         if (!compAct)
                                                         {
-                                                            Snackbar.Add($"No se pudo actualizar el comprobante del recibo por un error. Se descontinua la operacion.", Severity.Error);
+                                                            Snackbar.Add($"No se pudo actualizar el comprobante del recibo por un error. Se descontinua la operación.", Severity.Error);
                                                             break;
                                                         }
 
@@ -550,10 +550,10 @@ else
                                         //Navego a la pagina de inicio
                                         NavigationManager.NavigateTo("/detallesRecibo", forceLoad: true);
                                     }
-                                    else Snackbar.Add($"No se pudo generar el recibo (encabezado). Error de insercion.", Severity.Error);
+                                    else Snackbar.Add($"No se pudo generar el recibo (encabezado). Error de inserción.", Severity.Error);
                                 }                          
                             }
-                            else Snackbar.Add($"Operacion Cancelada", Severity.Warning);
+                            else Snackbar.Add($"Operación Cancelada", Severity.Warning);
                         }
                         else Snackbar.Add($"El importe del recibo no puede superar la suma a ingresar de los comprobantes", Severity.Error);
                     }

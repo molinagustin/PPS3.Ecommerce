@@ -27,11 +27,11 @@
                     <MudCard>
                         <MudCardHeader>
                             <CardHeaderContent>
-                                <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos de Inicio Sesion</MudText>
+                                <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Datos de Inicio Sesión</MudText>
                             </CardHeaderContent>
                         </MudCardHeader>
                         <MudCardContent>
-                            <MudTextField Label="Nombre Usuario" HelperText="Mayusculas y Minusculas no son iguales"
+                            <MudTextField Label="Nombre Usuario" HelperText="Mayúsculas y Minúsculas no son iguales"
                                           @bind-Value="usuarioReq.NombreUs" For="@(() => usuarioReq.NombreUs)"
                                           AutoFocus="true" />
                             <MudTextField Label="Password" Class="mt-3"
@@ -72,7 +72,7 @@
         {
             await AuthStateProvider.GetAuthenticationStateAsync();
             NavigationManager.NavigateTo("/");    
-            Snackbar.Add($"¡Nos alegramos de volver a verte por aca!", Severity.Success); 
+            Snackbar.Add($"¡Nos alegramos de volver a verte por acá!", Severity.Success); 
         }        
         else
             Snackbar.Add($"El usuario y/o contraseña no son correctos", Severity.Error);      

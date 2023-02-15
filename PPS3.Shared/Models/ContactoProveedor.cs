@@ -8,7 +8,7 @@ namespace PPS3.Shared.Models
         [Required(ErrorMessage = "El Nombre del Contacto de Proveedor es obligatorio.")]
         public string Nombre { get; set; } = string.Empty;
         public string Domicilio { get; set; } = string.Empty;
-        [RegularExpression(@"^[0-9]*$", ErrorMessage = "Solo se aceptan numeros sin espacio.")]
+        [RegularExpression(@"^[0-9]*$", ErrorMessage = "Solo se aceptan números sin espacio.")]
         public string Telefono { get; set; } = string.Empty ;
         [EmailAddress]
         public string Email { get; set; } = string.Empty;

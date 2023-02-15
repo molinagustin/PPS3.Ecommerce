@@ -26,7 +26,7 @@
                 <MudCardContent>
                     <MudTextField Label="Nombre del Proveedor" HelperText="Nombre Completo" @bind-Value="prov.NombreProv" For="@(() => prov.NombreProv)" AutoFocus = "true" Required="true"/>
 
-                    <MudTextField Label="Domicilio del Proveedor" HelperText="Bien Detallado" @bind-Value="prov.DomicilioProv" For="@(() => prov.DomicilioProv)"/>
+                    <MudTextField Label="Domicilio del Proveedor" HelperText="Mejor con detalles" @bind-Value="prov.DomicilioProv" For="@(() => prov.DomicilioProv)"/>
 
                     <AuthorizeView Roles="1">
                         @if(id > 0)
@@ -96,7 +96,7 @@
             {
                 //Pregunto si redirigir hacia los contactos del proveedor
                 var resultDialog = await DialogService.ShowMessageBox(
-                            "Elegir Accion",
+                            "Elegir Acción",
                             "Proveedor agregado. ¿Ir a agregar un contacto del proveedor?",
                             yesText: "Si", cancelText: "No");
 

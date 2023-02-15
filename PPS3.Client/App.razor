@@ -3,7 +3,7 @@
     <Found Context="routeData">
         <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"> @*Se debe agregar el AUTHORIZE a la etiqueta de enrutamiento para permitir que los componentes llamados en ella utilizen los servicios de autenticacion*@
             <NotAuthorized> @*Con esta etiqueta puedo mostrarle al usuario contenido en caso de que no este autorizado a ver el componente al que esta intentado acceder, por ejemplo una pagina completa*@
-                El nivel de autorizacion que posee no le permite acceder al componente solicitado. Por favor, contacte al Administrador.
+                El nivel de autorización que posee no le permite acceder al componente solicitado. Por favor, contacte al Administrador.
             </NotAuthorized>
         </AuthorizeRouteView>
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
@@ -11,7 +11,7 @@
     <NotFound>
         <PageTitle>Parece que no hay nada...</PageTitle>
         <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">No se encontro lo buscado.</p>
+            <p role="alert">No se encontró lo buscado.</p>
         </LayoutView>
     </NotFound>
 </Router>

@@ -7,7 +7,7 @@ namespace PPS3.Shared.Models
         public int IdTipoDoc { get; set; }
         [Required(ErrorMessage = "Se debe introducir una Sigla para el Tipo de Documento.")]
         public string Sigla { get; set; } = string.Empty;
-        [Required(ErrorMessage = "Se debe introducir una Descripcion para el Tipo de Documento.")]
+        [Required(ErrorMessage = "Se debe introducir una Descripción para el Tipo de Documento.")]
         public string DescripcionTD { get; set; } = string.Empty;
         public bool Activo { get; set; }
         public int UsuarioCrea { get; set; }

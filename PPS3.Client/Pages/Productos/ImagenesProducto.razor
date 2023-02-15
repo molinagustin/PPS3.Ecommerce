@@ -9,7 +9,7 @@
     <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
 </AuthorizeView>
 
-<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Cargar Imagenes del Producto</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Cargar Imágenes del Producto</MudText>
 
 <MudGrid Style="margin-bottom:30px;">
     <MudItem xs="4">
@@ -17,15 +17,15 @@
     </MudItem>
 
     <MudItem xs="4">
-        <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Primary">Las imagenes seleccionadas se guardan automaticamente</MudText>
-        <MudText Align="Align.Center" Typo="Typo.body1" Color="Color.Default"><b>¡Para una correcta visualizacion, usar imagenes de 100px x 100px maximo!</b></MudText>
+        <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Primary">Las imágenes seleccionadas se guardan automáticamente</MudText>
+        <MudText Align="Align.Center" Typo="Typo.body1" Color="Color.Default"><b>¡Para una correcta visualización, usar imágenes de 100px x 100px máximo!</b></MudText>
         <MudGrid Justify="Justify.Center" Style="margin-top:30px;">
             <InputFile OnChange="OnInputFileChanged"/>
         </MudGrid>        
     </MudItem>
 </MudGrid>
 
-<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Imagenes Guardadas</MudText>
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Imágenes Guardadas</MudText>
 
 <MudGrid Justify="Justify.Center">
     @if (imagenes != null && imagenes.Count() > 0)
@@ -60,7 +60,7 @@
     {
         <MudItem lg="4"></MudItem>
         <MudItem lg="4">
-            <MudText Align="Align.Center" Typo="Typo.h5" Color="Color.Error">El producto no posee imagenes todavia</MudText>
+            <MudText Align="Align.Center" Typo="Typo.h5" Color="Color.Error">El producto no posee imágenes todavía</MudText>
          </MudItem> 
          <MudItem lg="4">
 
@@ -115,7 +115,7 @@
                 NavigationManager.NavigateTo($"/detallesProducto/imagenes/{id}", forceLoad: true);
             }
             else
-                Snackbar.Add($"Solo se pueden cargar hasta 5 imagenes por producto. Debera borrar alguna ya cargada.", Severity.Info);
+                Snackbar.Add($"Solo se pueden cargar hasta 5 imágenes por producto. Deberá borrar alguna ya cargada.", Severity.Info);
         }
         else
             Snackbar.Add($"Cargar 1 imagen a la vez", Severity.Info);
@@ -135,7 +135,7 @@
     private async void BorrarImagen(int idImagen)
     {
         var result = await DialogService.ShowMessageBox(
-                    "¡Atencion!", 
+                    "¡Atención!", 
                     "Se procede a borrar la imagen y no podra ser recuperada. ¿Desea continuar?", 
                     yesText:"Borrar", cancelText:"Cancelar");
 
@@ -145,10 +145,10 @@
             if (borrado)
                 NavigationManager.NavigateTo($"/detallesProducto/imagenes/{id}", forceLoad: true);
             else
-                Snackbar.Add($"No se pudo completar la accion", Severity.Info);  
+                Snackbar.Add($"No se pudo completar la acción", Severity.Info);  
         }  
         else    
-            Snackbar.Add($"Se cancelo la accion", Severity.Info);        
+            Snackbar.Add($"Se canceló la acción", Severity.Info);        
     }
 
     private async void ImagenFavorita(ImagenProducto imagenFavorita)
@@ -159,7 +159,7 @@
         if(result)
             NavigationManager.NavigateTo($"/detallesProducto/imagenes/{id}", forceLoad: true);
         else
-            Snackbar.Add($"La modificacion no se pudo llevar a cabo", Severity.Info); 
+            Snackbar.Add($"La modificación no se pudo llevar a cabo", Severity.Info); 
     }
 
     private void Volver() => NavigationManager.NavigateTo($"/detallesProducto/{id}");

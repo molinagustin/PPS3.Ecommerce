@@ -41,17 +41,17 @@ else
 
         @*LISTADO ORDENES COMPRA*@
         <MudItem lg="8">
-            <MudText Align="Align.Center" Typo="Typo.h6">Lista de Ordenes de Compra</MudText>
+            <MudText Align="Align.Center" Typo="Typo.h6">Lista de Órdenes de Compra</MudText>
             
             @if (ordenesCliente == null || ordenesCliente.Count() < 1)
             {
-                <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Info" Style="margin-top:40px;">Sin Ordenes de Compra</MudText>
+                <MudText Align="Align.Center" Typo="Typo.h6" Color="Color.Info" Style="margin-top:40px;">Sin Órdenes de Compra</MudText>
             }
             else
             {
                 <RadzenTabs>
                     <Tabs>
-                        <RadzenTabsItem Text="Ordenes de Compra">
+                        <RadzenTabsItem Text="Órdenes de Compra">
                             <RadzenGrid Data="@ordenesCliente" TItem="OrdenesCompraListado" RowSelect="@(args => orden = args)" AllowPaging="true" AllowSorting="true">
                                 <Columns>
                                     <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="N° Orden" Width="75px"></RadzenGridColumn>

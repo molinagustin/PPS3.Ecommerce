@@ -6,7 +6,7 @@ namespace PPS3.Shared.Models
     public class TipoVenta
     {
         public int IdTipoVta { get; set; }
-        [Required(ErrorMessage = "La Descripcion del Tipo de Venta es obligatoria.")]
+        [Required(ErrorMessage = "La Descripción del Tipo de Venta es obligatoria.")]
         public string TipoVta { get; set; } = string.Empty;
     }
 }

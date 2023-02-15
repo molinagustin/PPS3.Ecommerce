@@ -22,18 +22,18 @@
         <MudCard Elevation="0">
             <MudCardHeader>
                 <CardHeaderContent>
-                    <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Comentanos en que podemos ayudarte</MudText>
+                    <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Primary">Coméntanos en qué podemos ayudarte</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
 
             <MudCardContent>
                 @if (usuario != null && usuario.EmailVerificado)
                 {
-                    <MudTextField Label="Email" HelperText="Correo electronico" @bind-Value="usuario.Email" ReadOnly=true Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Email" AdornmentColor="Color.Primary" />
+                    <MudTextField Label="Email" HelperText="Correo electrónico" @bind-Value="usuario.Email" ReadOnly=true Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Email" AdornmentColor="Color.Primary" />
                 }
                 else if(usuario != null)
                 {
-                    <MudTextField Label="Email" HelperText="Correo electronico" @bind-Value="usuario.Email" For="@(() => usuario.Email)" Required=true Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Email" AdornmentColor="Color.Primary" Immediate=true/>
+                    <MudTextField Label="Email" HelperText="Correo electrónico" @bind-Value="usuario.Email" For="@(() => usuario.Email)" Required=true Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Email" AdornmentColor="Color.Primary" Immediate=true/>
                 }
 
                 <MudTextField T="string" Label="¿Qué necesitas decirnos?" Variant="Variant.Outlined" @bind-Value="texto" Lines="7" MaxLength="350" Counter="0" Required=true Immediate=true Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Edit" AdornmentColor="Color.Primary"/>
@@ -110,7 +110,7 @@
         }
         catch
         {
-            Snackbar.Add($"El email no es valido", Severity.Error);
+            Snackbar.Add($"El email no es válido", Severity.Error);
         }        
     }
 }

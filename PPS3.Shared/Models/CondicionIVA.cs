@@ -5,7 +5,7 @@ namespace PPS3.Shared.Models
     public class CondicionIVA
     {
         public int IdCondicion { get; set; }
-        [Required(ErrorMessage = "Se debe cargar una Descripcion para la Condicion del IVA.")]
+        [Required(ErrorMessage = "Se debe cargar una Descripción para la Condición del IVA.")]
         public string DescripcionCond { get; set; } = string.Empty;
         public bool Activo { get; set; }
         public int UsuarioCrea { get; set; }

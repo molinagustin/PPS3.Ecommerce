@@ -6,10 +6,10 @@ namespace PPS3.Shared.Models
     {
         public int IdUsuarioAct { get; set; }
         [Required(ErrorMessage = "El Nombre Completo debe ser introducido.")]
-        [RegularExpression(@"^[a-zA-Z ]{4,}$", ErrorMessage = "El nombre de usuario debe contener letras mayusculas y/o minusculas solamente y se puede usar espaciado (Min. 4)")]
+        [RegularExpression(@"^[a-zA-Z ]{4,}$", ErrorMessage = "El nombre de usuario debe contener letras mayúsculas y/o minúsculas solamente y se puede usar espaciado (Min. 4)")]
         public string NombreCompleto { get; set; } = string.Empty;
         [Required(ErrorMessage = "El Nombre de Usuario es obligatorio.")]
-        [RegularExpression(@"^[a-zA-Z]{4,8}$", ErrorMessage = "El nombre de usuario debe contener letras mayusculas y/o minusculas solamente (Min. 4 Max. 8)")]
+        [RegularExpression(@"^[a-zA-Z]{4,8}$", ErrorMessage = "El nombre de usuario debe contener letras mayúsculas y/o minúsculas solamente (Min. 4 Max. 8)")]
         public string NombreUs { get; set; } = string.Empty ; 
         public string SaltCont { get; set; } = string.Empty;
         public string HashCont { get; set; } = string.Empty;

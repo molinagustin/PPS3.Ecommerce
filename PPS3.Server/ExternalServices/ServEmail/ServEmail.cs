@@ -52,7 +52,7 @@ namespace PPS3.Server.ExternalServices.ServEmail
                 email.From.Add(MailboxAddress.Parse(_config.GetSection("EmailUsername").Value));
                 email.To.Add(MailboxAddress.Parse(datosEmail.Destinatario));
                 email.Subject = "Email de Verificacion";                
-                email.Body = new TextPart(TextFormat.Html) { Text = $"Copiar el siguiente enlace y pegar en el navegador mientras se esta logueado en el sitio: <a href='{datosEmail.URL}validacionEmail/{usuario}'>{datosEmail.URL}validacionEmail/{usuario}</a>" };
+                email.Body = new TextPart(TextFormat.Html) { Text = $"Abrir el siguiente enlace en el navegador para validar su correo: <a href='{datosEmail.URL}validacionEmail/{usuario}'>{datosEmail.URL}validacionEmail/{usuario}</a>" };
 
                 // Configuro el envio del correo
                 using var smtp = new SmtpClient();

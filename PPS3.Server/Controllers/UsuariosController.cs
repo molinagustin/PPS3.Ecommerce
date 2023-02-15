@@ -69,7 +69,7 @@ namespace PPS3.Server.Controllers
                 //Verifico que no existe otro usuario con el mismo nombre de usuario
                 var existe = await _repUsuario.UsuarioExistente(usuarioCliente.NombreUs);
                 if (existe)
-                    return BadRequest(new { message = "El nombre de usuario que intenta utilizar no esta disponible, por favor introduzca otro." });
+                    return BadRequest(new { message = "El nombre de usuario que intenta utilizar no está disponible, por favor introduzca otro." });
 
                 //Luego de la verificacion del modelo valido y que el nombre de usuario este disponible, creo un nuevo cliente y traigo su id, el cual, si es mayor a 0 se lo asigno al usuario que estoy creando
                 var clienteResponse = await _repCliente.CrearCliente(usuarioCliente);
