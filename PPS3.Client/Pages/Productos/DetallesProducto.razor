@@ -71,10 +71,10 @@
                     }
 
                     <label for="costo">Precio Costo (Precio sin ganancia)</label>
-                    <input @bind-value="strPCosto" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(1, ref strPCosto))" @onfocus="@(() => focusControl = 1)" name="costo">
+                    <input @bind-value="strPCosto" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(1, ref strPCosto))" @onfocus="@(() => CheckValor(1))" name="costo">
 
                     <label for="final">Precio Final (Precio a la venta)</label>
-                    <input @bind-value="strPFinal" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(2, ref strPFinal))" @onfocus="@(() => focusControl = 2)" name="final">
+                    <input @bind-value="strPFinal" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(2, ref strPFinal))" @onfocus="@(() => CheckValor(2))" name="final">
 
                     @*<MudTextField Label="Precio de Costo" HelperText="Sin los adicionales. Formato 999,99 ó 999" @bind-Value="producto.PrecioCosto" For="@(() => producto.PrecioCosto)" Required="true"/>*@
 
@@ -83,7 +83,7 @@
                     @if (id > 0)
                     {
                         <label for="bonif">Bonificación (%)</label>
-                        <input @bind-value="strBonif" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(4, ref strBonif))" @onfocus="@(() => focusControl = 4)" name="bonif">
+                        <input @bind-value="strBonif" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(4, ref strBonif))" @onfocus="@(() => CheckValor(4))" name="bonif">
                     }
 
                     @if (provs != null)
@@ -124,7 +124,7 @@
                     @*<MudTextField Label="Cantidad Minima para Alerta" HelperText="El valor que se tomara para avisar de poco stock. Formato 999,99 ó 999" @bind-Value="producto.CantMinAlerta" For="@(() => producto.CantMinAlerta)"/>*@
 
                     <label for="stock">Stock Existente</label>
-                    <input @bind-value="strStock" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(3, ref strStock))" @onfocus="@(() => focusControl = 3)" name="stock">
+                    <input @bind-value="strStock" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(3, ref strStock))" @onfocus="@(() => CheckValor(3))" name="stock">
 
                     @*<MudTextField Label="Stock en Existencia" HelperText="Productos que quedan. Formato 999,99 ó 999" @bind-Value="producto.StockExistencia" For="@(() => producto.StockExistencia)"/>*@
 
@@ -330,6 +330,30 @@
                 can--;
                 str += dato.Dequeue();
             }
+        }
+    }
+
+    private void CheckValor(int focus)
+    {
+        focusControl = focus;
+
+        switch (focusControl)
+        {
+            case 1:
+                if (strPCosto == "0" || strPCosto == "0,00") strPCosto = "";
+                break;
+
+            case 2:
+                if (strPFinal == "0" || strPFinal == "0,00") strPFinal = "";
+                break;
+
+            case 3:
+                if (strStock == "0" || strStock == "0,00") strStock = "";
+                break;
+
+            case 4:
+                if (strBonif == "0" || strBonif == "0,00") strBonif = "";
+                break;
         }
     }
 

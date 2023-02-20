@@ -6,5 +6,6 @@
         Task<IEnumerable<Ganancia>> ReporteGanancias(Parametros parametros);
         Task<IEnumerable<StockProd>> ReporteStockProductos(Parametros parametros);
         Task<IEnumerable<ProductoFecha>> ReporteProductosFecha(Parametros parametros);
+        Task<IEnumerable<ProductoFechaReporte>> ReporteProductosFechaReporte(Parametros parametros);
     }
 }

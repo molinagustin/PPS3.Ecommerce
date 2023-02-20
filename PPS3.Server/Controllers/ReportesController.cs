@@ -58,6 +58,21 @@ namespace PPS3.Server.Controllers
         }
 
         [HttpPost]
+        public async Task<ActionResult<IEnumerable<ProductoFechaReporte>>> ReporteProductosFechaReporte([FromBody] Parametros parametros)
+        {
+            if (parametros == null) return BadRequest();
+
+            if (ModelState.IsValid)
+            {
+                var response = await _repReporte.ReporteProductosFechaReporte(parametros);
+
+                if (response != null) return Ok(response);
+                else return BadRequest();
+            }
+            else return Problem();
+        }
+
+        [HttpPost]
         public async Task<ActionResult<IEnumerable<StockProd>>> ReporteStockProductos([FromBody] Parametros parametros)
         {
             if (parametros == null) return BadRequest();

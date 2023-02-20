@@ -32,7 +32,7 @@ else
                 </Template>
             </RadzenGridColumn>
             <RadzenGridColumn TItem="Comprobante" Property="Cliente" Title="Cliente" Width="140px"></RadzenGridColumn>
-            <RadzenGridColumn TItem="Comprobante" Property="FormaP" Title="Forma Pago" Width="130px"></RadzenGridColumn>
+            @*<RadzenGridColumn TItem="Comprobante" Property="FormaP" Title="Forma Pago" Width="130px"></RadzenGridColumn>*@
             <RadzenGridColumn TItem="Comprobante" Property="ImporteFinal" Title="Importe Final" Width="130px">
                 <Template Context="impFin">
                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", impFin.ImporteFinal)

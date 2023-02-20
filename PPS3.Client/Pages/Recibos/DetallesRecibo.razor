@@ -172,7 +172,7 @@ else
                         @if(!pagoCompleto)
                         {
                             <label for="importe">Importe A Abonar</label>
-                            <input @bind-value="strImporte" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="Calculo" name="importe">
+                            <input @bind-value="strImporte" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="Calculo" name="importe" @onfocus="CheckValor">
                             @*<MudTextField Label="Importe A Abonar" HelperText="Formato 999,99 ó 999" @bind-Value="importe" For="@(() => recibo.ImporteTotal)" Required="true" AdornmentIcon="@Icons.Material.Filled.Money"/>*@
                         }  
                         else
@@ -323,6 +323,8 @@ else
         }
     }
 
+    private void CheckValor(){if(strImporte == "0") strImporte = "";}
+
     private async Task GenerarRecibo()
     {
         if (comprobantesAgregados != null && comprobantesAgregados.Count() > 0)
@@ -334,6 +336,21 @@ else
                     //Verifico que la forma de pago sea distinta a Sin Pagar (ID = 7)
                     if(formaPag != 7)
                     {   
+                        if(formaPag == 2 || formaPag == 3)
+                        {
+                            if(!int.TryParse(numTarj, out int result))
+                            {
+                                Snackbar.Add($"El número de tarjeta no es válido.", Severity.Error);
+                                return;
+                            }                            
+
+                            if(numTarj.Contains(' '))
+                            {
+                                Snackbar.Add($"El número de tarjeta no es válido.", Severity.Error);
+                                return;
+                            }
+                        }
+
                         //Verifico si es una Baja de Comprobante
                         if(formaPag == 9 && observ.Trim().Length < 1)
                         {

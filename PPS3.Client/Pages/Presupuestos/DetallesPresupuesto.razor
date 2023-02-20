@@ -51,12 +51,12 @@
         <MudStack Row="true" Justify="Justify.Center">
             <MudStack Style="width:50%">
                 <label for="cant">Cantidad</label>
-                <input @bind-value="strCant" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(1, ref strCant))" @onfocus="@(() => focusControl = 1)" name="cant" style="margin-bottom:10px;">
+                <input @bind-value="strCant" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(1, ref strCant))" @onfocus="@(() => CheckValor(1))" name="cant" style="margin-bottom:10px;">
                 @*<MudTextField Label="Cantidad" HelperText="Formato 9,99 ó 9" @bind-Value="cant"/>*@
             </MudStack>
             <MudStack>
                 <label for="bonif">% Bonificación</label>
-                <input @bind-value="strBon" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(2, ref strBon))" @onfocus="@(() => focusControl = 2)" name="bonif" style="margin-bottom:10px;">
+                <input @bind-value="strBon" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="@(() => Procesar(2, ref strBon))" @onfocus="@(() => CheckValor(2))" name="bonif" style="margin-bottom:10px;">
                 @*<MudTextField Label="% Bonificacion" HelperText="Formato 9,99 ó 9" @bind-Value="bonif"/>*@
             </MudStack>
         </MudStack>
@@ -249,6 +249,24 @@ else
                 can--;
                 str += dato.Dequeue();
             }
+        }
+    }
+
+    private void CheckValor(int focus)
+    {
+        focusControl = focus;
+
+        switch (focusControl)
+        {
+            case 1:
+                if (strCant == "1")
+                    strCant = "";
+                break;
+
+            case 2:
+                if (strBon == "0")
+                    strBon = "";
+                break;
         }
     }
 

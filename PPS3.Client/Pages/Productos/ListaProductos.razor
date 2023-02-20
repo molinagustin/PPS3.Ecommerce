@@ -12,7 +12,9 @@
     <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1"/>
 }
 else
-{    
+{
+    <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Outlined" Href="/detallesProducto" Style="margin-bottom:10px;">Agregar Nuevo</MudButton>
+
     <RadzenGrid Data="@productos" TItem="ProductoListado" AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowColumnResize=true>
         <Columns>
             <RadzenGridColumn TItem="ProductoListado" Property="NombreProd" Title="Nombre"></RadzenGridColumn>

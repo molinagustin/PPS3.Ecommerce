@@ -83,6 +83,30 @@
             else return null;
         }
 
+        public async Task<IEnumerable<ProductoFechaReporte>> ReporteProductosFechaReporte(Parametros parametros)
+        {
+            var token = await _sessionStorage.GetItemAsync<string>("token");
+            if (String.IsNullOrEmpty(token)) return null;
+
+            var request = new HttpRequestMessage(HttpMethod.Post, $"api/Reportes/ReporteProductosFechaReporte");
+            request.Headers.Add("Authorization", "Bearer " + token);
+
+            var parametrosJson = new StringContent(JsonSerializer.Serialize(parametros), Encoding.UTF8, "application/json");
+            request.Content = parametrosJson;
+
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var productos = await JsonSerializer.DeserializeAsync<IEnumerable<ProductoFechaReporte>>(stream, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+                return productos;
+            }
+            else return null;
+        }
+
         public async Task<IEnumerable<StockProd>> ReporteStockProductos(Parametros parametros)
         {
             var token = await _sessionStorage.GetItemAsync<string>("token");

@@ -58,7 +58,7 @@
     <RadzenChart Style="height:600px;">
         <RadzenBarSeries Data="productosReport" CategoryProperty="FechaComp" Title="Cantidad" ValueProperty="Cantidad" LineType="LineType.Dashed" />
         <RadzenBarOptions Radius="5" />
-        <RadzenValueAxis>
+        <RadzenValueAxis Min="0">
             <RadzenGridLines Visible="true" />
         </RadzenValueAxis>
     </RadzenChart>
@@ -71,7 +71,7 @@ else if (generando)
 @code {
     Parametros parametros = new Parametros();
     IEnumerable<ProductoFecha> productos = new List<ProductoFecha>();    
-    List<ProductoFechaReporte> productosReport = new List<ProductoFechaReporte>();
+    IEnumerable<ProductoFechaReporte> productosReport = new List<ProductoFechaReporte>();
     bool generando = false;
     private DateTime? fechaDes;
     private DateTime? fechaHas;
@@ -92,18 +92,10 @@ else if (generando)
             parametros.FechaDesde = fechaDes.Value;
             parametros.FechaHasta = fechaHas.Value;
         }
-        var result = await servReporte.ReporteProductosFecha(parametros);
+        productos = await servReporte.ReporteProductosFecha(parametros);
+        productosReport = await servReporte.ReporteProductosFechaReporte(parametros);
 
-        if (result != null)
-        {
-            productos = result;
-            foreach (var p in productos)
-            {
-                if(!(productosReport.Exists(x=>x.FechaComp == p.FechaComp)))
-                    productosReport.Add(new ProductoFechaReporte(p.FechaComp, productos.Where(x=>x.FechaComp == p.FechaComp).Sum(x=>x.Cantidad)));
-            }
-        }
-        else Snackbar.Add($"No se encontraron resultados para el reporte.", Severity.Error);
+        if (productos == null || productosReport == null) Snackbar.Add($"No se encontraron resultados para el reporte.", Severity.Error);
 
         generando = false;
         StateHasChanged();

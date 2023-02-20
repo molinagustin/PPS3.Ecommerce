@@ -85,7 +85,7 @@ else
                 <Authorized>
                     <EditForm Model="producto" OnValidSubmit="AgregarProducto">
                         <label for="CantProd">Cantidad</label>
-                        <input @bind-value="strCant" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="CalculoSubTotal" name="CantProd">
+                        <input @bind-value="strCant" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="CalculoSubTotal" name="CantProd" @onfocus="CheckValor">
                         @*<MudTextField Label="Cantidad" HelperText="Formato 999,99 ó 999" @bind-Value="cantidad" For="@(() => producto.Cantidad)" Required="true" Immediate=true OnBlur="CalculoSubTotal"/>*@
                         <MudText @bind-Value="subTotal" ReadOnly=true>
                             Sub Total:
@@ -344,4 +344,6 @@ else
             strCant += dato.Dequeue();
         }            
     }
+
+    private void CheckValor() => strCant = "";
 }
