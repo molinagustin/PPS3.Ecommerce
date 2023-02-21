@@ -25,6 +25,7 @@ else
     <RadzenGrid Data="@comprobantes" TItem="Comprobante" RowSelect="@(args => comprobante = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
         <Columns>
             <RadzenGridColumn TItem="Comprobante" Property="IdEncab" Title="N° Comp." Width="90px"></RadzenGridColumn>
+            <RadzenGridColumn TItem="Comprobante" Property="Carro" Title="N° Orden" Width="90px"></RadzenGridColumn>
             <RadzenGridColumn TItem="Comprobante" Property="TipoComp" Title="Tipo Comp." Width="130px"></RadzenGridColumn>
             <RadzenGridColumn TItem="Comprobante" Property="FechaComp" Title="Fecha Comp." Width="120px">
                 <Template Context="fecha">
