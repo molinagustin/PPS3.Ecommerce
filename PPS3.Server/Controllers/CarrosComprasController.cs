@@ -96,6 +96,14 @@ namespace PPS3.Server.Controllers
                 return BadRequest();
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<OrdenesCompraCotiz>>> ObtenerOCCotiz()
+        {
+            var response = await _repCarroCompra.ObtenerOCCotiz();
+            if (response != null) return Ok(response);
+            else return BadRequest();
+        }
+
         [HttpPost]
         public async Task<ActionResult<int>> CrearCarroCompra(int idUsuario)
         {
@@ -103,6 +111,18 @@ namespace PPS3.Server.Controllers
                 return BadRequest();
 
             var response = await _repCarroCompra.InsertarCarroCompra(idUsuario);
+            if (response > 0)
+                return Ok(response);
+            else
+                return BadRequest();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<int>> InsertarCarroComprasCotizacion(CarroCompra carroCompra)
+        {
+            if(carroCompra == null) return BadRequest();
+
+            var response = await _repCarroCompra.InsertarCarroComprasCotizacion(carroCompra);
             if (response > 0)
                 return Ok(response);
             else

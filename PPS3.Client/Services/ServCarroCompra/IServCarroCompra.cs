@@ -15,5 +15,7 @@ namespace PPS3.Client.Services.ServCarroCompra
         Task<bool> GuardarCarro(CarroCompra carro);
         Task<bool> BajaComprobanteCarro(int id);
         Task<IEnumerable<MovimientosPago>> ObtenerMovimientosPago(int NumOrden);
+        Task<int> InsertarCarroComprasCotizacion(CarroCompra carroCompra);
+        Task<IEnumerable<OrdenesCompraCotiz>> ObtenerOCCotiz();
     }
 }

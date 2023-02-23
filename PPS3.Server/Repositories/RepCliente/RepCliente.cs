@@ -149,9 +149,10 @@
             var db = dbConnection();
 
             var sql = @"
-                        SELECT c.*, cc.Activo AS CCActiva
+                        SELECT c.*, cc.Activo AS CCActiva, u.IdUsuarioAct AS UsCliente
                         FROM clientes c
                         INNER JOIN cuentas_corrientes cc ON c.IdCliente = cc.ClienteCC
+                        INNER JOIN usuarios u ON c.IdCliente = u.IdCliente
                         ";
             var result = await db.QueryAsync<Cliente>(sql, new { });
             return result;

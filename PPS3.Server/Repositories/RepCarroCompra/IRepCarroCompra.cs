@@ -16,5 +16,7 @@
         Task<bool> ActualizarCarroCompra(CarroCompra carroCompra);
         Task<bool> BajaComprobanteCarro(int id);
         Task<IEnumerable<MovimientosPago>>ObtenerMovimientosPago(int NumOrden);
+        Task<int> InsertarCarroComprasCotizacion(CarroCompra carroCompra);
+        Task<IEnumerable<OrdenesCompraCotiz>> ObtenerOCCotiz();
     }
 }

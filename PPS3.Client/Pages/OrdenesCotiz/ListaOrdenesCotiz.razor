@@ -1,0 +1,129 @@
+﻿@page "/listaOrdenCotiz"
+@inject IServCarroCompra ServCarro
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@using Radzen.Blazor
+@attribute [Authorize(Roles = "1, 2")]
+
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Listado de Ordenes de Compra de Cotización</MudText>
+
+<MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Outlined" Href="/detallesOrdenCotiz" Style="margin-bottom:20px;">Agregar Nueva</MudButton>
+
+@if (ordenes == null)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+}
+else
+{
+    @if(ordenes.Count() > 0)
+    {
+        <MudGrid Justify="Justify.Center">
+
+            <RadzenGrid Data="@ordenes" TItem="OrdenesCompraCotiz" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:30px;" AllowColumnResize="true">
+                <Columns>
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="IdCarro" Title="N° Orden" Width="100px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="Estado" Title="Estado" Width="120px">
+                        <Template Context="est">
+                            @if (est.Estado == "Pendiente")
+                            {
+                                <div style="color:deepskyblue;">@est.Estado</div>
+                            }
+                            else if (est.Estado == "Aprobado")
+                            {
+                                <div style="color:lime;">@est.Estado</div>
+                            }
+                            else if (est.Estado == "Finalizado")
+                            {
+                                <div style="color:darkmagenta;">@est.Estado</div>
+                            }
+                            else if (est.Estado == "Cancelado")
+                            {
+                                <div style="color:crimson;">@est.Estado</div>
+                            }
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="UsuarioCrea" Title="Solicitado por" Width="120px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="UsGenCot" Title="Generada por" Width="120px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="FechaOrden" Title="Fecha de Orden" Width="150px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="FechaEntrega" Title="Fecha de Entrega" Width="130px">
+                        <Template Context="fecEnt">
+                            @if (fecEnt.FechaEntrega == null)
+                            {
+                                @string.Format("----")
+                                ;
+                            }
+                            else
+                            {
+                                @string.Format("{0:d}", fecEnt.FechaEntrega)
+                                ;
+                            }
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="Total" Title="Importe Total" Width="150px">
+                        <Template Context="tot">
+                            @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", tot.Total)
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="Pagado" Title="¿Pagado?" Width="100px">
+                        <Template Context="pagado">
+                            @if (pagado.Pagado)
+                            {
+                                <MudIcon Icon="@Icons.Filled.Check" Color="Color.Success"></MudIcon>
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Filled.Dangerous" Color="Color.Error"></MudIcon>
+                            }
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="FechaPago" Title="Fecha de Pago" Width="150px">
+                        <Template Context="fecPag">
+                            @if (fecPag.FechaPago == null)
+                            {
+                                @string.Format("----")
+                                ;
+                            }
+                            else
+                            {
+                                @string.Format("{0:d}", fecPag.FechaPago)
+                                ;
+                            }
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="Observaciones" Title="Observaciones">
+                        <Template Context="obs">
+                            @if (string.IsNullOrEmpty(obs.Observaciones))
+                            {
+                                @string.Format("----")
+                                ;
+                            }
+                            else
+                            {
+                                @string.Format("{0}", obs.Observaciones)
+                                ;
+                            }
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="IdCarro" Title="Ver Detalles" Width="120px">
+                        <Template Context="detalles">
+                            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="info" Click="@(() => NavigationManager.NavigateTo($"/detallesOrdenesCompra/{@detalles.IdCarro}"))" />
+                        </Template>
+                    </RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+        </MudGrid>
+    }
+    else
+    {
+        <MudText Align="Align.Center" Typo="Typo.body1" Color="Color.Error" Style="margin-bottom:30px;">No hay órdenes generadas por el momento.</MudText>
+    }
+}
+
+@code {
+    IEnumerable<OrdenesCompraCotiz> ordenes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ordenes = await ServCarro.ObtenerOCCotiz();
+    }
+}

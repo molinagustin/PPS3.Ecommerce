@@ -18,5 +18,6 @@ namespace PPS3.Shared.Models
         public int MetodoPago { get; set; }
         public string Observaciones { get; set; } = string.Empty;
         public bool CompGenerado { get; set; }
+        public int UsGenCot { get; set; }
     }
 }

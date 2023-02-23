@@ -28,5 +28,7 @@ namespace PPS3.Shared.Models
 
         //Propiedad para su cuenta corriente activa
         public bool CCActiva { get; set; }
+        //Propiedad para ver su cliente
+        public int UsCliente { get; set; }
     }
 }

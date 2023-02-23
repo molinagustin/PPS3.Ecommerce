@@ -103,6 +103,44 @@ namespace PPS3.Server.Repositories.RepCarroCompra
                 return 0;
         }
 
+        public async Task<int> InsertarCarroComprasCotizacion(CarroCompra carroCompra)
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        INSERT INTO carros_compras (
+                                                    Estado, UsuarioCarro, FechaOrden, Total, Observaciones, UsGenCot  
+                                                    )
+                        VALUES (
+                                @Estado, @UsuarioCarro, @FechaOrden, @Total, @Observaciones, @UsGenCot 
+                                )
+                        ";
+            var result = await db.ExecuteAsync(sql, new { 
+                                                        carroCompra.Estado,
+                                                        carroCompra.UsuarioCarro,
+                                                        FechaOrden = DateTime.Now,
+                                                        carroCompra.Total,
+                                                        carroCompra.Observaciones,
+                                                        carroCompra.UsGenCot
+                                                        });
+
+            if (result > 0)
+            {
+                var sql2 = @"SELECT MAX(cc.IdCarro)
+                            FROM carros_compras cc
+                            WHERE Estado = 2 AND UsuarioCarro = @UsuarioCarro";
+
+                var idCarroNuevo = await db.ExecuteScalarAsync<int>(sql2, new { carroCompra.UsuarioCarro });
+
+                if (idCarroNuevo > 0)
+                    return idCarroNuevo;
+                else
+                    return 0;
+            }
+            else
+                return 0;
+        }
+
         public async Task<CarroCompra> ObtenerCarroCompra(int id)
         {
             var db = dbConnection();
@@ -277,6 +315,23 @@ namespace PPS3.Server.Repositories.RepCarroCompra
                         ORDER BY re.FechaRecibo;
                         ";
             var result = await db.QueryAsync<MovimientosPago>(sql, new { NumOrden = NumOrden });
+            return result;
+        }
+
+        public async Task<IEnumerable<OrdenesCompraCotiz>> ObtenerOCCotiz()
+        {
+            var db = dbConnection();
+
+            var sql = @"
+                        SELECT cc.IdCarro, cce.Estado, u.NombreUs AS UsuarioCrea, cc.FechaOrden, cc.FechaEntrega, cc.Total, cc.Pagado, cc.FechaPago, cc.Observaciones, u2.NombreUs AS UsGenCot
+                        FROM carros_compras AS cc
+                        INNER JOIN carros_compras_estados AS cce ON cc.Estado = cce.IdEstado
+                        INNER JOIN usuarios AS u ON cc.UsuarioCarro = u.IdUsuarioAct
+                        INNER JOIN usuarios AS u2 ON cc.UsGenCot = u2.IdUsuarioAct
+                        WHERE cc.Estado > 1 AND cc.UsGenCot IS NOT NULL
+						ORDER BY cc.IdCarro DESC;
+                        ";
+            var result = await db.QueryAsync<OrdenesCompraCotiz>(sql, new { });
             return result;
         }
     }
