@@ -5,6 +5,7 @@
 @inject IServEstadoCarroCompra ServEstadoCarro
 @inject IServMovCarro ServMovCarro
 @inject IServFormaPago ServFormaPago
+@inject IServEmail ServEmail
 @inject ISnackbar Snackbar /*Servicio para las notificaciones*/
 @inject IJSRuntime JS /*JS Interop*/
 @inject IDialogService DialogService
@@ -89,15 +90,31 @@ else
                 <MudSwitch @bind-Checked="pgdo" Label="Pagado" Color="Color.Success" ReadOnly="true" />
             </MudStack>
 
-            @if (ordenListado.Pagado)
-            {
-                <MudStack>
-                    <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Pago: <b>@string.Format("{0:d}", ordenListado.FechaPago)</b></MudText>
-                </MudStack>
-                @*<MudStack>
-                    <MudText Align="Align.Left" Typo="Typo.body1">Forma de Pago: <b>@ordenListado.FormaP</b></MudText>
-                </MudStack>*@
-            }                      
+            <MudStack>
+                @if (pagos != null && pagos.Count() > 0)
+                {
+                    @foreach (var pago in pagos)
+                    {
+                        <MudStack Row=true>
+                            <MudStack Spacing="0" Class="mb-2">
+                                <MudText Align="Align.Left" Typo="Typo.body1">Fecha de Pago: <b>@string.Format("{0:d}", pago.FechaRecibo)</b></MudText>
+                                <MudText Align="Align.Left" Typo="Typo.body1">Forma de Pago: <b>@pago.FormaP</b></MudText>
+                            </MudStack>
+                            <MudStack>
+                                <MudText Align="Align.Left" Typo="Typo.body1">Importe: <b>$ @pago.ImporteTotal</b></MudText>
+                            </MudStack>
+                        </MudStack>
+                    }
+                    @if (!ordenListado.Pagado)
+                    {
+                        <MudText Align="Align.Left" Typo="Typo.body1">Saldo Restante: <b>$ @pagos.First().SaldoRestante</b></MudText>
+                    }
+                }
+                else
+                {
+                    <MudText Align="Align.Left" Typo="Typo.body1"><b>Sin pagos realizados hasta el momento.</b></MudText>
+                }
+            </MudStack>
         </MudItem>
 
         <MudItem xs="4">
@@ -214,6 +231,7 @@ else
     IEnumerable<FormaPago> formaPago;
     IEnumerable<EstadoCarroCompra> estados;
     IEnumerable<HistorialMovimientoCarro> historial;
+    IEnumerable<MovimientosPago> pagos;
 
     //Guardo el ID del usuario actual
     protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId")); 
@@ -226,6 +244,7 @@ else
         estados = await ServEstadoCarro.ObtenerEstados();
         estados = estados.Where(e => e.IdEstado > 1);
         historial = await ServMovCarro.ObtenerHistorial(id);
+        pagos = await ServCarro.ObtenerMovimientosPago(id);
 
         //Obtengo el carro por si necesito actualizar datos
         carro = await ServCarro.ObtenerCarro(id);
@@ -280,8 +299,15 @@ else
             var movimientoCreado = await ServMovCarro.CrearMovimiento(movimiento);
             if (!movimientoCreado) Snackbar.Add($"No se creó el movimiento", Severity.Error);
 
+            //Envio un email si el usuario tiene confirmado su correo
+            if(ordenListado.EmailVerificado)
+            {
+                ordenListado.Estado = estados.Where(x => x.IdEstado == estado).First().Estado;
+                await ServEmail.EmailModificacionOrden(ordenListado);
+            }
+
             NavigationManager.NavigateTo("/listaOrdenesCompra");
-            Snackbar.Add($"Orden de compra N° {ordenListado.IdCarro} modificada exitosamente", Severity.Success);
+            Snackbar.Add($"Orden de compra N° {ordenListado.IdCarro} actualizada exitosamente", Severity.Success);
         }
         else Snackbar.Add($"No se pudo modificar la Orden de Compra", Severity.Error);
     }

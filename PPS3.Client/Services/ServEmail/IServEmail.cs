@@ -4,5 +4,6 @@
     {
         Task<bool> EmailContacto(EmailBasico datosEmail);
         Task<bool> EmailVerificacion(EmailAutenticacion datosEmail);
+        Task<bool> EmailModificacionOrden(OrdenesCompraListado orden);
     }
 }

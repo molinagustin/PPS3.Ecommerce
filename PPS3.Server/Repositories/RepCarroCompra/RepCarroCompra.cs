@@ -203,7 +203,7 @@ namespace PPS3.Server.Repositories.RepCarroCompra
 
             var sql = @"
                         SELECT cc.IdCarro, cce.Estado, u.NombreUs as UsuarioCrea, cc.FechaCrea, cc.FechaOrden, cc.FechaEntrega, cc.FechaUltModif, 
-                        cc.Total, cc.Pagado, cc.FechaPago, fp.FormaP, cc.Observaciones
+                        cc.Total, cc.Pagado, cc.FechaPago, fp.FormaP, cc.Observaciones, u.EmailVerificado, u.Email
                         FROM carros_compras as cc
                         INNER JOIN carros_compras_estados as cce ON cc.Estado = cce.IdEstado
                         INNER JOIN usuarios as u ON cc.UsuarioCarro = u.IdUsuarioAct

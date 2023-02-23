@@ -25,5 +25,9 @@ namespace PPS3.Shared.InternalModels
 
         //Para guardar los detalles del carro
         public ICollection<DetalleCarroCompra>? DetallesCarro { get; set; }
+
+        //Para enviar email cliente
+        public bool EmailVerificado { get; set; } = false;
+        public string Email { get; set; } = string.Empty;
     }
 }

@@ -35,5 +35,15 @@ namespace PPS3.Server.Controllers
             else
                 return BadRequest();
         }
+
+        [HttpPost]
+        public ActionResult EmailModificacionOrden([FromBody] OrdenesCompraListado orden)
+        {
+            var emailEnviado = _servEmail.EmailModificacionOrden(orden);
+            if (emailEnviado)
+                return Ok();
+            else
+                return BadRequest();
+        }
     }
 }

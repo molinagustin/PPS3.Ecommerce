@@ -94,7 +94,7 @@ else
                     <MudCardContent>
                         <MudStack Row="true">
                             <MudStack Style="width:50%">
-                                <MudSelect T="string" @bind-Value="@tipoCl" Label="Tipo de Cliente/Persona" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                <MudSelect T="string" @bind-Value="@tipoCl" Label="Tipo de Cliente/Persona" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="FiltrarDoc">
                                     <MudSelectItem Value="@("Fisica")">@string.Format("1- Física")</MudSelectItem>
                                     <MudSelectItem Value="@("Juridica")">@string.Format("2- Jurídica")</MudSelectItem>
                                 </MudSelect>
@@ -127,12 +127,12 @@ else
                     
                         <MudStack Row="true">
                             <MudStack Style="width:50%">
-                                @if (tipoDoc != null)
+                                @if (tipoDocsDisp != null)
                                 {
                                     <MudSelect T="int" @bind-Value="@tipoDocu" Label="Tipo de Documento" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                                        @foreach(var tipos in tipoDoc)
+                                        @foreach (var tipos in tipoDocsDisp)
                                         {
-                                            <MudSelectItem Value="@tipos.IdTipoDoc">@(tipoDoc.ToList().IndexOf(tipos) + 1) - @tipos.Sigla</MudSelectItem>
+                                            <MudSelectItem Value="@tipos.IdTipoDoc">@(tipoDocsDisp.ToList().IndexOf(tipos) + 1) - @tipos.Sigla</MudSelectItem>
                                         }
                                     </MudSelect>
                                 }
@@ -217,7 +217,8 @@ else
 
     //Objetos para CBO
     private IEnumerable<CondicionIVA> condIva;
-    private IEnumerable<TipoDocumento> tipoDoc;
+    private IEnumerable<TipoDocumento> tipoDoc = new List<TipoDocumento>();
+    private List<TipoDocumento> tipoDocsDisp = new List<TipoDocumento>();
     private IEnumerable<Localidad> loc;
     private IEnumerable<Localidad> locFiltradas = new List<Localidad>();
     private IEnumerable<Provincia> provs;
@@ -287,6 +288,23 @@ else
         {
             sinLocalidad = false;
             loca = locFiltradas.First().IdLocalidad;
+        }
+        StateHasChanged();
+    }
+
+    private void FiltrarDoc()
+    {
+        if (tipoCl == "Fisica")
+        {
+            tipoDocsDisp.Clear();
+            tipoDocsDisp = tipoDoc.Where(x => x.IdTipoDoc != 2).ToList();
+            tipoDocu = 3;
+        }
+        else
+        {
+            tipoDocsDisp.Clear();
+            tipoDocsDisp = tipoDoc.Where(x => x.IdTipoDoc == 2).ToList();
+            tipoDocu = 2;
         }
         StateHasChanged();
     }
@@ -402,8 +420,7 @@ else
             usuarioCliente.Telefono = cliente.Telefono;
             usuarioCliente.LocalidadC = cliente.LocalidadC;
 
-            cond = usuarioCliente.CondIva;
-            tipoDocu = usuarioCliente.TipoDocumento;     
+            cond = usuarioCliente.CondIva;            
             
             prov = loc.Where(x => x.IdLocalidad == usuarioCliente.LocalidadC).First().Provincia;
             BuscarLocalidad();
@@ -422,6 +439,9 @@ else
                 tipoCl = "Fisica";
             else
                 tipoCl = "Juridica";
+
+            FiltrarDoc();
+            tipoDocu = usuarioCliente.TipoDocumento;
 
             StateHasChanged();
 
