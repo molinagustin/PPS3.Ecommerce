@@ -29,5 +29,6 @@ namespace PPS3.Shared.InternalModels
         //Para enviar email cliente
         public bool EmailVerificado { get; set; } = false;
         public string Email { get; set; } = string.Empty;
+        public string UrlString { get; set; } = string.Empty;
     }
 }

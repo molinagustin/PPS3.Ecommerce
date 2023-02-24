@@ -49,23 +49,23 @@ namespace PPS3.Server.ExternalServices.ServEmail
                 var email = new MimeMessage();
                 email.From.Add(MailboxAddress.Parse(_config.GetSection("EmailUsername").Value));
                 email.To.Add(MailboxAddress.Parse(orden.Email));
-                email.Subject = "Actualización de Orden Compra nº " + orden.IdCarro.ToString();
+                email.Subject = "ExpoCeramica: Actualización de Orden Compra nº " + orden.IdCarro.ToString();
 
                 var contenido = new StringBuilder();
-                contenido.AppendLine($"<h4>La orden de compra nº {orden.IdCarro.ToString()} ha sido actualizada.</h4>");
-                contenido.AppendLine("<br><br>");
+                contenido.AppendLine($"<h3>La orden de compra nº {orden.IdCarro.ToString()} ha sido actualizada.</h4>");
                 contenido.AppendLine("<ul>");
                 contenido.AppendLine($"<li>Estado: <b>{orden.Estado}</b></li>");
                 contenido.AppendLine($"<li>Fecha Orden: <b>{orden.FechaOrden}</b></li>");
                 if(orden.FechaEntrega != null)
-                    contenido.AppendLine($"<li>Fecha Entrega: <b>{string.Format("dd/MM/yyyy" ,orden.FechaEntrega)}</b></li>");
+                    contenido.AppendLine($"<li>Fecha Entrega: <b>{orden.FechaEntrega.Value.ToShortDateString()}</b></li>");
                 contenido.AppendLine($"<li>Última Modif.: <b>{orden.FechaUltModif}</b></li>");
-                contenido.AppendLine($"<li>Total Orden: <b>{orden.Total}</b></li>");
+                contenido.AppendLine($"<li>Total Orden: <b>{string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", orden.Total)}</b></li>");
 
                 if(orden.Pagado)
                 {
                     contenido.AppendLine($"<li>Pagado: <b>Si</b></li>");
-                    contenido.AppendLine($"<li>Fecha Pago: <b>{orden.FechaPago}</b></li>");
+                    if(orden.FechaPago != null)
+                        contenido.AppendLine($"<li>Fecha Pago: <b>{orden.FechaPago.Value.ToShortDateString()}</b></li>");
                 }
                 else contenido.AppendLine($"<li>Pagado: <b>No</b></li>");
 
@@ -76,9 +76,8 @@ namespace PPS3.Server.ExternalServices.ServEmail
 
                 contenido.AppendLine("<table>");
                 contenido.AppendLine("<thead>");
-                contenido.AppendLine("<tr><th colspan=\"4\">Productos Solicitados</th></tr>");
+                contenido.AppendLine("<tr><th colspan=\"3\">Productos Solicitados</th></tr>");
                 contenido.AppendLine("<tr>");
-                contenido.AppendLine("<th></th>");
                 contenido.AppendLine("<th>Producto</th>");
                 contenido.AppendLine("<th>Cantidad</th>");
                 contenido.AppendLine("<th>Sub Total</th>");
@@ -86,13 +85,12 @@ namespace PPS3.Server.ExternalServices.ServEmail
                 contenido.AppendLine("</thead>");
                 contenido.AppendLine("<tbody>");
                 if(orden.DetallesCarro == null || orden.DetallesCarro.Count() == 0)
-                    contenido.AppendLine("<tr><th colspan=\"4\"><b>Sin Productos</b></th></tr>");
+                    contenido.AppendLine("<tr><th colspan=\"3\"><b>Sin Productos</b></th></tr>");
                 else
                 {
                     foreach (var det in orden.DetallesCarro)
                     {
                         contenido.AppendLine("<tr>");
-                        contenido.AppendLine($"<td><img src\"{det.UrlImagen}\" width=\"70\" height=\"70\"></td>");
                         contenido.AppendLine($"<td>{det.NombreProducto}</td>");
                         contenido.AppendLine($"<td>{det.Cantidad} {det.DescripcionUnidad}</td>");
                         contenido.AppendLine($"<td>{string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", det.SubTotal)}</td>");
@@ -102,7 +100,7 @@ namespace PPS3.Server.ExternalServices.ServEmail
                 contenido.AppendLine("</tbody></table>");
 
                 contenido.AppendLine("<br><br>");
-                contenido.AppendLine("<h6>Ante cualquier duda, puedes ponerte en contacto con nosotros a través de nuestro portal web.</h6>");
+                contenido.AppendLine($"<h6>Ante cualquier duda, puedes ponerte en contacto con nosotros enviandonos un <a href='{orden.UrlString}contacto'>Email</a> ó hablar con nuestro <a href='https://api.whatsapp.com/send?phone=5492625663454'>Whatsapp</a>. Te agracedemos habernos elegido :D.</h6>");
 
                 email.Body = new TextPart(TextFormat.Html) { Text = contenido.ToString() };
 

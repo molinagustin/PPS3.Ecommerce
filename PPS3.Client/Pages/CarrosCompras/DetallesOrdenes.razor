@@ -179,11 +179,18 @@ else
                 }
                 else
                 {
-                    <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success" Variant="Variant.Outlined" OnClick="GuardarOrden">Guardar</MudButton>
+                    @if(guardando)
+                    {
+                        <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                    }
+                    else
+                    {
+                        <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success" Variant="Variant.Outlined" OnClick="GuardarOrden" Disabled="guardando">Guardar</MudButton>
+                    }                    
                 }
             </MudStack>
             <MudStack>
-                <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Default" Variant="Variant.Outlined" OnClick="Cancelar">Cancelar</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Default" Variant="Variant.Outlined" OnClick="Cancelar" Disabled="guardando">Cancelar</MudButton>
             </MudStack>
         </MudItem>
     </MudGrid>
@@ -223,6 +230,7 @@ else
     private int formaP;
     private int estado;
     private bool pgdo;
+    private bool guardando = false;
 
     //Para guardar la orden solicitada
     OrdenesCompraListado ordenListado;
@@ -278,6 +286,8 @@ else
 
     private async Task ModificarOrden()
     {
+        guardando = true;
+        StateHasChanged();
         //Asigno los valores cambiados al carro
         carro.Estado = estado;       
 
@@ -302,6 +312,7 @@ else
             //Envio un email si el usuario tiene confirmado su correo
             if(ordenListado.EmailVerificado)
             {
+                ordenListado.UrlString = NavigationManager.BaseUri;
                 ordenListado.Estado = estados.Where(x => x.IdEstado == estado).First().Estado;
                 await ServEmail.EmailModificacionOrden(ordenListado);
             }
@@ -310,5 +321,7 @@ else
             Snackbar.Add($"Orden de compra N° {ordenListado.IdCarro} actualizada exitosamente", Severity.Success);
         }
         else Snackbar.Add($"No se pudo modificar la Orden de Compra", Severity.Error);
+        guardando = false;
+        StateHasChanged();
     }
 }
