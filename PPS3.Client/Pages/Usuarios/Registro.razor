@@ -150,7 +150,14 @@
 
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.AppRegistration" Color="Color.Success" ButtonType="ButtonType.Submit" Style="margin-bottom:5px;" Disabled=registrando>REGISTRARSE</MudButton>
+                    @if(registrando)
+                    {
+                    <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+                    }
+                    else
+                    {
+                        <MudButton FullWidth="true" StartIcon="@Icons.Material.Filled.AppRegistration" Color="Color.Success" ButtonType="ButtonType.Submit" Style="margin-bottom:5px;" Disabled=registrando>REGISTRARSE</MudButton>
+                    }
                 </MudCardActions>
             </MudCard>
         </MudItem>
@@ -256,6 +263,7 @@
             {
                 //Deshabilito el boton
                 registrando = true;
+                StateHasChanged();
 
                 //Asigno los valores apropiados
                 usuarioCliente.TipoCliente = Convert.ToChar(tipoCl.Substring(0, 1));
@@ -276,6 +284,7 @@
                 else
                 {
                     registrando = false;
+                    StateHasChanged();
                     Snackbar.Add($"No se pudo crear el usuario", Severity.Error); 
                 }                    
             }

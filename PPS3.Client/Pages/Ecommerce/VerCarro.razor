@@ -102,6 +102,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         carro = await ServCarro.ObtenerCarro(id);
+        if (carro != null && carro.Estado != 1) NavigationManager.NavigateTo($"/", forceLoad: true);
         detalles = await ServDetalleCarro.ObtenerDetallesCarro(id);
     }
 
