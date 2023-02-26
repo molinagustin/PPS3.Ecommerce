@@ -97,8 +97,11 @@ else
     IEnumerable<DetalleCarroCompra> detalles;
 
     //Guardo el ID del usuario actual
-    protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
-
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+        if (carro.UsuarioCarro != idUsAct) NavigationManager.NavigateTo($"/", forceLoad: true);
+    } 
     protected override async Task OnInitializedAsync()
     {
         carro = await ServCarro.ObtenerCarro(id);
