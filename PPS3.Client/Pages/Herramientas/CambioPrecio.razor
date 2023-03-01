@@ -1,0 +1,260 @@
+﻿@page "/cambioPrecio"
+@inject IServHerramientas ServHerramientas
+@inject IServRubro ServRubro
+@inject IServTipoProducto ServTipoProducto
+@inject IServProveedor ServProveedor
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar /*Servicio para las notificaciones*/
+@inject IJSRuntime JS /*JS Interop*/
+@inject IDialogService DialogService
+@using Radzen.Blazor
+@attribute [Authorize(Roles = "1, 2")]
+
+<AuthorizeView Context="usCont">
+    <input type="hidden" id="UsAct" value="@usCont.User.Claims.First().Value" />
+</AuthorizeView>
+
+<MudText Align="Align.Center" Typo="Typo.h5" Style="margin-bottom:30px;">Cambio de Precios Masivo</MudText>
+
+<MudGrid Justify="Justify.FlexStart">
+    <MudItem xs="3">
+        <MudSwitch @bind-Checked="cambios.Global" Label="Cambio Global" Color="Color.Success" />
+    </MudItem>        
+</MudGrid>
+
+<MudGrid Justify="Justify.FlexStart">
+    @if(!cambios.Global)
+    {
+        <MudItem xs="3">
+            <MudSwitch @bind-Checked="cambios.Rubros" Label="Rubros" Color="Color.Success" />
+
+            @if(cambios.Rubros)
+            {
+                <RadzenGrid Data="@rubros" TItem="Rubro" RowSelect="@(args => rubro = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
+                    <Columns>
+                        <RadzenGridColumn TItem="Rubro" Property="DescRubro" Title="Rubro"></RadzenGridColumn>
+                    </Columns>
+                </RadzenGrid>
+            }
+            else
+            {
+                rubro = new Rubro();
+            }
+        </MudItem>
+
+        <MudItem xs="3">
+            <MudSwitch @bind-Checked="cambios.TiposProds" Label="Tipos Productos" Color="Color.Success" />
+
+            @if (cambios.TiposProds)
+            {
+                <RadzenGrid Data="@tiposProd" TItem="TipoProducto" RowSelect="@(args => tipoProd = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
+                    <Columns>
+                        <RadzenGridColumn TItem="TipoProducto" Property="DescripcionTipo" Title="Tipo Producto"></RadzenGridColumn>
+                    </Columns>
+                </RadzenGrid>
+            }
+            else
+            {
+                tipoProd = new TipoProducto();
+            }
+        </MudItem>
+
+        <MudItem xs="3">
+            <MudSwitch @bind-Checked="cambios.Provs" Label="Proveedores" Color="Color.Success" />
+
+            @if (cambios.Provs)
+            {
+                <RadzenGrid Data="@provs" TItem="Proveedor" RowSelect="@(args => prov = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
+                    <Columns>
+                        <RadzenGridColumn TItem="Proveedor" Property="NombreProv" Title="Proveedor"></RadzenGridColumn>
+                    </Columns>
+                </RadzenGrid>
+            }
+            else
+            {
+                prov = new Proveedor();
+            }
+        </MudItem>
+    }
+    else
+    {
+        cambios.Rubros = false;
+        cambios.TiposProds = false;
+        cambios.Provs = false;
+    }
+
+    <MudItem xs="3">
+        <MudStack >
+            <label for="porcentaje">Porcentaje</label>
+            <input @bind-value="strProcentaje" @onkeydown="ProcessKeyPress" @onkeydown:preventDefault class="form-control" required="true" @onblur="Calculo" name="porcentaje" @onfocus="CheckValor">    
+            
+            <MudStack Row=true>
+                <MudText Color="Color.Error" Inline=true Style="align-self:center;">Disminuir</MudText>
+                <MudSwitch @bind-Checked="cambios.Aumentar" Color="Color.Success" UnCheckedColor="Color.Error" Style="margin-right:0px;"/>
+                <MudText Color="Color.Success" Inline=true Style="align-self:center;">Aumentar</MudText>
+            </MudStack>
+
+            @if(generando)
+            {
+                <MudProgressLinear Color="Color.Primary" Striped="true" Indeterminate="true" Class="my-1" />
+            }
+            else
+            {
+                <MudButton StartIcon="@Icons.Material.Filled.Done" Color="Color.Success" Variant="Variant.Outlined" OnClick="CambiarPrecio">Cambiar Precios</MudButton>                
+            }
+        </MudStack>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private int idUsAct;
+
+    IEnumerable<Rubro> rubros = new List<Rubro>();
+    IEnumerable<TipoProducto> tiposProd = new List<TipoProducto>();
+    IEnumerable<Proveedor> provs = new List<Proveedor>();
+
+    Rubro rubro = new Rubro();
+    TipoProducto tipoProd = new TipoProducto();
+    Proveedor prov = new Proveedor();
+    PPS3.Shared.InternalModels.CambioPrecios cambios = new ();
+
+    private string strProcentaje = "0";
+    private decimal porcentaje = 0;
+    private bool generando = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        rubros = await ServRubro.ObtenerRubros();
+        tiposProd = await ServTipoProducto.ObtenerTiposProd();
+        provs = await ServProveedor.ObtenerProveedores();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) => idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+
+    private void Calculo()
+    {
+        if (string.IsNullOrEmpty(strProcentaje.Trim())) strProcentaje = "0";
+        if (strProcentaje.Trim().StartsWith(',')) strProcentaje = "0" + strProcentaje;
+        if (strProcentaje.Contains(','))
+        {
+            var index = strProcentaje.IndexOf(',');
+            try { strProcentaje = strProcentaje.Substring(0, index + 3); }
+            catch (Exception) { strProcentaje = strProcentaje.Remove(index); }
+        }
+        porcentaje = Convert.ToDecimal(strProcentaje);
+        strProcentaje = porcentaje.ToString();
+    }
+
+    private static bool IsNumeric(string caracter)
+    {
+        int result;
+        return int.TryParse(caracter, out result);
+    }
+
+    //Declaro una pila (ultimo en entrar primero en salir) Dejo la pila o cola porque es mas facil acceder a los elementos
+    private Queue<Object> dato = new();
+
+    private void ProcessKeyPress(KeyboardEventArgs e)
+    {
+        dato.Clear();
+        var back = false;
+        foreach (var c in strProcentaje)
+            dato.Enqueue(c.ToString());
+
+        switch (e.Key)
+        {
+            case ".":
+                if (!dato.Contains(","))
+                    dato.Enqueue(",");
+                break;
+            case ",":
+                if (!dato.Contains(","))
+                    dato.Enqueue(",");
+                break;
+            default:
+                if (IsNumeric(e.Key))
+                    dato.Enqueue(e.Key);
+                if (e.Code == "Backspace" && dato.Count() > 0)
+                    back = true;
+                break;
+        }
+        strProcentaje = "";
+        var can = back ? dato.Count - 1 : dato.Count;
+        while (can > 0)
+        {
+            can--;
+            strProcentaje += dato.Dequeue();
+        }
+    }
+
+    private void CheckValor() { if (strProcentaje == "0") strProcentaje = ""; }
+
+    private async void CambiarPrecio()
+    {
+        cambios.IdUsAct = idUsAct;
+        cambios.Porcentaje = porcentaje;
+
+        if(!cambios.Aumentar && cambios.Porcentaje > 100)
+        {
+            Snackbar.Add($"El porcentaje de decremento no puede superar el 100%.", Severity.Error);
+            return;
+        }
+
+        if(cambios.Aumentar && cambios.Porcentaje > 200)
+        {
+            Snackbar.Add($"El porcentaje de aumento no puede superar el 200%.", Severity.Error);
+            return;
+        }
+
+        if(!cambios.Global)
+        {
+            cambios.Rubro = rubro.IdRubro;
+            cambios.TipoProd = tipoProd.IdTipo;
+            cambios.Prov = prov.IdProveedor;
+
+            if(!cambios.Rubros && !cambios.TiposProds && !cambios.Provs)
+            {
+                Snackbar.Add($"Debe seleccionar alguna opcion de modificación.", Severity.Error);
+                return;
+            }
+            else if(cambios.Rubros && cambios.Rubro == 0)
+            {
+                Snackbar.Add($"El rubro seleccionado es incorrecto.", Severity.Error);
+                return;
+            }
+            else if(cambios.TiposProds && cambios.TipoProd == 0)
+            {
+                Snackbar.Add($"El tipo de producto seleccionado es incorrecto.", Severity.Error);
+                return;
+            }
+            else if (cambios.Provs && cambios.Prov == 0)
+            {
+                Snackbar.Add($"El proveedor seleccionado es incorrecto.", Severity.Error);
+                return;
+            }
+        }
+
+        //Consulto si quiere realizar la operacion
+        var result = await DialogService.ShowMessageBox(
+                    "Atención",
+                    "¿Desea continuar con la operación?",
+                    yesText: "Si", cancelText: "No");
+
+        if (result == true)
+        {
+            generando = true;
+            var cant = await ServHerramientas.CambiarPrecios(cambios);
+
+            if (cant > 0)
+            {
+                NavigationManager.NavigateTo("/blanco");
+                NavigationManager.NavigateTo("/cambioPrecio");
+                Snackbar.Add($"Se actualizaron {cant} productos.", Severity.Success);
+            }
+            else Snackbar.Add($"Se modificaron 0 precios.", Severity.Error);
+
+            generando = false;
+        }
+        else Snackbar.Add($"Se cancela la operación.", Severity.Warning);        
+    }
+}

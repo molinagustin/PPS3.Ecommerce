@@ -57,8 +57,16 @@ else if (generando)
         stockProds = new List<StockProd>();
         var result = await servReporte.ReporteStockProductos(parametros);
 
-        if (result != null) stockProds = result;
-        else Snackbar.Add($"No se encontraron resultados para el reporte.", Severity.Error);
+        if (result != null)
+        {
+            var sumStock = result.Sum(x=>x.StockExistencia);
+            if(sumStock > 0)
+            {
+                stockProds = result;
+            }
+            else Snackbar.Add($"Seleccionar mayor cantidad de productos.", Severity.Info);
+        }
+    else Snackbar.Add($"No se encontraron resultados para el reporte.", Severity.Error);
 
         generando = false;
         StateHasChanged();

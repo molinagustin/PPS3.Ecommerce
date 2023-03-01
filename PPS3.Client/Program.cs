@@ -42,6 +42,7 @@ global using PPS3.Client.Services.ServCliente;
 global using PPS3.Client.Services.ServCarroCompra;
 global using PPS3.Client.Services.ServEmail;
 global using PPS3.Client.Services.ServMovimientoCarroCompra;
+global using PPS3.Client.Services.ServHerramientas;
 #endregion
 
 using MudBlazor.Services;
@@ -63,7 +64,7 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.PreventDuplicates = true;
     config.SnackbarConfiguration.NewestOnTop = false;
     config.SnackbarConfiguration.ShowCloseIcon = true;
-    config.SnackbarConfiguration.VisibleStateDuration = 10000;
+    config.SnackbarConfiguration.VisibleStateDuration = 5000;
     config.SnackbarConfiguration.HideTransitionDuration = 500;
     config.SnackbarConfiguration.ShowTransitionDuration = 500;
     config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
@@ -85,6 +86,7 @@ var API_URL = new Uri("http://localhost:7022");
 
 
 //Se inyectan los servicios HTTP del servicio creado (Producto) y se asigna la direccion URL a la que debe solicitar los request
+builder.Services.AddHttpClient<IServHerramientas, ServHerramientas>(client => { client.BaseAddress = API_URL; });
 builder.Services.AddHttpClient<IServProducto, ServProducto>( client => { client.BaseAddress = API_URL; });
 builder.Services.AddHttpClient<IServUsuario, ServUsuario>(client => { client.BaseAddress = API_URL; });
 builder.Services.AddHttpClient<IServProveedor, ServProveedor>(client => { client.BaseAddress = API_URL; });

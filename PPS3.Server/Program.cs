@@ -39,6 +39,7 @@ global using PPS3.Server.Repositories.RepCuerpoComprobante;
 global using PPS3.Server.Repositories.RepEncabezadoRecibo;
 global using PPS3.Server.Repositories.RepDetalleRecibo;
 global using PPS3.Server.Repositories.RepMovimientoCarroCompra;
+global using PPS3.Server.Repositories.RepHerramientas;
 #endregion
 using Microsoft.AspNetCore.Authentication.JwtBearer; //Para establecer la comunicacion de autenticacion
 using Microsoft.IdentityModel.Tokens; //Para las configuraciones de los JWT Bearers
@@ -94,6 +95,7 @@ builder.Services.AddScoped<IRepCuerpoComprobante, RepCuerpoComprobante>();
 builder.Services.AddScoped<IRepEncabezadoRecibo, RepEncabezadoRecibo>();
 builder.Services.AddScoped<IRepDetalleRecibo, RepDetalleRecibo>();
 builder.Services.AddScoped<IRepMovCarro, RepMovCarro>();
+builder.Services.AddScoped<IRepHerramientas, RepHerramientas>();
 #endregion
 
 #region Servicio de Autenticacion
