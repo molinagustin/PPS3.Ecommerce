@@ -18,15 +18,18 @@
         </MudSelect>
     </MudItem>
 
-    <MudItem xs="1">
-        <MudButton StartIcon="@Icons.Material.Filled.AdsClick" Color="Color.Primary" Variant="Variant.Filled" OnClick="ObtenerStock">Generar</MudButton>        
-    </MudItem>
-
-    <MudItem xs="1">
-        @if (stockProds.Count() > 0)
-        {
-            <MudButton StartIcon="@Icons.Material.Filled.Print" Color="Color.Primary" Variant="Variant.Outlined" OnClick="ImprimirReporte">Imprimir</MudButton>
-        }
+    <MudItem xs="2">
+        <MudStack Row=true>
+            <MudStack>
+                <MudButton StartIcon="@Icons.Material.Filled.AdsClick" Color="Color.Primary" Variant="Variant.Filled" OnClick="ObtenerStock">Generar</MudButton>
+            </MudStack>
+            <MudStack>
+                @if (stockProds.Count() > 0)
+                {
+                    <MudButton StartIcon="@Icons.Material.Filled.Print" Color="Color.Primary" Variant="Variant.Outlined" OnClick="ImprimirReporte">Imprimir</MudButton>
+                }
+            </MudStack>
+        </MudStack>
     </MudItem>
 </MudGrid>
 

@@ -25,8 +25,8 @@ else
     <RadzenGrid Data="@comprobantes" TItem="Comprobante" RowSelect="@(args => comprobante = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
         <Columns>
             <RadzenGridColumn TItem="Comprobante" Property="IdEncab" Title="N° Comp." Width="90px"></RadzenGridColumn>
-            <RadzenGridColumn TItem="Comprobante" Property="Carro" Title="N° Orden" Width="90px"></RadzenGridColumn>
-            <RadzenGridColumn TItem="Comprobante" Property="TipoComp" Title="Tipo Comp." Width="130px"></RadzenGridColumn>
+            <RadzenGridColumn TItem="Comprobante" Property="Carro" Title="N° Orden" Width="95px"></RadzenGridColumn>
+            <RadzenGridColumn TItem="Comprobante" Property="TipoComp" Title="Tipo Comp." Width="115px"></RadzenGridColumn>
             <RadzenGridColumn TItem="Comprobante" Property="FechaComp" Title="Fecha Comp." Width="120px">
                 <Template Context="fecha">
                     @string.Format("{0:d}", fecha.FechaComp)
@@ -39,12 +39,12 @@ else
                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", impFin.ImporteFinal)
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="Comprobante" Property="SaldoRestante" Title="Saldo Restante" Width="130px">
+            <RadzenGridColumn TItem="Comprobante" Property="SaldoRestante" Title="Saldo Rest." Width="130px">
                 <Template Context="saldo">
                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", saldo.SaldoRestante)
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="Comprobante" Property="Pagado" Title="¿Pagado?" Width="90px">
+            <RadzenGridColumn TItem="Comprobante" Property="Pagado" Title="¿Pagado?" Width="95px">
                 <Template Context="pgdo">
                     @if(pgdo.Pagado)
                     {
@@ -57,7 +57,7 @@ else
                 </Template>
             </RadzenGridColumn>
             <RadzenGridColumn TItem="Comprobante" Property="Observaciones" Title="Observaciones"></RadzenGridColumn>
-            <RadzenGridColumn TItem="Comprobante" Property="UsuarioCrea" Title="Creado Por" Width="100px"></RadzenGridColumn>
+            <RadzenGridColumn TItem="Comprobante" Property="UsuarioCrea" Title="Creador" Width="100px"></RadzenGridColumn>
             <RadzenGridColumn TItem="Comprobante" Property="TipoVta" Title="Vta a CC" Width="100px">
                 <Template Context="cc">
                     @if(cc.TipoVta == 1)
@@ -92,19 +92,19 @@ else
                 <RadzenGrid Data="@comprobante.DetallesComprobante" TItem="DetalleComprobante" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true"  AllowSorting="true">
                     <Columns>
                         <RadzenGridColumn TItem="DetalleComprobante" Property="NombreProd" Title="Nombre Producto"></RadzenGridColumn>
-                        <RadzenGridColumn TItem="DetalleComprobante" Property="CantidadProdC" Title="Cantidad" Width="160px"></RadzenGridColumn>
-                        <RadzenGridColumn TItem="DetalleComprobante" Property="DescripcionUnidad" Title="Unidad Medida" Width="180px"></RadzenGridColumn>
-                        <RadzenGridColumn TItem="DetalleComprobante" Property="PrecioUnitario" Title="Precio Venta" Width="180px">
+                        <RadzenGridColumn TItem="DetalleComprobante" Property="CantidadProdC" Title="Cantidad" Width="120px"></RadzenGridColumn>
+                        @*<RadzenGridColumn TItem="DetalleComprobante" Property="DescripcionUnidad" Title="Unidad Medida" Width="180px"></RadzenGridColumn>*@
+                        <RadzenGridColumn TItem="DetalleComprobante" Property="PrecioUnitario" Title="Precio Venta" Width="150px">
                             <Template Context="precio">
                                 @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", precio.PrecioUnitario)
                             </Template>
                         </RadzenGridColumn>
-                        <RadzenGridColumn TItem="DetalleComprobante" Property="Bonificacion" Title="Bonificación" Width="180px">
+                        <RadzenGridColumn TItem="DetalleComprobante" Property="Bonificacion" Title="Bonif." Width="120px">
                             <Template Context="precio">
                                 @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0} %", precio.Bonificacion)
                             </Template>
                         </RadzenGridColumn>
-                        <RadzenGridColumn TItem="DetalleComprobante" Property="BonificacionTotal" Title="Bonificación Total" Width="180px">
+                        <RadzenGridColumn TItem="DetalleComprobante" Property="BonificacionTotal" Title="Bonif. Total" Width="150px">
                             <Template Context="boniftot">
                                 @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", boniftot.BonificacionTotal)
                             </Template>
@@ -126,26 +126,26 @@ else
                 {
                     <RadzenGrid Data="@recibosCompr" TItem="Recibo" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true"  AllowSorting="true" AllowColumnResize="true">
                         <Columns>
-                            <RadzenGridColumn TItem="Recibo" Property="IdRecibo" Title="N° Recibo" Width="120px"></RadzenGridColumn>
-                            <RadzenGridColumn TItem="Recibo" Property="IdComprobante" Title="N° Comprobante" Width="140px"></RadzenGridColumn>
-                            <RadzenGridColumn TItem="Recibo" Property="FechaRecibo" Title="Fecha Recibo" Width="140px">
+                            <RadzenGridColumn TItem="Recibo" Property="IdRecibo" Title="N° Rec." Width="100px"></RadzenGridColumn>
+                            <RadzenGridColumn TItem="Recibo" Property="IdComprobante" Title="N° Comp." Width="100px"></RadzenGridColumn>
+                            <RadzenGridColumn TItem="Recibo" Property="FechaRecibo" Title="Fecha Recibo" Width="130px">
                                 <Template Context="fecha">
                                     @string.Format("{0:d}", fecha.FechaRecibo)
                                 </Template>
                             </RadzenGridColumn>
-                            <RadzenGridColumn TItem="Recibo" Property="Importe" Title="Importe del Detalle" Width="165px">
+                            <RadzenGridColumn TItem="Recibo" Property="Importe" Title="Importe Detalle" Width="150px">
                                 <Template Context="imp">
                                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", imp.Importe)
                                 </Template>
                             </RadzenGridColumn>
-                            <RadzenGridColumn TItem="Recibo" Property="ImporteTotal" Title="Importe Total del Recibo" Width="200px">
+                            <RadzenGridColumn TItem="Recibo" Property="ImporteTotal" Title="Importe Total" Width="150px">
                                 <Template Context="impT">
                                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", impT.ImporteTotal)
                                 </Template>
                             </RadzenGridColumn>
-                            <RadzenGridColumn TItem="Recibo" Property="FormaP" Title="Forma Pago" Width="150px"></RadzenGridColumn>
+                            <RadzenGridColumn TItem="Recibo" Property="FormaP" Title="Forma Pago" Width="140px"></RadzenGridColumn>
                             @*<RadzenGridColumn TItem="Recibo" Property="NombreTarj" Title="Tarjeta"></RadzenGridColumn>  *@
-                            <RadzenGridColumn TItem="Recibo" Property="NumTarjeta" Title="N° Tarj." Width="120px">
+                            @*<RadzenGridColumn TItem="Recibo" Property="NumTarjeta" Title="N° Tarj." Width="120px">
                                 <Template Context="numT">
                                     @if(string.IsNullOrEmpty(numT.NumTarjeta))
                                     {
@@ -156,9 +156,9 @@ else
                                         @string.Format("...{0}", numT.NumTarjeta);
                                     }
                                 </Template>
-                            </RadzenGridColumn>  
+                            </RadzenGridColumn>  *@
                             <RadzenGridColumn TItem="Recibo" Property="Observaciones" Title="Observaciones"></RadzenGridColumn>  
-                            <RadzenGridColumn TItem="Recibo" Property="UsuarioCrea" Title="Emitido Por" Width="130px"></RadzenGridColumn>  
+                            <RadzenGridColumn TItem="Recibo" Property="UsuarioCrea" Title="Emitido Por" Width="120px"></RadzenGridColumn>  
                         </Columns>
                     </RadzenGrid>
                 }                

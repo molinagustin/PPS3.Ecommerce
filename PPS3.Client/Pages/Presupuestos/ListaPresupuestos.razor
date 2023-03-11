@@ -40,23 +40,23 @@ else
                     <Columns>
                         <RadzenGridColumn TItem="DetallePresupuesto" Property="NombreProducto" Title="Nombre del Producto"></RadzenGridColumn>
                         <RadzenGridColumn TItem="DetallePresupuesto" Property="Cantidad" Title="Cantidad" Width="100px"></RadzenGridColumn>
-                        <RadzenGridColumn TItem="DetallePresupuesto" Property="DescripcionUnidad" Title="Unidad Medida" Width="130px"></RadzenGridColumn>
-                        <RadzenGridColumn TItem="DetallePresupuesto" Property="PrecioUnit" Title="Precio por Unidad" Width="150px">
+                        @*<RadzenGridColumn TItem="DetallePresupuesto" Property="DescripcionUnidad" Title="Unidad Medida" Width="130px"></RadzenGridColumn>*@
+                        <RadzenGridColumn TItem="DetallePresupuesto" Property="PrecioUnit" Title="Precio" Width="130px">
                             <Template Context="PrecUn">
                                 @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", PrecUn.PrecioUnit)
                             </Template>
                         </RadzenGridColumn>
-                        <RadzenGridColumn TItem="DetallePresupuesto" Property="Bonificacion" Title="% Bonificado" Width="150px">
+                        <RadzenGridColumn TItem="DetallePresupuesto" Property="Bonificacion" Title="% Bonif." Width="100px">
                             <Template Context="bonif">
                                 @bonif.Bonificacion %
                             </Template>
                         </RadzenGridColumn>
-                        <RadzenGridColumn TItem="DetallePresupuesto" Property="BonificacionTotal" Title="Bonificación Total" Width="150px">
+                        <RadzenGridColumn TItem="DetallePresupuesto" Property="BonificacionTotal" Title="Bonif. Total" Width="130px">
                             <Template Context="bonifT">
                                 @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", bonifT.BonificacionTotal)
                             </Template>
                         </RadzenGridColumn>
-                        <RadzenGridColumn TItem="DetallePresupuesto" Property="SubTotal" Title="Sub Total" Width="200px;">
+                        <RadzenGridColumn TItem="DetallePresupuesto" Property="SubTotal" Title="Sub Total" Width="180px;">
                             <Template Context="SubT">
                                 @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", SubT.SubTotal)
                             </Template>

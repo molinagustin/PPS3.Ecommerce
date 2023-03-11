@@ -21,8 +21,8 @@ else
 
             <RadzenGrid Data="@ordenes" TItem="OrdenesCompraCotiz" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:30px;" AllowColumnResize="true">
                 <Columns>
-                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="IdCarro" Title="N° Orden" Width="100px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="Estado" Title="Estado" Width="120px">
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="IdCarro" Title="N°" Width="80px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="Estado" Title="Estado" Width="100px">
                         <Template Context="est">
                             @if (est.Estado == "Pendiente")
                             {
@@ -42,10 +42,10 @@ else
                             }
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="UsuarioCrea" Title="Solicitado por" Width="120px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="UsGenCot" Title="Generada por" Width="120px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="FechaOrden" Title="Fecha de Orden" Width="150px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="FechaEntrega" Title="Fecha de Entrega" Width="130px">
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="UsuarioCrea" Title="Solicitó" Width="100px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="UsGenCot" Title="Generó" Width="100px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="FechaOrden" Title="Fecha Orden" Width="150px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="FechaEntrega" Title="Fecha Entrega" Width="130px">
                         <Template Context="fecEnt">
                             @if (fecEnt.FechaEntrega == null)
                             {
@@ -59,12 +59,12 @@ else
                             }
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="Total" Title="Importe Total" Width="150px">
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="Total" Title="Importe" Width="130px">
                         <Template Context="tot">
                             @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", tot.Total)
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="Pagado" Title="¿Pagado?" Width="100px">
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="Pagado" Title="¿Pagó?" Width="80px">
                         <Template Context="pagado">
                             @if (pagado.Pagado)
                             {
@@ -76,7 +76,7 @@ else
                             }
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="FechaPago" Title="Fecha de Pago" Width="150px">
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="FechaPago" Title="Fecha Pago" Width="110px">
                         <Template Context="fecPag">
                             @if (fecPag.FechaPago == null)
                             {
@@ -104,7 +104,7 @@ else
                             }
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="IdCarro" Title="Ver Detalles" Width="120px">
+                    <RadzenGridColumn TItem="OrdenesCompraCotiz" Property="IdCarro" Title="" Width="70px">
                         <Template Context="detalles">
                             <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="info" Click="@(() => NavigationManager.NavigateTo($"/detallesOrdenesCompra/{@detalles.IdCarro}"))" />
                         </Template>

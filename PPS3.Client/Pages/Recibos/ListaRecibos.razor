@@ -24,16 +24,16 @@ else
         <MudItem lg="9">
             <RadzenGrid Data="@recibos" TItem="ReciboListado" RowSelect="@(args => recibo = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
                 <Columns>
-                    <RadzenGridColumn TItem="ReciboListado" Property="IdRecibo" Title="N° Recibo" Width="100px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ReciboListado" Property="IdRecibo" Title="N° Rec." Width="90px"></RadzenGridColumn>
                     <RadzenGridColumn TItem="ReciboListado" Property="Cliente" Title="Cliente" Width="130px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ReciboListado" Property="FechaRecibo" Title="Fecha Recibo" Width="120px">
+                    <RadzenGridColumn TItem="ReciboListado" Property="FechaRecibo" Title="Fecha" Width="100px">
                         <Template Context="fecha">
                             @string.Format("{0:d}", fecha.FechaRecibo)
                         </Template>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="ReciboListado" Property="FormaP" Title="Forma Pago"Width="150px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ReciboListado" Property="FormaP" Title="Forma Pago"Width="130px"></RadzenGridColumn>
                     @*<RadzenGridColumn TItem="ReciboListado" Property="NombreTarj" Title="Tarjeta"></RadzenGridColumn>*@
-                    <RadzenGridColumn TItem="ReciboListado" Property="NumTarjeta" Title="N° Tarj." Width="120px">
+                    @*<RadzenGridColumn TItem="ReciboListado" Property="NumTarjeta" Title="N° Tarj." Width="120px">
                         <Template Context="numT">
                             @if(string.IsNullOrEmpty(numT.NumTarjeta))
                             {
@@ -44,22 +44,22 @@ else
                                 @string.Format("...{0}", numT.NumTarjeta);
                             }
                         </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="ReciboListado" Property="ImporteTotal" Title="Importe Total" Width="130px">
+                    </RadzenGridColumn>*@
+                    <RadzenGridColumn TItem="ReciboListado" Property="ImporteTotal" Title="Importe" Width="115px">
                         <Template Context="imp">
                             @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", imp.ImporteTotal)
                         </Template>
                     </RadzenGridColumn>
                     <RadzenGridColumn TItem="ReciboListado" Property="Observaciones" Title="Observaciones"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ReciboListado" Property="UsuarioCrea" Title="Emitido Por" Width="130px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="ReciboListado" Property="UsuarioCrea" Title="Creador" Width="100px"></RadzenGridColumn>
                 </Columns>
             </RadzenGrid>
         </MudItem>
         <MudItem xs="3">
             <RadzenGrid Data="@recibo.DetallesRecibo" TItem="DetalleRecibo" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
                 <Columns>
-                    <RadzenGridColumn TItem="DetalleRecibo" Property="IdDetalle" Title="N° Detalle"Width="110px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="DetalleRecibo" Property="IdComprobante" Title="N° Comp." Width="110px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="DetalleRecibo" Property="IdDetalle" Title="N° Det."Width="90px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="DetalleRecibo" Property="IdComprobante" Title="N° Comp." Width="90px"></RadzenGridColumn>
                     <RadzenGridColumn TItem="DetalleRecibo" Property="Importe" Title="Importe">
                         <Template Context="imp">
                             @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", imp.Importe)

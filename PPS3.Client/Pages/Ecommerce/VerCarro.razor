@@ -24,7 +24,7 @@ else
     {     
         <RadzenGrid Data="@detalles" TItem="DetalleCarroCompra" PageSize="15">
             <Columns>
-                <RadzenGridColumn TItem="DetalleCarroCompra" Width="10px" TextAlign="Radzen.TextAlign.Center" Property="IdDetalle" Title="#">
+                <RadzenGridColumn TItem="DetalleCarroCompra" Width="5px" TextAlign="Radzen.TextAlign.Center" Property="IdDetalle" Title="#">
                     <Template Context="data">
                         @(detalles.ToList().IndexOf(data) + 1)
                     </Template>
@@ -35,9 +35,9 @@ else
                         <h6 class="mt-1 mb-0"><a href="/verProducto/@prod.Producto">@prod.NombreProducto</a></h6>
                     </Template>
                 </RadzenGridColumn>
-                <RadzenGridColumn TItem="DetalleCarroCompra" TextAlign="Radzen.TextAlign.Center" Property="Descripcion" Title="Descripción" Width="50px"></RadzenGridColumn>
-                <RadzenGridColumn TItem="DetalleCarroCompra" Property="Cantidad" Title="Cantidad" Width="10px"></RadzenGridColumn>
-                <RadzenGridColumn TItem="DetalleCarroCompra" Property="DescripcionUnidad" Title="Unidad Medida" Width="15px"></RadzenGridColumn>                
+                @*<RadzenGridColumn TItem="DetalleCarroCompra" TextAlign="Radzen.TextAlign.Center" Property="Descripcion" Title="Descripción" Width="50px"></RadzenGridColumn>*@
+                <RadzenGridColumn TItem="DetalleCarroCompra" Property="Cantidad" Title="Cant." Width="7px"></RadzenGridColumn>
+                @*<RadzenGridColumn TItem="DetalleCarroCompra" Property="DescripcionUnidad" Title="Unidad Medida" Width="15px"></RadzenGridColumn>                *@
                 <RadzenGridColumn TItem="DetalleCarroCompra" Property="PrecioUnit" Title="Precio" Width="15px">
                     <Template Context="precio">
                         @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", precio.PrecioUnit)
@@ -67,9 +67,9 @@ else
                         }
                     </FooterTemplate>
                 </RadzenGridColumn>
-                <RadzenGridColumn Width="10px" TItem="DetalleCarroCompra" Property="IdDetalle">
+                <RadzenGridColumn Width="5px" TItem="DetalleCarroCompra" Property="IdDetalle">
                     <Template Context="data">
-                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Icon="highlight_off" Class="m-1" Click="@(() => EliminarProducto(data.IdDetalle))" Size="Radzen.ButtonSize.Small" Text="Quitar"/>
+                        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Danger" Icon="highlight_off" Class="m-1" Click="@(() => EliminarProducto(data.IdDetalle))" Size="Radzen.ButtonSize.Small" Text=""/>
                     </Template>
                 </RadzenGridColumn>
             </Columns>

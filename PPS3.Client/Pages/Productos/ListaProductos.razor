@@ -20,18 +20,18 @@ else
             <RadzenGridColumn TItem="ProductoListado" Property="NombreProd" Title="Nombre"></RadzenGridColumn>
             @*<RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripcion"></RadzenGridColumn>*@
             <RadzenGridColumn TItem="ProductoListado" Property="DescRubro" Title="Rubro" Width="120px"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="DescripcionTipo" Title="Tipo Producto"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="PrecioCosto" Title="Precio de Costo" Width="120px">
+            @*<RadzenGridColumn TItem="ProductoListado" Property="DescripcionTipo" Title="Tipo Producto"></RadzenGridColumn>*@
+            @*<RadzenGridColumn TItem="ProductoListado" Property="PrecioCosto" Title="Precio de Costo" Width="120px">
                 <Template Context="pcosto">
                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pcosto.PrecioCosto)
                 </Template>
-            </RadzenGridColumn>
+            </RadzenGridColumn>*@
             <RadzenGridColumn TItem="ProductoListado" Property="PrecioFinal" Title="Precio Final" Width="120px">
                 <Template Context="pfinal">
                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pfinal.PrecioFinal)
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="NombreProv" Title="Proveedor"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="NombreProv" Title="Proveedor" Width="150px"></RadzenGridColumn>
             <RadzenGridColumn TItem="ProductoListado" Property="DescripcionUnidad" Title="Medido en" Width="100px"></RadzenGridColumn>
             @*<RadzenGridColumn TItem="ProductoListado" Property="CantMinAlerta" Title="Alerta de Cantidad"></RadzenGridColumn>*@
             <RadzenGridColumn TItem="ProductoListado" Property="StockExistencia" Title="Stock" Width="100px"></RadzenGridColumn>
@@ -40,11 +40,11 @@ else
                     @bon.Bonificacion %
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="UsuarioCrea" Title="Creado por" Width="100px"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="UsuarioModif" Title="Modificado por" Width="100px"></RadzenGridColumn>
+            @*<RadzenGridColumn TItem="ProductoListado" Property="UsuarioCrea" Title="Creado por" Width="100px"></RadzenGridColumn>*@
+            @*<RadzenGridColumn TItem="ProductoListado" Property="UsuarioModif" Title="Modificado por" Width="100px"></RadzenGridColumn>*@
             @*<RadzenGridColumn TItem="ProductoListado" Property="FechaCrea" Title="Fecha Creacion"></RadzenGridColumn>*@
-            <RadzenGridColumn TItem="ProductoListado" Property="FechaUltModif" Title="Fecha Ult. Modif."></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="IdProducto">
+            @*<RadzenGridColumn TItem="ProductoListado" Property="FechaUltModif" Title="Fecha Ult. Modif."></RadzenGridColumn>*@
+            <RadzenGridColumn TItem="ProductoListado" Property="IdProducto" Width="140px">
                 <Template Context="acciones">
                     <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="info" Click="@(() => NavigationManager.NavigateTo($"/detallesProducto/{acciones.IdProducto}"))" Size="Radzen.ButtonSize.Small" Text="Edit"/>
                     <RadzenButton ButtonStyle="Radzen.ButtonStyle.Warning" Icon="open_in_new" Click="@(() => NavigationManager.NavigateTo($"/detallesProducto/imagenes/{acciones.IdProducto}"))" Size="Radzen.ButtonSize.Small" Text="Img"/>
@@ -67,18 +67,18 @@ else
             <RadzenGridColumn TItem="ProductoListado" Property="NombreProd" Title="Nombre"></RadzenGridColumn>
             @*<RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripcion"></RadzenGridColumn>*@
             <RadzenGridColumn TItem="ProductoListado" Property="DescRubro" Title="Rubro" Width="120px"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="DescripcionTipo" Title="Tipo Producto"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="PrecioCosto" Title="Precio de Costo" Width="120px">
+            @*<RadzenGridColumn TItem="ProductoListado" Property="DescripcionTipo" Title="Tipo Producto"></RadzenGridColumn>*@
+            @*<RadzenGridColumn TItem="ProductoListado" Property="PrecioCosto" Title="Precio de Costo" Width="120px">
                 <Template Context="pcosto">
                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pcosto.PrecioCosto)
                 </Template>
-            </RadzenGridColumn>
+            </RadzenGridColumn>*@
             <RadzenGridColumn TItem="ProductoListado" Property="PrecioFinal" Title="Precio Final" Width="120px">
                 <Template Context="pfinal">
                     @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pfinal.PrecioFinal)
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="NombreProv" Title="Proveedor"></RadzenGridColumn>
+            <RadzenGridColumn TItem="ProductoListado" Property="NombreProv" Title="Proveedor" Width="150px"></RadzenGridColumn>
             <RadzenGridColumn TItem="ProductoListado" Property="DescripcionUnidad" Title="Medido en" Width="100px"></RadzenGridColumn>
             @*<RadzenGridColumn TItem="ProductoListado" Property="CantMinAlerta" Title="Alerta de Cantidad"></RadzenGridColumn>*@
             <RadzenGridColumn TItem="ProductoListado" Property="StockExistencia" Title="Stock" Width="100px"></RadzenGridColumn>
@@ -87,11 +87,11 @@ else
                     @bon.Bonificacion %
                 </Template>
             </RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="UsuarioCrea" Title="Creado por" Width="100px"></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="UsuarioModif" Title="Modificado por" Width="100px"></RadzenGridColumn>
+            @*<RadzenGridColumn TItem="ProductoListado" Property="UsuarioCrea" Title="Creado por" Width="100px"></RadzenGridColumn>*@
+            @*<RadzenGridColumn TItem="ProductoListado" Property="UsuarioModif" Title="Modificado por" Width="100px"></RadzenGridColumn>*@
             @*<RadzenGridColumn TItem="ProductoListado" Property="FechaCrea" Title="Fecha Creacion"></RadzenGridColumn>*@
-            <RadzenGridColumn TItem="ProductoListado" Property="FechaUltModif" Title="Fecha Ult. Modif."></RadzenGridColumn>
-            <RadzenGridColumn TItem="ProductoListado" Property="IdProducto">
+            @*<RadzenGridColumn TItem="ProductoListado" Property="FechaUltModif" Title="Fecha Ult. Modif."></RadzenGridColumn>*@
+            <RadzenGridColumn TItem="ProductoListado" Property="IdProducto" Width="140px">
                 <Template Context="acciones">
                     <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="info" Click="@(() => NavigationManager.NavigateTo($"/detallesProducto/{acciones.IdProducto}"))" Size="Radzen.ButtonSize.Small" Text="Edit"/>
                     <RadzenButton ButtonStyle="Radzen.ButtonStyle.Warning" Icon="open_in_new" Click="@(() => NavigationManager.NavigateTo($"/detallesProducto/imagenes/{acciones.IdProducto}"))" Size="Radzen.ButtonSize.Small" Text="Img"/>

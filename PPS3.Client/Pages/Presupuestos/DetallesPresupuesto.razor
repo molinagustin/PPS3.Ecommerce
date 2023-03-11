@@ -30,16 +30,16 @@
             <RadzenGrid Data="@productosDisponibles" TItem="ProductoListado" RowSelect="@(args => prodSelect = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
                 <Columns>
                     <RadzenGridColumn TItem="ProductoListado" Property="NombreProd" Title="Nombre Producto"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripción"></RadzenGridColumn>
+                    @*<RadzenGridColumn TItem="ProductoListado" Property="Descripcion" Title="Descripción"></RadzenGridColumn>*@
                     <RadzenGridColumn TItem="ProductoListado" Property="DescRubro" Title="Rubro" Width="120px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductoListado" Property="DescripcionTipo" Title="Tipo Producto"></RadzenGridColumn>
+                    @*<RadzenGridColumn TItem="ProductoListado" Property="DescripcionTipo" Title="Tipo Producto"></RadzenGridColumn>*@
                     <RadzenGridColumn TItem="ProductoListado" Property="PrecioFinal" Title="Precio Venta" Width="130px">
                         <Template Context="pVta">
                             @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pVta.PrecioFinal)
                         </Template>
                     </RadzenGridColumn>
                     <RadzenGridColumn TItem="ProductoListado" Property="DescripcionUnidad" Title="Unidad Medida" Width="130px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="ProductoListado" Property="NombreProv" Title="Proveedor" Width="150px"></RadzenGridColumn>
+                    @*<RadzenGridColumn TItem="ProductoListado" Property="NombreProv" Title="Proveedor" Width="150px"></RadzenGridColumn>*@
                     <RadzenGridColumn TItem="ProductoListado" Property="StockExistencia" Title="Stock" Width="100px"></RadzenGridColumn>
                 </Columns>
             </RadzenGrid>
@@ -76,10 +76,10 @@
                 <thead>
                     <tr>
                         <td>Nombre Producto</td>
-                        <td>Descripción</td>
+                        @*<td>Descripción</td>*@
+                        <td>Cantidad</td>
                         <td>Unidad Medida</td>
                         <td>Precio Venta</td>
-                        <td>Cantidad</td>
                         <td>% Bonificación</td>
                         <td>Bonificación Total</td>
                         <td>Sub Total</td>
@@ -91,10 +91,10 @@
                     {
                         <tr>
                             <td>@pr.NombreProd</td>
-                            <td>@pr.Descripcion</td>
-                            <td>@pr.DescripcionUnidad</td>
-                            <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pr.PrecioFinal)</td>
+                            @*<td>@pr.Descripcion</td>*@
                             <td>@pr.Cantidad</td>
+                            <td>@pr.DescripcionUnidad</td>
+                            <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pr.PrecioFinal)</td>     
                             <td>@pr.Bonificacion %</td>
                             <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pr.BonificacionTotal)</td>
                             <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", pr.SubTotal)</td>
@@ -103,7 +103,7 @@
                     }
                     <tr>
                         <td></td>
-                        <td></td>
+                        @*<td></td>*@
                         <td></td>
                         <td></td>
                         <td></td>

@@ -35,7 +35,7 @@ else
             <MudText Align="Align.Center" Typo="Typo.h6">Cuentas Corrientes</MudText>
             <RadzenGrid Data="@cuentasComp" TItem="CuentasCorrientesListado" RowSelect="@(args => cuentaSelect = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
                 <Columns>
-                    <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NumCC" Title="N° CC" Width="90px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NumCC" Title="N° CC" Width="70px"></RadzenGridColumn>
                     <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NombreCompleto" Title="Cliente"></RadzenGridColumn>
                     <RadzenGridColumn TItem="CuentasCorrientesListado" Property="NumDocumento" Title="N° Doc." Width="90px"></RadzenGridColumn>
                 </Columns>
@@ -47,27 +47,27 @@ else
             <RadzenGrid Data="@cuentaSelect.Comprobantes" TItem="Comprobante" RowSelect="@(args => compSelect = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true">
                 <Columns>
                     <RadzenGridColumn TItem="Comprobante" Property="IdEncab" Title="N° Comp." Width="90px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="Comprobante" Property="TipoComp" Title="Tipo Comp." Width="120px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="Comprobante" Property="FechaComp" Title="Fecha Comp." Width="120px">
+                    <RadzenGridColumn TItem="Comprobante" Property="TipoComp" Title="Tipo" Width="100px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="Comprobante" Property="FechaComp" Title="Fecha" Width="100px">
                         <Template Context="fecha">
                             @string.Format("{0:d}", fecha.FechaComp)
                         </Template>
                     </RadzenGridColumn>
                     @*<RadzenGridColumn TItem="Comprobante" Property="FormaP" Title="Forma Pago"></RadzenGridColumn>*@
                     <RadzenGridColumn TItem="Comprobante" Property="Observaciones" Title="Observaciones"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="Comprobante" Property="UsuarioCrea" Title="Emitido Por" Width="110px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="Comprobante" Property="ImporteFinal" Title="Importe Final" Width="140px">
+                    <RadzenGridColumn TItem="Comprobante" Property="UsuarioCrea" Title="Creador" Width="100px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="Comprobante" Property="ImporteFinal" Title="Importe" Width="120px">
                         <Template Context="impFin">
                             @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", impFin.ImporteFinal)
                         </Template>
                         <FooterTemplate>
                             @if(cuentaSelect.Comprobantes != null)
                             {
-                                @string.Format("TOTAL RESTANTE:");
+                                @string.Format("TOTAL REST.:");
                             }                            
                         </FooterTemplate>
                     </RadzenGridColumn>
-                    <RadzenGridColumn TItem="Comprobante" Property="SaldoRestante" Title="Saldo Restante" Width="140px">
+                    <RadzenGridColumn TItem="Comprobante" Property="SaldoRestante" Title="Saldo Rest." Width="120px">
                         <Template Context="saldo">
                             @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", saldo.SaldoRestante)
                         </Template>
@@ -100,10 +100,10 @@ else
                 <thead>
                     <tr>
                         <td style="width:90px;">N° Comp.</td>
-                        <td>Fecha Comp.</td>
+                        <td style="width:90px;">Fecha</td>
                         <td>Observaciones</td>
-                        <td>Importe Final</td>
-                        <td>Saldo Restante</td>
+                        <td style="width:100px;">Importe</td>
+                        <td style="width:100px;">Saldo Rest.</td>
                         <td></td>
                     </tr>
                 </thead>                
@@ -112,19 +112,19 @@ else
                     {
                         <tr>
                             <td style="width:90px;">@compAg.IdEncab</td>
-                            <td>@string.Format("{0:d}", compAg.FechaComp)</td>
+                            <td style="width:90px;">@string.Format("{0:d}", compAg.FechaComp)</td>
                             <td>@compAg.Observaciones</td>
-                            <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", compAg.ImporteFinal)</td>
-                            <td>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", compAg.SaldoRestante)</td>
+                            <td style="width:100px;">@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", compAg.ImporteFinal)</td>
+                            <td style="width:100px;">@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", compAg.SaldoRestante)</td>
                             <td><MudIconButton Icon="@Icons.Material.Filled.RemoveCircle" OnClick="@(e => RemoverCompr(compAg.IdEncab))" Color="Color.Error" /></td>
                         </tr>
                     }
                     <tr>
                         <td style="width:90px;"></td>
+                        <td style="width:90px;"></td>
                         <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>TOTAL:</td>
+                        <td style="width:100px;"></td>
+                        <td style="width:100px;">TOTAL:</td>
                         <td><b>@string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", comprobantesAgregados.Sum(s => s.SaldoRestante))</b></td>
                     </tr>
                 </tbody>

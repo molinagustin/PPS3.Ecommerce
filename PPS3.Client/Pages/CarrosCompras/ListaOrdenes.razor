@@ -24,15 +24,15 @@ else
 
                 <RadzenGrid Data="@ordenesPendientes" TItem="OrdenesCompraListado" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:30px;" AllowColumnResize="true">
                     <Columns>
-                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="N° Orden" Width="100px"></RadzenGridColumn>
-                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Estado" Title="Estado" Width="120px">
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="N°" Width="80px"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Estado" Title="Estado" Width="100px">
                             <Template Context="est">
                                 <div style="color:green;">@est.Estado</div>
                             </Template>
                         </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="UsuarioCrea" Title="Solicitado por" Width="120px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaOrden" Title="Fecha de Orden" Width="150px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaEntrega" Title="Fecha de Entrega" Width="130px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="UsuarioCrea" Title="Solicitó" Width="90px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaOrden" Title="Fecha Orden" Width="150px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaEntrega" Title="Fecha Entrega" Width="130px">
                             <Template Context="fecEnt">
                                 @if(fecEnt.FechaEntrega == null)
                                 {
@@ -45,12 +45,12 @@ else
                             </Template>
                         </RadzenGridColumn>
                         @*<RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaUltModif" Title="Ultima Modificacion"></RadzenGridColumn>*@
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Total" Title="Importe Total" Width="150px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Total" Title="Importe" Width="120px">
                             <Template Context="tot">
                                 @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", tot.Total)
                             </Template>
                         </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Pagado" Title="¿Pagado?" Width="100px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Pagado" Title="¿Pagó?" Width="80px">
                             <Template Context="pagado">
                                 @if(pagado.Pagado)
                                 {
@@ -62,7 +62,7 @@ else
                                 }
                             </Template>
                         </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaPago" Title="Fecha de Pago" Width="150px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaPago" Title="Fecha Pago" Width="130px">
                             <Template Context="fecPag">
                                 @if(fecPag.FechaPago == null)
                                 {
@@ -87,7 +87,7 @@ else
                                 }
                             </Template>
                         </RadzenGridColumn>
-                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="Ver Detalles" Width="120px">
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="" Width="70px">
                             <Template Context="detalles">
                                 <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="info" Click="@(() => NavigationManager.NavigateTo($"/detallesOrdenesCompra/{@detalles.IdCarro}"))"/>
                             </Template>
@@ -108,15 +108,15 @@ else
 
                 <RadzenGrid Data="@ordenesAprobadas" TItem="OrdenesCompraListado" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:30px;" AllowColumnResize="true">
                     <Columns>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="N° Orden" Width="100px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Estado" Title="Estado" Width="120px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="N°" Width="80px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Estado" Title="Estado" Width="100px">
                             <Template Context="est">
                                 <div style="color:#00FF00;">@est.Estado</div>
                             </Template>
                         </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="UsuarioCrea" Title="Solicitado por" Width="120px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaOrden" Title="Fecha de Orden" Width="150px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaEntrega" Title="Fecha de Entrega" Width="130px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="UsuarioCrea" Title="Solicitó" Width="90px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaOrden" Title="Fecha Orden" Width="150px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaEntrega" Title="Fecha Entrega" Width="130px">
                             <Template Context="fecEnt">
                                 @if(fecEnt.FechaEntrega == null)
                                 {
@@ -129,12 +129,12 @@ else
                             </Template>
                         </RadzenGridColumn>
                         @*<RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaUltModif" Title="Ultima Modificacion"></RadzenGridColumn>*@
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Total" Title="Importe Total" Width="150px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Total" Title="Importe" Width="120px">
                             <Template Context="tot">
                                 @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", tot.Total)
                             </Template>
                         </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Pagado" Title="¿Pagado?" Width="100px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Pagado" Title="¿Pagó?" Width="80px">
                             <Template Context="pagado">
                                 @if(pagado.Pagado)
                                 {
@@ -146,7 +146,7 @@ else
                                 }
                         </Template>
                         </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaPago" Title="Fecha de Pago" Width="150px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaPago" Title="Fecha Pago" Width="130px">
                             <Template Context="fecPag">
                                 @if(fecPag.FechaPago == null)
                                 {
@@ -171,7 +171,7 @@ else
                                 }
                             </Template>
                         </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="Ver Detalles" Width="120px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="" Width="70px">
                             <Template Context="detalles">
                                 <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="info" Click="@(() => NavigationManager.NavigateTo($"/detallesOrdenesCompra/{@detalles.IdCarro}"))"/>
                             </Template>
@@ -192,15 +192,15 @@ else
 
                 <RadzenGrid Data="@ordenesCanceladas" TItem="OrdenesCompraListado" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:30px;" AllowColumnResize="true">
                     <Columns>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="N° Orden" Width="100px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Estado" Title="Estado" Width="120px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="N°" Width="80px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Estado" Title="Estado" Width="100px">
                             <Template Context="est">
                                 <div style="color:red;">@est.Estado</div>
                             </Template>
                         </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="UsuarioCrea" Title="Solicitado por" Width="120px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaOrden" Title="Fecha de Orden" Width="150px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaEntrega" Title="Fecha de Entrega" Width="130px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="UsuarioCrea" Title="Solicitó" Width="90px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaOrden" Title="Fecha Orden" Width="150px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaEntrega" Title="Fecha Entrega" Width="130px">
                             <Template Context="fecEnt">
                                 @if(fecEnt.FechaEntrega == null)
                                 {
@@ -213,12 +213,12 @@ else
                             </Template>
                         </RadzenGridColumn>
                         @*<RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaUltModif" Title="Ultima Modificacion"></RadzenGridColumn>*@
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Total" Title="Importe Total" Width="150px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Total" Title="Importe" Width="120px">
                         <Template Context="tot">
                                 @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", tot.Total)
                             </Template>
                         </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Pagado" Title="¿Pagado?" Width="100px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Pagado" Title="¿Pagó?" Width="80px">
                             <Template Context="pagado">
                                 @if(pagado.Pagado)
                                 {
@@ -230,7 +230,7 @@ else
                                 }
                         </Template>
                         </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaPago" Title="Fecha de Pago" Width="150px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaPago" Title="Fecha Pago" Width="130px">
                             <Template Context="fecPag">
                                 @if(fecPag.FechaPago == null)
                                 {
@@ -255,7 +255,7 @@ else
                                 }
                             </Template>
                         </RadzenGridColumn>
-                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="Ver Detalles" Width="120px">
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="" Width="70px">
                             <Template Context="detalles">
                                 <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="info" Click="@(() => NavigationManager.NavigateTo($"/detallesOrdenesCompra/{@detalles.IdCarro}"))"/>
                             </Template>
@@ -276,15 +276,15 @@ else
 
                 <RadzenGrid Data="@ordenesFinalizadas" TItem="OrdenesCompraListado" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom: 30px;" AllowColumnResize="true">
                     <Columns>
-                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="N° Orden" Width="100px"></RadzenGridColumn>
-                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Estado" Title="Estado" Width="120px">
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="N°" Width="80px"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Estado" Title="Estado" Width="100px">
                             <Template Context="est">
                                 <div style="color: blue;">@est.Estado</div>
                             </Template>
                         </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="UsuarioCrea" Title="Solicitado por" Width="120px"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaOrden" Title="Fecha de Orden" Width="150px"></RadzenGridColumn>
-                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaEntrega" Title="Fecha de Entrega" Width="130px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="UsuarioCrea" Title="Solicitó" Width="90px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaOrden" Title="Fecha Orden" Width="150px"></RadzenGridColumn>
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaEntrega" Title="Fecha Entrega" Width="130px">
                             <Template Context="fecEnt">
                                 @if(fecEnt.FechaEntrega == null)
                                 {
@@ -297,12 +297,12 @@ else
                             </Template>
                         </RadzenGridColumn>
                         @*<RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaUltModif" Title="Ultima Modificacion"></RadzenGridColumn>*@
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Total" Title="Importe Total" Width="150px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Total" Title="Importe" Width="120px">
                             <Template Context="tot">
                                 @string.Format(new System.Globalization.CultureInfo("es-AR"), "{0:C}", tot.Total)
                             </Template>
                         </RadzenGridColumn>
-                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="Pagado" Title="¿Pagado?" Width="100px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="Pagado" Title="¿Pagó?" Width="80px">
                             <Template Context="pagado">
                                 @if(pagado.Pagado)
                                 {
@@ -314,7 +314,7 @@ else
                                 }
                         </Template>
                         </RadzenGridColumn>
-                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaPago" Title="Fecha de Pago" Width="150px">
+                    <RadzenGridColumn TItem="OrdenesCompraListado" Property="FechaPago" Title="Fecha Pago" Width="130px">
                             <Template Context="fecPag">
                                 @if(fecPag.FechaPago == null)
                                 {
@@ -339,7 +339,7 @@ else
                                 }
                             </Template>
                         </RadzenGridColumn>
-                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="Ver Detalles" Width="120px">
+                        <RadzenGridColumn TItem="OrdenesCompraListado" Property="IdCarro" Title="" Width="70px">
                             <Template Context="detalles">
                                 <RadzenButton ButtonStyle="Radzen.ButtonStyle.Info" Icon="info" Click="@(() => NavigationManager.NavigateTo($"/detallesOrdenesCompra/{@detalles.IdCarro}"))"/>
                             </Template>
