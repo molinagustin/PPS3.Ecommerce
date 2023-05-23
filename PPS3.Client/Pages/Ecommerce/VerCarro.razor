@@ -100,6 +100,7 @@ else
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         idUsAct = Convert.ToInt32(await JS.InvokeAsync<string>("getUserId"));
+        await Task.Delay(1000);
         if (carro.UsuarioCarro != idUsAct) NavigationManager.NavigateTo($"/", forceLoad: true);
     } 
     protected override async Task OnInitializedAsync()

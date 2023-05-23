@@ -396,7 +396,7 @@ else
                                             DetalleRecibo detalle = new DetalleRecibo();
                                             detalle.IdComprobante = comp.IdEncab;
                                             detalle.IdRecibo = idRec;
-                                            detalle.Importe = comp.ImporteFinal;
+                                            detalle.Importe = comp.SaldoRestante;
                                             var detalleCreado = await ServDetRecibo.CrearDetalleRecibo(detalle);
 
                                             //Si se crea el detalle correctamente, procedo a actualizar los comprobantes

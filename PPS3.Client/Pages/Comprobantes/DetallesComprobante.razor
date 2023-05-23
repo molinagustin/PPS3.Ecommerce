@@ -29,18 +29,18 @@ else
 {
     <MudGrid Justify="Justify.Center">
         @*CLIENTES*@
-        <MudItem xs="2">
+        <MudItem xs="3">
             <MudText Align="Align.Center" Typo="Typo.h6">Clientes</MudText>
             <RadzenGrid Data="@clientes" TItem="Cliente" RowSelect="@(args => cliente = args)" AllowFiltering="true" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10" AllowSorting="true" Style="margin-bottom:10px;" AllowColumnResize="true" ValueChanged="cliente => CambioCliente()">
                 <Columns>
                     <RadzenGridColumn TItem="Cliente" Property="NombreCompleto" Title="Nombre"></RadzenGridColumn>
-                    <RadzenGridColumn TItem="Cliente" Property="NumDocumento" Title="N° Doc." Width="90px"></RadzenGridColumn>
+                    <RadzenGridColumn TItem="Cliente" Property="NumDocumento" Title="N° Doc." Width="110px"></RadzenGridColumn>
                 </Columns>
             </RadzenGrid>
         </MudItem>
 
         @*LISTADO ORDENES COMPRA*@
-        <MudItem lg="8">
+        <MudItem lg="7">
             <MudText Align="Align.Center" Typo="Typo.h6">Lista de Órdenes de Compra</MudText>
             
             @if (ordenesCliente == null || ordenesCliente.Count() < 1)

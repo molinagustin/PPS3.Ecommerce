@@ -312,6 +312,7 @@ namespace PPS3.Server.Repositories.RepCarroCompra
                         INNER JOIN formas_pago fp ON re.FormaPago = fp.IdFormaP
                         INNER JOIN comprobantes_encabezados ce ON ce.IdEncab = rd.IdComprobante
                         WHERE re.FormaPago != 9 AND ce.Carro = @NumOrden
+                        AND ce.IdEncab NOT IN (SELECT IdComprobante FROM recibos_detalles rds INNER JOIN recibos_encabezado res ON rds.IdRecibo = res.IdRecibo AND res.FormaPago = 9)
                         ORDER BY re.FechaRecibo;
                         ";
             var result = await db.QueryAsync<MovimientosPago>(sql, new { NumOrden = NumOrden });

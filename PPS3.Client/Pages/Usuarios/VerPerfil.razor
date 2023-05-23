@@ -334,6 +334,12 @@ else
             return;
         }
 
+        if (passNuevo != passNuevo2)
+        {
+            Snackbar.Add($"Las contraseñas a cambiar no coinciden.", Severity.Error);
+            return;
+        }
+
         if(!string.IsNullOrEmpty(usuarioCliente.Password))
         {
             enviandoEmail = true;
